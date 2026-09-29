@@ -71,7 +71,7 @@
   --rz-accent:        #cc9900;   /* darker amber for AA on white */
   --rz-accent-strong: #b38600;
   --rz-accent-soft:   rgba(255, 204, 0, 0.14);
-  --rz-accent-fg:     #ffffff;
+  --rz-accent-fg:     #0a0a0f;   /* ink on deep gold ≈ 7.9:1 (white was ≈ 2.5:1) */
   --rz-accent-ring:   rgba(204, 153, 0, 0.35);
 
   --rz-success:       #16a34a;

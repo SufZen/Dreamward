@@ -149,7 +149,9 @@ function ensureFts(db: DB) {
 }
 
 // CLI: migrate control DB + all user DBs under ${DATA_DIR}/users/*.
-if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith('migrate.ts')) {
+// Run as a script only when this file IS the entry (never inside a bundle such
+// as the desktop engine, where every module shares the bundle's import.meta.url).
+if (/[\\/]migrate\.(ts|js)$/.test(process.argv[1] ?? '')) {
   (async () => {
     const { loadEnv } = await import('../env');
     const { resolveDataDir, usersRoot } = await import('../lib/paths');

@@ -17,9 +17,9 @@ function MarkShapes({ fill }: { fill: string }) {
   return (
     <>
       {STEPS.map(([cx, cy, r]) => (
-        <circle key={cx} cx={cx} cy={cy} r={r} fill={fill} />
+        <circle key={cx} cx={cx} cy={cy} r={r} style={{ fill }} />
       ))}
-      <path d={STAR} fill={fill} />
+      <path d={STAR} style={{ fill }} />
     </>
   );
 }
@@ -40,7 +40,7 @@ export function DreamwardLogo({ title = 'Dreamward', height = 28, ...rest }: Pro
       <g transform="translate(6.17 11.83) scale(0.8570)">
         <MarkShapes fill="var(--rz-accent, #ffcc00)" />
       </g>
-      <path transform="translate(66.02 63.42)" d={WORDMARK} fill="currentColor" />
+      <path style={{ fill: 'currentColor' }} transform="translate(66.02 63.42)" d={WORDMARK} />
     </svg>
   );
 }

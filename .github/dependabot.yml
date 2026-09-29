@@ -14,11 +14,21 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]
     commit-message:
       prefix: ci
   - package-ecosystem: docker
     directories: [/apps/api, /apps/web]
     schedule:
       interval: monthly
+    # The runtime follows Node LTS lines; majors are bumped deliberately.
+    ignore:
+      - dependency-name: node
+        update-types: [version-update:semver-major]
+    groups:
+      images:
+        patterns: ["*"]
     commit-message:
       prefix: build
