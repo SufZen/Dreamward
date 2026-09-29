@@ -1,0 +1,35 @@
+name: Site
+
+# Publishes dreamward.life (site/) to GitHub Pages, with the self-host
+# installer served as https://dreamward.life/install.sh.
+on:
+  push:
+    branches: [main]
+    paths: [site/**, deploy/install.sh, .github/workflows/pages.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add the installer
+        run: cp deploy/install.sh site/install.sh
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4
