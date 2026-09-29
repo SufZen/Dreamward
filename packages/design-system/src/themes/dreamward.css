@@ -1,0 +1,107 @@
+/* ============================================================================
+ * @dreamward/design-system — themes/dreamward.css
+ * The Dreamward brand layer on top of the REALIZEOS tokens (tokens.css):
+ * night ink + gold, Poppins / Rubik, and three brand elements —
+ *   the north star  (vision)       → DreamwardMark, --dw-star
+ *   the steps       (small actions) → .dw-steps
+ *   the night sky   (dreaming)     → .dw-starfield, .dw-horizon
+ * Guidelines: docs/brand.md. Imported AFTER tokens.css.
+ * ========================================================================= */
+
+:root,
+[data-mode="dark"] {
+  /* Reader column width for long-form prose */
+  --dw-reader-width: 72ch;
+  /* Section accent used by category headers */
+  --dw-category-accent: var(--rz-accent);
+
+  /* Brand elements */
+  --dw-star: var(--rz-accent);
+  --dw-step: var(--rz-border-strong);
+  --dw-horizon: radial-gradient(60% 55% at 80% 12%, rgba(255, 204, 0, 0.14), transparent 70%);
+  --dw-starfield: radial-gradient(circle, rgba(255, 255, 255, 0.07) 1px, transparent 1.3px);
+}
+
+[data-mode="light"] {
+  --dw-horizon: radial-gradient(60% 55% at 80% 12%, rgba(204, 153, 0, 0.12), transparent 70%);
+  --dw-starfield: radial-gradient(circle, rgba(10, 10, 15, 0.07) 1px, transparent 1.3px);
+}
+
+/* The night sky: a quiet starfield, and the star's glow on the horizon. */
+.dw-starfield { background-image: var(--dw-starfield); background-size: 28px 28px; }
+.dw-horizon   { background-image: var(--dw-horizon); background-repeat: no-repeat; }
+
+/* Steps: growing dots toward the star — a progress row for actions and
+ * streaks. Mark completed steps with [data-done]; the last one is the star. */
+.dw-steps { display: inline-flex; align-items: center; gap: 6px; }
+.dw-steps > i {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--rz-radius-full);
+  background: var(--dw-step);
+  transition: background var(--rz-dur) var(--rz-ease-out);
+}
+.dw-steps > i:nth-child(2) { width: 7px; height: 7px; }
+.dw-steps > i:nth-child(3) { width: 8px; height: 8px; }
+.dw-steps > i:nth-child(n + 4) { width: 9px; height: 9px; }
+.dw-steps > i[data-done] { background: var(--dw-star); }
+
+/* The app defaults to dark — the book's native identity. */
+html { background: var(--rz-bg); color: var(--rz-fg); }
+
+/* Long-form content blocks: comfortable reading rhythm, direction-aware. */
+.dw-prose {
+  font-size: var(--rz-text-md);
+  line-height: 1.75;
+  color: var(--rz-fg);
+  max-width: var(--dw-reader-width);
+}
+.dw-prose :is(h1, h2, h3) { margin-block: 1.4em 0.5em; }
+.dw-prose p { margin-block: 0.75em; }
+.dw-prose ul, .dw-prose ol { margin-block: 0.75em; padding-inline-start: 1.5em; }
+.dw-prose li { margin-block: 0.25em; }
+.dw-prose blockquote {
+  margin-block: 1em;
+  padding-inline-start: 1em;
+  border-inline-start: 3px solid var(--rz-accent);
+  color: var(--rz-fg-muted);
+  font-style: italic;
+}
+.dw-prose a {
+  color: var(--rz-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.dw-prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--rz-radius-md);
+  margin-block: 0.75em;
+}
+/* TipTap Youtube node: div[data-youtube-video] > iframe — responsive 16:9 */
+.dw-prose div[data-youtube-video] {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 16 / 9;
+  margin-block: 1em;
+}
+.dw-prose div[data-youtube-video] iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: var(--rz-radius-md);
+}
+
+/* Mixed-direction safety: long content auto-detects its direction. */
+[dir="auto"] { unicode-bidi: plaintext; }
+
+/* Each paragraph/list item resolves its own direction independently, so a
+ * Hebrew paragraph and an English paragraph coexist in one document. */
+.dw-prose :is(p, li, h1, h2, h3, blockquote) {
+  unicode-bidi: plaintext;
+  text-align: start;
+}

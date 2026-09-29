@@ -1,0 +1,52 @@
+name: Release Please
+
+# Keeps a "chore(main): release X.Y.Z" PR up to date from conventional commits
+# on main (version bump in every package.json + CHANGELOG). Merging that PR
+# tags vX.Y.Z, creates the GitHub Release and runs the release pipeline.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.rp.outputs.release_created }}
+      tag_name: ${{ steps.rp.outputs.tag_name }}
+      prerelease: ${{ steps.rp.outputs.prerelease }}
+    steps:
+      - id: rp
+        uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  # Releases created with GITHUB_TOKEN don't trigger other workflows, so the
+  # pipeline is called directly.
+  publish:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.release-please.outputs.tag_name }}
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+      attestations: write
+    secrets: inherit
+
+  deploy-own:
+    needs: [release-please, publish]
+    if: needs.release-please.outputs.release_created == 'true' && vars.DEPLOY_ENABLED == 'true'
+    uses: ./.github/workflows/deploy-own.yml
+    with:
+      tag: ${{ needs.release-please.outputs.tag_name }}
+    permissions:
+      contents: read
+      packages: read
+    secrets: inherit

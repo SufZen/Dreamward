@@ -1,0 +1,20 @@
+name: Feature / idea
+description: Suggest an improvement
+labels: [enhancement, triage]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the need or the moment in your personal-growth practice where the tool falls short.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [Book & categories, Chapter / wheel / identity, IKIGAI, Goals & actions, Journal, Lify (AI), Agents (MCP/CLI/API), Self-hosting & upgrades, Desktop app, Translations, Other]

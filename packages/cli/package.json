@@ -1,0 +1,50 @@
+{
+  "name": "dreamward",
+  "version": "0.4.0",
+  "license": "AGPL-3.0-only",
+  "description": "Dreamward from the terminal — and one-command MCP setup for Claude, Codex, Gemini, Cursor, VS Code and more.",
+  "keywords": [
+    "dreamward",
+    "cli",
+    "mcp",
+    "ikigai",
+    "personal-growth",
+    "agents"
+  ],
+  "type": "module",
+  "bin": {
+    "dreamward": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SufZen/Dreamward.git",
+    "directory": "packages/cli"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx src/index.ts",
+    "lint": "echo \"(cli) no lint configured\" && exit 0",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "commander": "^13.0.0"
+  },
+  "devDependencies": {
+    "@dreamward/client": "workspace:*",
+    "@types/node": "^22.10.7",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "@dreamward/mcp": "workspace:*"
+  }
+}

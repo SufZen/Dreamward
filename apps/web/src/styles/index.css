@@ -1,0 +1,35 @@
+/* REALIZEOS tokens + effects + components + dreamward theme.
+ * Must precede @tailwind so the @import is first (CSS spec requirement). */
+@import "@dreamward/design-system/index.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--rz-bg);
+  color: var(--rz-fg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Thin, themed scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rz-surface) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--rz-surface);
+  border-radius: 999px;
+}

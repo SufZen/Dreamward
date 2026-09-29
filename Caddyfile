@@ -1,0 +1,23 @@
+{$DREAMWARD_DOMAIN} {
+	encode gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+	}
+
+	handle /api/* {
+		# flush_interval -1 disables response buffering so the agent's SSE
+		# chat stream reaches the browser token-by-token.
+		reverse_proxy api:4000 {
+			flush_interval -1
+		}
+	}
+	handle /media/* {
+		reverse_proxy api:4000
+	}
+	handle {
+		reverse_proxy web:80
+	}
+}

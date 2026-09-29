@@ -1,0 +1,80 @@
+name: Deploy (own instance)
+
+# Deploys a released tag to the maintainer's own server over SSH. Not part of
+# the community release — enabled only when the repo variable DEPLOY_ENABLED
+# is "true". Rollback = run manually with the previous tag (the server's
+# pre-upgrade snapshots make data rollback possible too — see docs).
+#
+# Secrets:   VPS_HOST, VPS_USER, VPS_SSH_KEY
+# Variables: DEPLOY_ENABLED=true, DEPLOY_URL=https://your.domain,
+#            DEPLOY_PATH (default /opt/dreamward),
+#            DEPLOY_COMPOSE_FILE (default docker-compose.prod.yml)
+on:
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to deploy (e.g. v0.4.0) — use the previous tag to roll back
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    env:
+      TAG: ${{ inputs.tag }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/opt/dreamward' }}
+      COMPOSE_FILE_NAME: ${{ vars.DEPLOY_COMPOSE_FILE || 'docker-compose.prod.yml' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Ship compose file
+        uses: appleboy/scp-action@917f8b81dfc1ccd331fef9e2d61bdc6c8be94634 # v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: ${{ env.COMPOSE_FILE_NAME }}
+          target: ${{ env.DEPLOY_PATH }}/
+
+      - name: Back up, pull & restart
+        uses: appleboy/ssh-action@7eaf76671a0d7eec5d98ee897acda4f968735a17 # v1.2.0
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_USER: ${{ github.actor }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: TAG,GHCR_TOKEN,GHCR_USER,DEPLOY_PATH,COMPOSE_FILE_NAME
+          script: |
+            set -e
+            cd "$DEPLOY_PATH"
+            # best effort: explicit backup on the running version (older versions lack the CLI)
+            docker compose -f "$COMPOSE_FILE_NAME" exec -T api node dist/scripts/admin.js backup || true
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            grep -q '^TAG=' .env && sed -i "s/^TAG=.*/TAG=$TAG/" .env || echo "TAG=$TAG" >> .env
+            docker compose -f "$COMPOSE_FILE_NAME" pull
+            docker compose -f "$COMPOSE_FILE_NAME" up -d --remove-orphans
+            docker logout ghcr.io
+
+      - name: Health check (running the new version)
+        env:
+          URL: ${{ vars.DEPLOY_URL }}
+        run: |
+          [ -z "$URL" ] && { echo "DEPLOY_URL not set — skipping health check"; exit 0; }
+          want="${TAG#v}"
+          for i in $(seq 1 30); do
+            body=$(curl -fsS --max-time 10 "$URL/api/health" || true)
+            if echo "$body" | grep -q "\"version\":\"$want\""; then echo "healthy on $want"; exit 0; fi
+            echo "waiting ($i/30)… $body"; sleep 10
+          done
+          echo "::error::deployment unhealthy or not on $want"; exit 1

@@ -1,0 +1,41 @@
+name: Bug report
+description: Something is broken
+labels: [bug, triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping! **Never paste personal content** (journal entries, visions) or secrets (API keys, .env) here.
+        Security issue? Use **Security → Report a vulnerability** instead.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "Shown in Admin → System, or: curl https://your-host/api/health"
+      placeholder: v0.4.0
+    validations:
+      required: true
+  - type: dropdown
+    id: edition
+    attributes:
+      label: Edition
+      options: [Self-hosted (Docker), Desktop app, Development (pnpm dev)]
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Go to … 2. Click … 3. See error"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: "e.g. docker compose logs api --tail 100 (check it contains nothing private)"
+      render: shell

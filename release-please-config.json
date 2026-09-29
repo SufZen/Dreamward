@@ -1,0 +1,35 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "node",
+  "include-component-in-tag": false,
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": false,
+  "changelog-sections": [
+    { "type": "feat", "section": "Features" },
+    { "type": "fix", "section": "Bug Fixes" },
+    { "type": "perf", "section": "Performance" },
+    { "type": "security", "section": "Security" },
+    { "type": "docs", "section": "Documentation" },
+    { "type": "refactor", "section": "Internal", "hidden": true },
+    { "type": "test", "section": "Internal", "hidden": true },
+    { "type": "build", "section": "Internal", "hidden": true },
+    { "type": "ci", "section": "Internal", "hidden": true },
+    { "type": "chore", "section": "Internal", "hidden": true }
+  ],
+  "packages": {
+    ".": {
+      "package-name": "dreamward",
+      "changelog-path": "CHANGELOG.md",
+      "extra-files": [
+        { "type": "json", "path": "apps/api/package.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "apps/web/package.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "apps/desktop/package.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "packages/shared/package.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "packages/client/package.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "packages/mcp/package.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "packages/cli/package.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "packages/design-system/package.json", "jsonpath": "$.version" }
+      ]
+    }
+  }
+}

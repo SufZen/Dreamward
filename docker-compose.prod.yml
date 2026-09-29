@@ -1,0 +1,80 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Dreamward behind Coolify / Traefik — the deploy-own.yml target (docs/deployment.md).
+# Coolify's Traefik (coolify-proxy) owns ports 80/443; nothing is published
+# here: `web` joins the external `coolify` network with Traefik labels.
+# Most self-hosters want deploy/docker-compose.yml + deploy/install.sh instead.
+#
+#   TAG=v0.4.0 docker compose -f docker-compose.prod.yml up -d
+#
+# Required .env: DREAMWARD_DOMAIN, PUBLIC_ORIGIN, JWT_SECRET, KEY_ENCRYPTION_SECRET
+# Optional: DREAMWARD_EMAIL/DREAMWARD_PASSWORD (only used on an empty install),
+#           CODEX_ENABLED, MAX_USERS, BACKUP_* settings, IMAGE_REGISTRY
+# Backups: in-app daily backups + automatic pre-upgrade snapshots → the
+#          dreamward_backups volume (/backups). Sync it off-site from the host.
+# Moving an existing install here? Keep its data volumes by adding
+#   `name: <old_volume_name>` under each entry in `volumes:` below.
+# ═══════════════════════════════════════════════════════════════════════════
+services:
+  api:
+    image: ${IMAGE_REGISTRY:-ghcr.io/sufzen}/dreamward-api:${TAG:-latest}
+    environment:
+      NODE_ENV: production
+      DATA_DIR: /data
+      BACKUP_DIR: /backups
+      PORT: 4000
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      KEY_ENCRYPTION_SECRET: ${KEY_ENCRYPTION_SECRET:?set KEY_ENCRYPTION_SECRET in .env}
+      DREAMWARD_EMAIL: ${DREAMWARD_EMAIL:-}
+      DREAMWARD_PASSWORD: ${DREAMWARD_PASSWORD:-}
+      MAX_USERS: ${MAX_USERS:-10}
+      CODEX_ENABLED: ${CODEX_ENABLED:-false}
+      BACKUP_HOUR: ${BACKUP_HOUR:-3}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
+      COOKIE_SECURE: "true"
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?set PUBLIC_ORIGIN in .env}
+    volumes:
+      - dreamward_data:/data
+      - dreamward_backups:/backups
+    networks: [internal]
+    restart: unless-stopped
+    logging: &logging
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  web:
+    image: ${IMAGE_REGISTRY:-ghcr.io/sufzen}/dreamward-web:${TAG:-latest}
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [internal, coolify]
+    restart: unless-stopped
+    logging: *logging
+    labels:
+      - traefik.enable=true
+      # web is dual-homed — tell Traefik which network to reach it on
+      - traefik.docker.network=coolify
+      - traefik.http.routers.dreamward.rule=Host(`${DREAMWARD_DOMAIN:?set DREAMWARD_DOMAIN in .env}`)
+      - traefik.http.routers.dreamward.entrypoints=https
+      - traefik.http.routers.dreamward.tls=true
+      - traefik.http.routers.dreamward.tls.certresolver=letsencrypt
+      - traefik.http.routers.dreamward.middlewares=dreamward-headers
+      - traefik.http.services.dreamward.loadbalancer.server.port=80
+      # http → https (ACME HTTP-01 is answered by Traefik before routing)
+      - traefik.http.routers.dreamward-http.rule=Host(`${DREAMWARD_DOMAIN}`)
+      - traefik.http.routers.dreamward-http.entrypoints=http
+      - traefik.http.routers.dreamward-http.middlewares=dreamward-redirect
+      - traefik.http.middlewares.dreamward-redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.dreamward-redirect.redirectscheme.permanent=true
+      - traefik.http.middlewares.dreamward-headers.headers.stsSeconds=31536000
+      - traefik.http.middlewares.dreamward-headers.headers.stsIncludeSubdomains=false
+
+networks:
+  internal:
+  coolify:
+    external: true
+
+volumes:
+  dreamward_data:
+  dreamward_backups:

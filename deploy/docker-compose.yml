@@ -1,0 +1,83 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Dreamward — self-hosted stack (published images).
+# Installed and managed by install.sh / dreamward-ctl; settings live in .env.
+#
+#   Modes (COMPOSE_PROFILES in .env):
+#     https  → Caddy on :80/:443 with automatic Let's Encrypt for $DOMAIN
+#     (empty)→ web on $WEB_BIND:$WEB_PORT only — put your own reverse proxy /
+#              Cloudflare Tunnel / Tailscale in front, or use it on your LAN
+#
+#   Your data:   volume dreamward_data    (one SQLite file per account + images)
+#   Backups:     volume dreamward_backups (daily + automatic pre-upgrade copies)
+# ═══════════════════════════════════════════════════════════════════════════
+name: dreamward
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  api:
+    image: ${IMAGE_REGISTRY:-ghcr.io/sufzen}/dreamward-api:${DREAMWARD_VERSION:?set DREAMWARD_VERSION in .env}
+    environment:
+      NODE_ENV: production
+      DATA_DIR: /data
+      BACKUP_DIR: /backups
+      PORT: 4000
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?set PUBLIC_ORIGIN in .env}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      KEY_ENCRYPTION_SECRET: ${KEY_ENCRYPTION_SECRET:?set KEY_ENCRYPTION_SECRET in .env}
+      MAX_USERS: ${MAX_USERS:-10}
+      BACKUP_HOUR: ${BACKUP_HOUR:-3}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
+      ALLOW_PRIVATE_AI_URLS: ${ALLOW_PRIVATE_AI_URLS:-}
+      CODEX_ENABLED: ${CODEX_ENABLED:-false}
+      FRAMEWORK_PACK_FILE: ${FRAMEWORK_PACK_FILE:-}
+      TZ: ${TZ:-UTC}
+    volumes:
+      - dreamward_data:/data
+      - dreamward_backups:/backups
+      # Optional custom framework packs (docs/framework-packs.md): put pack.json
+      # here and set FRAMEWORK_PACK_FILE=/packs/pack.json in .env.
+      - ./packs:/packs:ro
+    # Local AI (Ollama / LM Studio on the host): use http://host.docker.internal:11434/v1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    logging: *logging
+
+  web:
+    image: ${IMAGE_REGISTRY:-ghcr.io/sufzen}/dreamward-web:${DREAMWARD_VERSION}
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${WEB_BIND:-127.0.0.1}:${WEB_PORT:-8080}:80"
+    restart: unless-stopped
+    logging: *logging
+
+  caddy:
+    image: caddy:2-alpine
+    profiles: [https]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+    restart: unless-stopped
+    logging: *logging
+
+volumes:
+  dreamward_data:
+  dreamward_backups:
+  caddy_data:
+  caddy_config:

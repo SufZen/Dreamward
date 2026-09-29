@@ -1,0 +1,29 @@
+# Dreamward
+
+> A private, self-hosted life-design system: a book of your life across 12 categories (vision, purpose, strategy, identity), a current Life Chapter with focus areas, a 1–10 life wheel, IKIGAI, goals and actions, a journal, and Lify — an AI companion that runs on the user's own AI provider. Every user's data lives in its own database. AI agents connect over MCP, the CLI or a REST API with personal API keys, and every write is audited.
+
+Key facts for agents:
+- Start from `get_overview` (MCP) or `GET /api/v1/overview`. It returns the whole book as compact markdown.
+- Read keys can only read. Write keys can change data, and every write is audited, so confirm with the user before destructive changes.
+- Ratings are append-only. IKIGAI and chapters are versioned: start a draft or a new chapter, don't overwrite history.
+- Content is bilingual (English/Hebrew). Answer in the user's language.
+
+## Docs
+
+- [Agent access](docs/agent-access.md): API keys, MCP tools/resources/prompts, `dreamward setup <agent>`, OpenAPI, n8n
+- [Agent skill](skills/dreamward/SKILL.md): how to coach and write safely in someone's book
+- [User guide](docs/user-guide.md): the method and every screen
+- [AI providers](docs/ai-providers.md): bring your own AI (API keys, local models, subscriptions via your agent)
+- [Self-hosting](docs/self-hosting.md): install, upgrade, backups
+- [Backup & restore](docs/backup-restore.md): snapshots, export/import
+
+## API
+
+- OpenAPI 3.1: `/api/v1/openapi.json` on any instance (browsable at `/api/v1/docs`)
+- Auth: `Authorization: Bearer lbk_…`
+
+## Optional
+
+- [Architecture](docs/architecture.md)
+- [Contributing](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) for coding agents
+- [Roadmap](docs/roadmap-2.0.md)

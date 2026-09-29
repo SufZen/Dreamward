@@ -1,0 +1,60 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Dreamward — build-from-source stack (developers / people who want to build
+# the images themselves). Most self-hosters should use the published images:
+# deploy/install.sh + deploy/docker-compose.yml.
+#
+#   cp .env.example .env   # set DREAMWARD_DOMAIN, PUBLIC_ORIGIN, secrets
+#   docker compose up -d --build
+# ═══════════════════════════════════════════════════════════════════════════
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      NODE_ENV: production
+      DATA_DIR: /data
+      BACKUP_DIR: /backups
+      PORT: 4000
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      KEY_ENCRYPTION_SECRET: ${KEY_ENCRYPTION_SECRET:?set KEY_ENCRYPTION_SECRET in .env}
+      DREAMWARD_EMAIL: ${DREAMWARD_EMAIL:-}
+      DREAMWARD_PASSWORD: ${DREAMWARD_PASSWORD:-}
+      MAX_USERS: ${MAX_USERS:-10}
+      CODEX_ENABLED: ${CODEX_ENABLED:-false}
+      COOKIE_SECURE: "true"
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?set PUBLIC_ORIGIN in .env}
+    volumes:
+      - dreamward_data:/data
+      - dreamward_backups:/backups
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DREAMWARD_DOMAIN: ${DREAMWARD_DOMAIN:?set DREAMWARD_DOMAIN in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  dreamward_data:
+  dreamward_backups:
+  caddy_data:
+  caddy_config:

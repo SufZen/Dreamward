@@ -1,0 +1,203 @@
+#!/usr/bin/env bash
+# ═══════════════════════════════════════════════════════════════════════════
+# dreamward-ctl — manage a self-hosted Dreamward (lives next to docker-compose.yml)
+#
+#   status                  containers, version, health, accounts, last backup
+#   logs [service]          follow logs (api | web | caddy)
+#   backup                  full verified backup now
+#   backups                 list backups (daily + pre-upgrade)
+#   update [version] [--yes]   back up → pin version → pull → start → verify;
+#                              rolls back automatically if the new version is unhealthy
+#   rollback                return to the version before the last update
+#                           (restores its pre-upgrade data snapshot if one was taken)
+#   restore <folder> [--user N]   restore a backup folder (asks first)
+#   export-user <id> [file.zip]   download one account's book
+#   setup-link              print the one-time admin setup link (fresh installs)
+#   doctor                  check the installation for common problems
+#   version                 installed vs latest available version
+# ═══════════════════════════════════════════════════════════════════════════
+set -euo pipefail
+
+SELF="$(readlink -f "$0" 2>/dev/null || echo "$0")"
+cd "$(dirname "$SELF")"
+[ -f docker-compose.yml ] && [ -f .env ] || { echo "Run from the install folder (docker-compose.yml + .env not found)." >&2; exit 1; }
+
+REPO="${DREAMWARD_REPO:-SufZen/Dreamward}"
+DC="docker compose"
+STATE=.ctl-state
+
+bold() { printf '\033[1m%s\033[0m\n' "$*"; }
+info() { printf '  \033[36m›\033[0m %s\n' "$*"; }
+warn() { printf '  \033[33m!\033[0m %s\n' "$*" >&2; }
+die() { printf '  \033[31m✗\033[0m %s\n' "$*" >&2; exit 1; }
+
+env_get() { sed -n "s/^$1=//p" .env | tail -1; }
+env_set() { # env_set KEY VALUE — rewrite in place, keep permissions
+  local tmp; tmp=$(mktemp)
+  if grep -q "^$1=" .env; then sed "s|^$1=.*|$1=$2|" .env > "$tmp"; else cat .env > "$tmp"; echo "$1=$2" >> "$tmp"; fi
+  cat "$tmp" > .env; rm -f "$tmp"
+}
+port() { local p; p=$(env_get WEB_PORT); echo "${p:-8080}"; }
+health() { curl -fsS --max-time 5 "http://127.0.0.1:$(port)/api/health" 2>/dev/null || true; }
+health_version() { health | sed -n 's/.*"version":"\([^"]*\)".*/\1/p'; }
+admin() { $DC exec -T api node dist/scripts/admin.js "$@"; }
+latest() { curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" | sed -n 's/.*"tag_name": *"v\{0,1\}\([^"]*\)".*/\1/p' | head -1; }
+# Lists pre-upgrade snapshot folders — works even when the api container is down.
+pre_upgrade_runs() {
+  { $DC exec -T api sh -c 'ls -1 /backups/pre-upgrade 2>/dev/null' 2>/dev/null \
+    || $DC run --rm --no-deps -T --entrypoint sh api -c 'ls -1 /backups/pre-upgrade 2>/dev/null' 2>/dev/null; } | tr -d '\r' || true
+}
+
+# semver compare: prints -1 / 0 / 1
+vcmp() {
+  local a="${1%%-*}" b="${2%%-*}" i x y
+  for i in 1 2 3; do
+    x=$(echo "$a" | cut -d. -f$i); y=$(echo "$b" | cut -d. -f$i)
+    x=${x:-0}; y=${y:-0}
+    [ "$x" -gt "$y" ] && { echo 1; return; }
+    [ "$x" -lt "$y" ] && { echo -1; return; }
+  done
+  echo 0
+}
+
+wait_version() { # wait_version VERSION SECONDS
+  local want="$1" secs="${2:-300}" i
+  for i in $(seq 1 $((secs / 3))); do
+    [ "$(health_version)" = "$want" ] && return 0
+    # a refused downgrade / broken boot exits the container — stop waiting early
+    if [ "$($DC ps --status exited -q api 2>/dev/null)" != "" ]; then return 1; fi
+    sleep 3
+  done
+  return 1
+}
+
+fetch_deploy_files() { # refresh compose/Caddyfile/ctl for a version (keeps .env)
+  local ref="$1" raw="https://raw.githubusercontent.com/$REPO/$1/deploy" f
+  for f in docker-compose.yml Caddyfile dreamward-ctl; do
+    if curl -fsSL "$raw/$f" -o "$f.new" 2>/dev/null; then cp -f "$f" "$f.prev" 2>/dev/null || true; mv "$f.new" "$f"; else rm -f "$f.new"; fi
+  done
+  chmod +x dreamward-ctl
+}
+
+do_rollback() {
+  [ -f "$STATE" ] || die "Nothing to roll back to (no previous update recorded)."
+  # shellcheck disable=SC1090
+  . "./$STATE"
+  [ -n "${PREV_VERSION:-}" ] || die "No previous version recorded."
+  bold "Rolling back to v$PREV_VERSION"
+  local snapshot=""
+  if [ -n "${RUNS_BEFORE+x}" ]; then
+    for run in $(pre_upgrade_runs 2>/dev/null); do
+      echo "$RUNS_BEFORE" | grep -qx "$run" || snapshot="$run"
+    done
+  fi
+  $DC stop api web >/dev/null 2>&1 || true
+  env_set DREAMWARD_VERSION "$PREV_VERSION"
+  for f in docker-compose.yml Caddyfile; do [ -f "$f.prev" ] && mv -f "$f.prev" "$f"; done
+  if [ -n "$snapshot" ]; then
+    info "restoring the data snapshot taken before the update: $snapshot"
+    $DC run --rm --no-deps api node dist/scripts/admin.js restore "/backups/pre-upgrade/$snapshot" --yes
+  else
+    info "no schema change happened during the update — data needs no restore"
+  fi
+  $DC up -d
+  if wait_version "$PREV_VERSION" 180; then bold "Rolled back to v$PREV_VERSION ✓"; else die "v$PREV_VERSION did not come up — see: dreamward-ctl logs api"; fi
+  rm -f "$STATE"
+}
+
+cmd="${1:-status}"; shift || true
+case "$cmd" in
+  status)
+    bold "Dreamward — $(env_get PUBLIC_ORIGIN)"
+    $DC ps
+    echo
+    info "pinned version: $(env_get DREAMWARD_VERSION) · running: $(health_version || echo '?')"
+    admin status || true
+    ;;
+  logs) $DC logs -f --tail 200 "$@" ;;
+  backup) admin backup ;;
+  backups) admin backups ;;
+  setup-link)
+    token=$($DC exec -T api cat /data/setup-token 2>/dev/null | tr -d '\r\n' || true)
+    [ -n "$token" ] && echo "$(env_get PUBLIC_ORIGIN)/setup?token=$token" || echo "Setup is complete (no pending setup link)."
+    ;;
+  version)
+    echo "installed: $(env_get DREAMWARD_VERSION)"
+    echo "running:   $(health_version || echo '?')"
+    echo "latest:    $(latest || echo '?')"
+    ;;
+  update)
+    target="" ; yes=0
+    for a in "$@"; do case "$a" in --yes|-y) yes=1 ;; *) target="$a" ;; esac; done
+    current=$(env_get DREAMWARD_VERSION)
+    [ -n "$target" ] || target=$(latest)
+    target="${target#v}"
+    [ -n "$target" ] || die "Could not determine the latest version."
+    [ "$target" = "$current" ] && { info "Already on v$current."; exit 0; }
+    if [ "$target" != "edge" ] && [ "$current" != "edge" ]; then
+      [ "$(vcmp "$target" "$current")" = "-1" ] && die "v$target is older than v$current. Use 'dreamward-ctl rollback' (it restores the matching data snapshot)."
+      cmaj=${current%%.*}; tmaj=${target%%.*}
+      if [ "$tmaj" != "$cmaj" ] && [ $yes -eq 0 ]; then
+        warn "v$current → v$target is a MAJOR upgrade. Read the notes first: https://github.com/$REPO/releases/tag/v$target"
+        die "Re-run with --yes to continue."
+      fi
+    fi
+    bold "Updating v$current → v$target"
+    info "backing up first…"
+    admin backup || die "Backup failed — not updating. (Fix the backup, or run 'dreamward-ctl doctor'.)"
+    { echo "PREV_VERSION=$current"; echo "RUNS_BEFORE='$(pre_upgrade_runs)'"; } > "$STATE"
+    if [ "$target" = "edge" ]; then fetch_deploy_files main; else fetch_deploy_files "v$target"; fi
+    env_set DREAMWARD_VERSION "$target"
+    $DC pull
+    $DC up -d
+    if [ "$target" = "edge" ] || wait_version "$target" 300; then
+      bold "Updated to v$target ✓"
+      info "if anything looks wrong: dreamward-ctl rollback"
+    else
+      warn "v$target did not become healthy — rolling back automatically."
+      $DC logs --tail 40 api >&2 || true
+      do_rollback
+      exit 1
+    fi
+    ;;
+  rollback) do_rollback ;;
+  restore)
+    [ $# -ge 1 ] || die "usage: dreamward-ctl restore <backup-folder> [--user N]   (list: dreamward-ctl backups)"
+    folder="$1"; shift
+    case "$folder" in /backups/*) ;; *) folder="/backups/$folder" ;; esac
+    warn "This overwrites live data with $folder (current files are saved to /backups/pre-restore first)."
+    read -r -p "  Type 'restore' to continue: " ok < /dev/tty
+    [ "$ok" = "restore" ] || die "Cancelled."
+    $DC stop api web
+    $DC run --rm --no-deps api node dist/scripts/admin.js restore "$folder" "$@" --yes
+    $DC up -d
+    ;;
+  export-user)
+    [ $# -ge 1 ] || die "usage: dreamward-ctl export-user <account-id> [file.zip]"
+    out="${2:-lifebook-export-$1-$(date +%Y%m%d).zip}"
+    admin export-user "$1" "/tmp/export-$1.zip"
+    $DC cp "api:/tmp/export-$1.zip" "$out"
+    $DC exec -T api rm -f "/tmp/export-$1.zip"
+    info "saved $out"
+    ;;
+  doctor)
+    bold "Checking your installation"
+    ok() { printf '  \033[32m✓\033[0m %s\n' "$*"; }
+    docker compose version >/dev/null 2>&1 && ok "docker compose $(docker compose version --short)" || warn "docker compose missing"
+    [ "$(stat -c %a .env 2>/dev/null || echo 600)" = "600" ] && ok ".env is private (600)" || warn ".env should be chmod 600"
+    [ -n "$(env_get JWT_SECRET)" ] && [ -n "$(env_get KEY_ENCRYPTION_SECRET)" ] && ok "secrets set" || warn "JWT_SECRET / KEY_ENCRYPTION_SECRET missing in .env"
+    h=$(health); [ -n "$h" ] && ok "healthy: $h" || warn "API not reachable on 127.0.0.1:$(port) — dreamward-ctl logs api"
+    echo "$h" | grep -q '"unavailableAccounts":0' || [ -z "$h" ] || warn "some accounts are unavailable — see dreamward-ctl status"
+    avail=$(df -Pk . | awk 'NR==2 {print $4}'); [ "${avail:-0}" -gt 1048576 ] && ok "disk: $((avail / 1024)) MB free" || warn "less than 1 GB free disk"
+    last=$($DC exec -T api sh -c 'cat /backups/last-backup.json 2>/dev/null' | sed -n 's/.*"createdAt": *\([0-9]*\).*/\1/p' | head -1)
+    if [ -n "$last" ]; then
+      age=$(( ($(date +%s) - last / 1000) / 3600 ))
+      [ "$age" -le 30 ] && ok "last backup ${age}h ago" || warn "last backup ${age}h ago — check BACKUP_* settings"
+    else warn "no backup yet — run: dreamward-ctl backup"; fi
+    lv=$(latest || true); cv=$(env_get DREAMWARD_VERSION)
+    [ -n "$lv" ] && [ "$(vcmp "$lv" "$cv")" = "1" ] && warn "update available: v$cv → v$lv (dreamward-ctl update)" || ok "version v$cv"
+    info "remember: copy the dreamward_backups volume off this machine (see docs/backup-restore.md)"
+    ;;
+  -h|--help|help) sed -n '2,20p' "$SELF" ;;
+  *) die "Unknown command: $cmd (dreamward-ctl help)" ;;
+esac

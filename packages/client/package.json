@@ -1,0 +1,47 @@
+{
+  "name": "@dreamward/client",
+  "version": "0.4.0",
+  "license": "AGPL-3.0-only",
+  "description": "Tiny typed HTTP client for the Dreamward agent API (/api/v1).",
+  "keywords": [
+    "dreamward",
+    "api",
+    "client"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SufZen/Dreamward.git",
+    "directory": "packages/client"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      }
+    },
+    "types": "./dist/index.d.ts"
+  },
+  "scripts": {
+    "build": "tsup",
+    "lint": "echo \"(client) no lint configured\" && exit 0",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "@types/node": "^22.10.7",
+    "tsup": "^8.3.5"
+  }
+}

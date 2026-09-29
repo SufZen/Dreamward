@@ -1,0 +1,29 @@
+# Never ship personal data, secrets or local build state into an image.
+**/data
+**/backups
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/.env
+**/.env.*
+!**/.env.example
+scripts/import/out
+docs/presentation
+
+# Local build/dependency state (rebuilt inside the image)
+**/node_modules
+**/dist
+**/.turbo
+**/*.tsbuildinfo
+**/*.log
+
+# Repo/editor noise
+.git
+.github
+.claude
+.vscode
+.idea
+**/.DS_Store
+**/Thumbs.db
+apps/desktop/release
+apps/desktop/.stage

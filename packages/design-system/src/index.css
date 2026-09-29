@@ -1,0 +1,12 @@
+/* ============================================================================
+ * @dreamward/design-system — index.css
+ * Single import that pulls the whole system in the correct order.
+ * Consumed by apps/web's root stylesheet AFTER `@tailwind base`.
+ * ========================================================================= */
+
+@import "./tokens.css";
+@import "./fonts.css";
+@import "./keyframes.css";
+@import "./effects.css";
+@import "./components.css";
+@import "./themes/dreamward.css";

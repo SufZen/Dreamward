@@ -1,0 +1,14 @@
+# Automatic HTTPS for the self-hosted stack (COMPOSE_PROFILES=https).
+# The web container (nginx) already routes /api and /media to the API.
+{$DOMAIN} {
+	encode gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+	}
+	# flush_interval -1: stream AI chat (SSE) token by token.
+	reverse_proxy web:80 {
+		flush_interval -1
+	}
+}
