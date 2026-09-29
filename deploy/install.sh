@@ -2,7 +2,7 @@
 # ═══════════════════════════════════════════════════════════════════════════
 # Dreamward installer — self-hosted, private, yours.
 #
-#   curl -fsSL https://raw.githubusercontent.com/SufZen/Dreamward/main/deploy/install.sh | bash
+#   curl -fsSL https://dreamward.life/install.sh | bash
 #
 # Options (all optional — you'll be asked interactively otherwise):
 #   --domain life.example.com   public HTTPS address (automatic certificate)

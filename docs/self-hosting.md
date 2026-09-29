@@ -18,8 +18,10 @@ you coach. Everything stays on your machine; every user connects their own AI.
 ## Install (2 minutes)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/SufZen/Dreamward/main/deploy/install.sh | sudo bash
+curl -fsSL https://dreamward.life/install.sh | sudo bash
 ```
+
+(The same script is in the repository: `https://raw.githubusercontent.com/SufZen/Dreamward/main/deploy/install.sh`.)
 
 The installer asks for a domain (or runs locally), generates secrets, pins the
 latest version, starts everything and prints a **one-time setup link** — open

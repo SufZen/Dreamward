@@ -4,6 +4,8 @@
 
 # Dreamward
 
+**[dreamward.life](https://dreamward.life)** · move toward the life you envision.
+
 **Dreamward** — a private app for turning the life you envision into the life you live: a book of your 12 life areas, goals with measurable progress, granular actions, a journal, visual moodboards, and AI agents (built-in and external) that work over your own content. Bilingual (English + Hebrew, full RTL), dark + gold REALIZEOS design language.
 
 > **Status:** v0.4.0 — "meaning & focus". Runs as a **desktop app** (Windows / macOS / Linux) for one person, or **self-hosted** for you and a small invited circle.
@@ -51,7 +53,7 @@ updates). Guide: [docs/desktop.md](docs/desktop.md).
 ## Self-host it (2 minutes)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/SufZen/Dreamward/main/deploy/install.sh | sudo bash
+curl -fsSL https://dreamward.life/install.sh | sudo bash
 ```
 
 Asks for a domain (automatic HTTPS) or runs on your home network, generates

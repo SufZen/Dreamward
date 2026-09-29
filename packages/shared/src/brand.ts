@@ -10,6 +10,7 @@ export const BRAND = {
   tagline: { en: 'Move toward the life you envision', he: 'להתקדם אל החיים שאתם מדמיינים' },
   /** The AI companion's persona. */
   companion: { en: 'Lify', he: 'חיימי' },
+  site: 'https://dreamward.life',
   repo: 'SufZen/Dreamward',
   repoUrl: 'https://github.com/SufZen/Dreamward',
   docsUrl: 'https://github.com/SufZen/Dreamward/tree/main/docs',
