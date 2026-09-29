@@ -123,3 +123,8 @@ scripts/deploy    VPS bootstrap
 [AGPL-3.0-only](LICENSE). You may use, study, modify and self-host it freely;
 if you run a modified version as a service for others, you must share your
 changes under the same license. Contributions: see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Made by Realization
+
+Dreamward is designed and built by [Realization](https://realization.world). It is the second generation of Lifebook.
+Case study: [realization.world/work/dreamward](https://realization.world/work/dreamward)
