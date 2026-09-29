@@ -5,7 +5,7 @@
 # root package.json `pnpm.onlyBuiltDependencies`). The toolchain below is only a
 # fallback for platforms without a prebuild.
 
-FROM node:22-bookworm-slim AS build
+FROM node:26-bookworm-slim AS build
 RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ \
     && rm -rf /var/lib/apt/lists/*
 RUN corepack enable
@@ -25,7 +25,7 @@ RUN pnpm --filter @dreamward/api deploy --legacy --prod /out \
     && rm -rf /out/src /out/data /out/Dockerfile
 
 # ── runtime ──────────────────────────────────────────────────────────────────
-FROM node:22-bookworm-slim AS run
+FROM node:26-bookworm-slim AS run
 ENV NODE_ENV=production \
     DATA_DIR=/data \
     BACKUP_DIR=/backups \
