@@ -33,6 +33,11 @@
     ],
     "ignoredBuiltDependencies": [
       "better-sqlite3"
-    ]
+    ],
+    "overrides": {
+      "markdown-it": "^14.3.1",
+      "linkify-it": "^5.0.2",
+      "postcss-selector-parser": "^6.1.3"
+    }
   }
 }

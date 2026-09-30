@@ -21,8 +21,13 @@ export function stripHtml(html: string | null | undefined): string {
     .replace(/<\/p>/gi, '\n')
     .replace(/<li[^>]*>/gi, '- ')
     .replace(/<\/li>/gi, '\n')
-    .replace(/<\/(h[1-6]|blockquote|div)>/gi, '\n')
-    .replace(/<[^>]+>/g, '');
+    .replace(/<\/(h[1-6]|blockquote|div)>/gi, '\n');
+  // Repeat until stable so nested fragments such as "<<b>script>" cannot leave a tag behind.
+  for (let prev = ''; prev !== text; ) {
+    prev = text;
+    text = text.replace(/<[^>]*>/g, '');
+  }
+  text = text.replace(/[<>]/g, '');
   for (const [entity, char] of Object.entries(ENTITIES)) {
     text = text.replaceAll(entity, char);
   }

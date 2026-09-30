@@ -133,7 +133,12 @@ export function snapshotBeforeUpgrade(sqlite: Database.Database, label: string, 
   if (existsSync(dest)) return dest; // already snapshotted in this run
   sqlite.exec(`VACUUM INTO '${dest.replace(/'/g, "''")}'`);
   const manifestPath = join(dir, 'manifest.json');
-  const manifest = existsSync(manifestPath) ? (JSON.parse(readFileSync(manifestPath, 'utf8')) as unknown[]) : [];
+  let manifest: unknown[] = [];
+  try {
+    manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as unknown[];
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err; // first snapshot of this run
+  }
   manifest.push({ file: name, label, toVersion: APP_VERSION, at: new Date().toISOString(), ...info });
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
   console.log(`[upgrade] snapshot ${label} → ${dest}`);
