@@ -1,8 +1,11 @@
 name: Site
 
 # Publishes dreamward.life (site/) to GitHub Pages, with the self-host
-# installer served as https://dreamward.life/install.sh.
+# installer served as https://dreamward.life/install.sh and the download
+# buttons pointing straight at the latest release's installers. Runs on
+# changes to the site and after every release (called by release.yml).
 on:
+  workflow_call:
   push:
     branches: [main]
     paths: [site/**, deploy/install.sh, .github/workflows/pages.yml]
@@ -27,6 +30,30 @@ jobs:
       - uses: actions/checkout@v4
       - name: Add the installer
         run: cp deploy/install.sh site/install.sh
+      - name: Point the download buttons at the latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          fallback="https://github.com/${GITHUB_REPOSITORY}/releases/latest"
+          rel=$(gh api "repos/${GITHUB_REPOSITORY}/releases/latest" 2>/dev/null || echo '{}')
+          pick() { jq -r --arg re "$1" '[.assets[]? | select(.name | test($re)) | .browser_download_url][0] // empty' <<<"$rel"; }
+          version=$(jq -r '.tag_name // ""' <<<"$rel")
+          win=$(pick 'Setup-.*\.exe$')
+          mac_arm=$(pick 'mac-arm64\.dmg$')
+          mac_x64=$(pick 'mac-x64\.dmg$')
+          appimage=$(pick '\.AppImage$')
+          deb=$(pick '\.deb$')
+          echo "release=${version:-none}"; echo "win=${win:-fallback}"; echo "mac_arm=${mac_arm:-fallback}"
+          echo "mac_x64=${mac_x64:-fallback}"; echo "appimage=${appimage:-fallback}"; echo "deb=${deb:-fallback}"
+          sed -i \
+            -e "s|__DL_WIN__|${win:-$fallback}|g" \
+            -e "s|__DL_MAC_ARM__|${mac_arm:-$fallback}|g" \
+            -e "s|__DL_MAC_X64__|${mac_x64:-$fallback}|g" \
+            -e "s|__DL_APPIMAGE__|${appimage:-$fallback}|g" \
+            -e "s|__DL_DEB__|${deb:-$fallback}|g" \
+            -e "s|__VERSION__|${version:-Latest}|g" \
+            site/index.html
+          if grep -n "__DL_\|__VERSION__" site/index.html; then echo "::error::unfilled placeholders"; exit 1; fi
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

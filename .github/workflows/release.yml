@@ -216,6 +216,16 @@ jobs:
           ls -la "${files[@]}"
           gh release upload "$TAG" "${files[@]}" --clobber --repo "$GITHUB_REPOSITORY"
 
+  # Refresh dreamward.life so its download buttons point at the new installers.
+  site:
+    needs: [desktop]
+    if: ${{ !cancelled() && needs.desktop.result == 'success' }}
+    uses: ./.github/workflows/pages.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
   # Hand-published releases also deploy the maintainer's own instance (opt-in).
   # (release-please releases deploy from release-please.yml instead.)
   deploy-own:

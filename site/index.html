@@ -152,6 +152,29 @@
   @media (max-width: 860px) { .yours { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 520px) { .yours { grid-template-columns: 1fr; } }
 
+  /* Download */
+  .tabs { display: inline-flex; gap: 4px; padding: 4px; background: var(--sunken); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 28px; }
+  .tab { font: 500 14px/1 var(--sans); color: var(--muted); background: transparent; border: 0; border-radius: 9px; padding: 10px 18px; cursor: pointer; }
+  .tab:hover { color: var(--mist); }
+  .tab[aria-selected="true"] { background: var(--raised); color: var(--mist); box-shadow: inset 0 0 0 1px var(--line-strong); }
+  .panel { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 40px; align-items: start; background: var(--raised); border: 1px solid var(--line); border-radius: 16px; padding: 32px; }
+  .panel[hidden] { display: none; }
+  .dl { display: grid; gap: 12px; align-content: start; }
+  .dl .btn { justify-content: center; }
+  .dl small { color: var(--muted); font-size: 13px; }
+  .dl .hint { margin-top: 6px; padding: 12px 14px; background: var(--sunken); border: 1px solid var(--line); border-radius: 10px; font-size: 13px; color: var(--muted); }
+  .dl .hint b { color: var(--mist); font-weight: 500; }
+  .install { margin: 0; padding: 0; list-style: none; display: grid; gap: 18px; counter-reset: step; }
+  .install li { position: relative; padding-inline-start: 44px; color: var(--muted); font-size: 15px; }
+  .install li::before { counter-increment: step; content: counter(step); position: absolute; inset-inline-start: 0; top: -2px; width: 28px; height: 28px; border-radius: 999px; display: grid; place-items: center; font: 600 13px/1 var(--sans); color: var(--ink); background: var(--gold); }
+  .install li b { display: block; color: var(--mist); font-weight: 500; margin-bottom: 2px; }
+  .install code, .dl code { font: 500 12.5px/1.4 var(--mono); color: var(--mist); background: var(--sunken); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; overflow-wrap: anywhere; }
+  .mobile-note { display: none; margin-bottom: 20px; padding: 14px 16px; border: 1px solid rgba(255, 204, 0, 0.25); border-radius: 12px; background: var(--gold-soft); font-size: 15px; }
+  .is-mobile .mobile-note { display: block; }
+  .more { margin-top: 14px; font-size: 14px; color: var(--muted); }
+  .more a { color: var(--mist); }
+  @media (max-width: 860px) { .panel { grid-template-columns: 1fr; gap: 28px; padding: 24px; } .tabs { display: flex; } .tab { flex: 1; } }
+
   footer { padding-block: 44px 56px; color: var(--muted); font-size: 14px; }
   footer .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 20px 28px; }
   footer .logo { color: var(--mist); display: flex; }
@@ -183,14 +206,69 @@
         <p class="lede">Dreamward is a private book for your whole life. Write the vision, choose what matters this season, and take the small steps, with Lify, an AI companion that runs on your own AI.</p>
         <p class="he" dir="rtl" lang="he">להתקדם אל החיים שאתם מדמיינים.</p>
         <div class="ctas">
-          <a class="btn btn-primary" href="https://github.com/SufZen/Dreamward/releases/latest">Download the app</a>
+          <a class="btn btn-primary" id="hero-download" href="#download">Download Dreamward</a>
           <a class="btn btn-secondary" href="#start">Self-host it</a>
         </div>
+        <p class="more"><a href="#download">All downloads and install steps</a></p>
         <p class="meta"><b>Free and open source</b> · Windows, macOS, Linux or your own server · English &amp; עברית</p>
       </div>
       <div class="hero-mark" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="9" cy="58" r="2.2" class="step"/><circle cx="14.5" cy="48.5" r="2.7" class="step"/><circle cx="21.5" cy="40.2" r="3.2" class="step"/><circle cx="29.6" cy="33.4" r="3.7" class="step"/><path class="star" d="M46.00 3.00 L48.19 15.81 L56.00 18.00 L48.19 20.19 L46.00 33.00 L43.81 20.19 L36.00 18.00 L43.81 15.81 Z"/></svg></div>
     </div>
   </div>
+
+  <section id="download">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Download · __VERSION__</p>
+        <h2>Install Dreamward.</h2>
+        <p>Free, and yours: your book stays on your computer, and new versions install themselves.</p>
+      </div>
+      <p class="mobile-note">Dreamward runs on computers (Windows, Mac, Linux). Open <b>dreamward.life</b> on your computer to download it.</p>
+      <div class="tabs" role="tablist" aria-label="Choose your computer">
+        <button class="tab" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true" data-os="win">Windows</button>
+        <button class="tab" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" data-os="mac">Mac</button>
+        <button class="tab" role="tab" id="tab-linux" aria-controls="panel-linux" aria-selected="false" data-os="linux">Linux</button>
+      </div>
+
+      <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
+        <div class="dl">
+          <a class="btn btn-primary" href="__DL_WIN__" data-download="win">Download for Windows</a>
+          <small>Windows 10 or 11, 64-bit</small>
+        </div>
+        <ol class="install">
+          <li><b>Open the file you downloaded</b>Dreamward-Setup.exe, in your Downloads folder.</li>
+          <li><b>If you see "Windows protected your PC"</b>Click <em>More info</em>, then <em>Run anyway</em>. It shows once because early versions aren't signed yet.</li>
+          <li><b>Follow the installer</b>Dreamward opens when it's done. Updates install themselves.</li>
+        </ol>
+      </div>
+
+      <div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac" hidden>
+        <div class="dl">
+          <a class="btn btn-primary" href="__DL_MAC_ARM__" data-download="mac-arm">Download for Mac (Apple silicon)</a>
+          <a class="btn btn-secondary" href="__DL_MAC_X64__" data-download="mac-intel">Download for Mac (Intel)</a>
+          <p class="hint"><b>Not sure which?</b> Apple menu → About This Mac. If it says <em>Chip: Apple M…</em>, choose Apple silicon. If it says <em>Processor: Intel</em>, choose Intel.</p>
+        </div>
+        <ol class="install">
+          <li><b>Open the downloaded file</b>Drag Dreamward into your Applications folder.</li>
+          <li><b>Open it the first time with a right-click</b>In Applications, right-click (or Control-click) Dreamward, choose <em>Open</em>, then <em>Open</em> again. It's needed once because early versions aren't signed yet.</li>
+          <li><b>If macOS says the app "is damaged"</b>Open Terminal, run <code>xattr -cr /Applications/Dreamward.app</code>, then open Dreamward again.</li>
+        </ol>
+      </div>
+
+      <div class="panel" id="panel-linux" role="tabpanel" aria-labelledby="tab-linux" hidden>
+        <div class="dl">
+          <a class="btn btn-primary" href="__DL_APPIMAGE__" data-download="linux">Download AppImage (any Linux)</a>
+          <a class="btn btn-secondary" href="__DL_DEB__" data-download="deb">Download .deb (Ubuntu, Debian)</a>
+          <small>64-bit (x86_64)</small>
+        </div>
+        <ol class="install">
+          <li><b>AppImage: make it runnable</b>Right-click the file, open <em>Properties</em> and allow running it as a program. Or run <code>chmod +x Dreamward-*.AppImage</code>.</li>
+          <li><b>Double-click to start</b>Dreamward opens. Updates install themselves.</li>
+          <li><b>Prefer the .deb?</b>Run <code>sudo apt install ./Dreamward-*.deb</code> in the folder you downloaded it to.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
 
   <section id="how">
     <div class="wrap">
@@ -266,9 +344,8 @@
         <div class="card featured">
           <h3>Desktop app</h3>
           <p>For you, on your computer. No server, no account, automatic backups and updates.</p>
-          <a class="btn btn-primary push" href="https://github.com/SufZen/Dreamward/releases/latest">Download the app</a>
-          <small>Windows · macOS (Apple silicon and Intel) · Linux</small>
-          <small>Early builds aren't code-signed yet, so your system asks you to confirm once.</small>
+          <a class="btn btn-primary push" href="#download">Download and install</a>
+          <small>Windows · Mac (Apple silicon and Intel) · Linux</small>
         </div>
         <div class="card">
           <h3>Self-host</h3>
@@ -302,6 +379,52 @@
 </footer>
 
 <script>
+  (function () {
+    var ua = navigator.userAgent || '';
+    var uad = navigator.userAgentData;
+    var plat = (uad && uad.platform) || navigator.platform || '';
+    var mobile = /Android|iPhone|iPad|iPod/i.test(ua) || (/Mac/i.test(plat) && navigator.maxTouchPoints > 1) || (uad && uad.mobile);
+    var os = /Win/i.test(plat) || /Windows/i.test(ua) ? 'win'
+      : /Mac/i.test(plat) || /Mac OS X/i.test(ua) ? 'mac'
+      : /Linux|X11|CrOS/i.test(plat + ' ' + ua) ? 'linux' : null;
+    if (mobile) { document.documentElement.classList.add('is-mobile'); os = null; }
+
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+    function select(which) {
+      tabs.forEach(function (t) {
+        var on = t.getAttribute('data-os') === which;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        document.getElementById('panel-' + t.getAttribute('data-os')).hidden = !on;
+      });
+    }
+    tabs.forEach(function (t) { t.addEventListener('click', function () { select(t.getAttribute('data-os')); }); });
+    select(os || 'win');
+
+    var hero = document.getElementById('hero-download');
+    var labels = { win: 'Download for Windows', mac: 'Download for Mac', linux: 'Download for Linux' };
+    function link(key) { var a = document.querySelector('[data-download="' + key + '"]'); return a && a.getAttribute('href'); }
+    function aim(key) {
+      var href = link(key);
+      if (!href || href.indexOf('__') === 0) return;
+      hero.setAttribute('href', href);
+      hero.textContent = labels[os];
+      // After the download starts, show the install steps.
+      hero.addEventListener('click', function () {
+        setTimeout(function () { document.getElementById('download').scrollIntoView({ behavior: 'smooth' }); }, 400);
+      });
+    }
+    if (os === 'win') aim('win');
+    if (os === 'linux') aim('linux');
+    if (os === 'mac') {
+      aim('mac-arm'); // most Macs sold since 2020
+      if (uad && uad.getHighEntropyValues) {
+        uad.getHighEntropyValues(['architecture']).then(function (v) {
+          if (v.architecture === 'x86') hero.setAttribute('href', link('mac-intel'));
+        }).catch(function () {});
+      }
+    }
+  })();
+
   document.querySelectorAll('.copy').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const text = btn.getAttribute('data-copy');
