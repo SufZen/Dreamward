@@ -38,6 +38,7 @@ jobs:
       packages: write
       id-token: write
       attestations: write
+      pages: write
     secrets: inherit
 
   deploy-own:
