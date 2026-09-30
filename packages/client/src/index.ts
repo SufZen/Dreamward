@@ -7,6 +7,13 @@ import { resolveBaseUrl } from './desktop';
 
 export { DESKTOP_URL, desktopAppDir, resolveBaseUrl } from './desktop';
 
+/** Linear-time `/+$` removal (a regex here is quadratic on long slash runs). */
+function trimTrailingSlashes(url: string): string {
+  let end = url.length;
+  while (end > 0 && url.charCodeAt(end - 1) === 47 /* / */) end--;
+  return url.slice(0, end);
+}
+
 export class DreamwardApiError extends Error {
   constructor(
     public status: number,
@@ -35,7 +42,7 @@ export class DreamwardClient {
 
   /** Resolved per request, so `desktop` follows the app across restarts. */
   private get root(): string {
-    return resolveBaseUrl(this.baseUrl).replace(/\/+$/, '') + '/api/v1';
+    return trimTrailingSlashes(resolveBaseUrl(this.baseUrl)) + '/api/v1';
   }
 
   private async request<T>(method: string, path: string, body?: unknown): Promise<T> {

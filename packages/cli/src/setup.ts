@@ -199,9 +199,15 @@ export async function runSetup(agentId: string | undefined, opts: SetupOptions):
       console.log('Dry run — nothing written. Re-run with --write to apply (a .bak copy is kept).');
     } else if (opts.yes || (await confirm(`Write ${file}?`))) {
       mkdirSync(dirname(file), { recursive: true });
-      if (existsSync(file)) copyFileSync(file, `${file}.bak`);
+      let backedUp = false;
+      try {
+        copyFileSync(file, `${file}.bak`);
+        backedUp = true;
+      } catch (err) {
+        if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err; // no previous file: nothing to back up
+      }
       writeFileSync(file, next, { mode: 0o600 });
-      console.log(`Written ✓${existsSync(`${file}.bak`) ? `  (previous version: ${file}.bak)` : ''}`);
+      console.log(`Written ✓${backedUp ? `  (previous version: ${file}.bak)` : ''}`);
     }
   } else {
     console.log(JSON.stringify({ mcpServers: { dreamward: { command: launch.command, args: launch.args, env: launch.env } } }, null, 2));
