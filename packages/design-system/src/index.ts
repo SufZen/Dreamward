@@ -14,3 +14,4 @@ export { Badge, badgeVariants, type BadgeProps } from './components/badge';
 export { Skeleton, type SkeletonProps } from './components/skeleton';
 export { EmptyState, type EmptyStateProps } from './components/empty-state';
 export { DreamwardLogo, DreamwardMark } from './components/logo';
+export { ClarityAvatar, type ClarityState } from './components/clarity-avatar';

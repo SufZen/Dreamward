@@ -200,3 +200,23 @@ textarea.rz-input {
 .rz-status-dot--error    { background: var(--rz-danger);  box-shadow: 0 0 0 3px var(--rz-danger-soft); }
 .rz-status-dot--routing  { background: var(--rz-info);    box-shadow: 0 0 0 3px var(--rz-info-soft); }
 .rz-status-dot--brand    { background: var(--rz-accent);  box-shadow: 0 0 0 3px var(--rz-accent-soft); }
+
+/* ── Clarity avatar (components/clarity-avatar.tsx) ────────────────────── */
+.dw-clarity { flex: none; overflow: visible; }
+.dw-clarity__halo { transform-origin: 24px 24px; }
+.dw-clarity__ring { transform-origin: 24px 24px; }
+.dw-clarity__star { filter: drop-shadow(0 0 1.5px rgba(255, 204, 0, 0.6)); }
+.dw-clarity--idle .dw-clarity__halo { animation: dw-clarity-breathe 4s ease-in-out infinite; }
+.dw-clarity--speaking .dw-clarity__halo { opacity: 1; transform: scale(1.08); }
+.dw-clarity--thinking .dw-clarity__ring { animation: dw-clarity-focus 1.6s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.dw-clarity--thinking .dw-clarity__step { animation: dw-clarity-step 1.6s ease-in-out infinite; opacity: 0.25; }
+.dw-clarity--thinking .dw-clarity__step:nth-of-type(2) { animation-delay: 0.2s; }
+.dw-clarity--thinking .dw-clarity__step:nth-of-type(3) { animation-delay: 0.4s; }
+.dw-clarity--thinking .dw-clarity__step:nth-of-type(4) { animation-delay: 0.6s; }
+@keyframes dw-clarity-breathe { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+@keyframes dw-clarity-focus { 0% { transform: scale(1.18); stroke-opacity: 0.3; } 60%, 100% { transform: scale(1); stroke-opacity: 0.85; } }
+@keyframes dw-clarity-step { 0%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .dw-clarity__halo, .dw-clarity__ring, .dw-clarity__step { animation: none !important; }
+  .dw-clarity--thinking .dw-clarity__step { opacity: 1; }
+}

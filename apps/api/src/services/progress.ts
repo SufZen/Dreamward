@@ -1,7 +1,7 @@
 /* ============================================================================
  * apps/api — services/progress.ts
  * Computed goal progress rollups (no storage): % of linked actions done,
- * weekly momentum, and a risk signal that the dashboard, Lify's digest and
+ * weekly momentum, and a risk signal that the dashboard, Clarity's digest and
  * the autonomous routines all key off.
  * ========================================================================= */
 import { isNull } from 'drizzle-orm';

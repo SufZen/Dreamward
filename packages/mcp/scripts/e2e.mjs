@@ -88,7 +88,7 @@ const { prompts } = await w.listPrompts();
 console.log(`prompts: ${prompts.map((p) => p.name).join(', ')}`);
 assert.deepEqual(prompts.map((p) => p.name).sort(), ['chapter-reset', 'daily-plan', 'ikigai-coach', 'rate-my-wheel', 'weekly-review']);
 const he = await w.getPrompt({ name: 'weekly-review', arguments: { language: 'he' } });
-assert.ok(he.messages[0].content.text.includes('חיימי'));
+assert.ok(he.messages[0].content.text.includes('העוזר האישי')); // the Hebrew persona
 await w.close();
 
 // ── read key: only read tools ──

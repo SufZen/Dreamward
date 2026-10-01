@@ -1,7 +1,7 @@
 /* ============================================================================
  * apps/api — agent/meaningText.ts
  * Hebrew markdown renderings of the meaning & focus layer (chapter, life
- * wheel, IKIGAI, identity sections) for the Lify digest and get_item.
+ * wheel, IKIGAI, identity sections) for the Clarity digest and get_item.
  * ========================================================================= */
 import {
   IKIGAI_CIRCLES,

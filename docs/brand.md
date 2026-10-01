@@ -16,8 +16,12 @@ Files: `packages/design-system/assets/`. Code: `DreamwardLogo` and
 - Write **Dreamward**: one word, capital D. The wordmark is set in lowercase
   (`dreamward`); running text is not.
 - In Hebrew text the name stays in Latin letters: Dreamward.
-- The AI companion is **Lify** (Hebrew: **חיימי**). Lify is a character inside
-  Dreamward, not a second brand.
+- The personal assistant is **Clarity**, in every language (in Hebrew too,
+  in Latin letters; never translated). Clarity is a character inside Dreamward,
+  not a second brand. Its job is in its name: it brings clarity, helps people
+  find their true direction, and turns it into steps.
+- In Hebrew UI text, avoid gendered verbs for Clarity: "שיחה עם Clarity",
+  "הצעות מ-Clarity", not "Clarity מציע".
 - Say "your book" for the user's content ("Suggest from my book"), and
   "Dreamward" for the product.
 
@@ -44,6 +48,21 @@ Files: `packages/design-system/assets/`. Code: `DreamwardLogo` and
   Never place a gold star on white.
 - **Don't** stretch the logo, recolour the star, add effects to the wordmark,
   rearrange the steps, or put the logo on busy photos without an ink panel.
+
+### Clarity's avatar
+
+The north star from the mark inside a thin gold focus ring (a lens snapping
+into focus), with the mark's four steps orbiting it, always on night ink.
+`ClarityAvatar` (`size`, `state`) in the design system; static copy in
+`assets/clarity-avatar.svg`.
+
+| State | Motion |
+|---|---|
+| `idle` | a slow, gentle glow |
+| `thinking` | the ring tightens into focus; the steps light up in turn |
+| `speaking` | a steady, brighter glow |
+
+Reduced motion shows the static avatar.
 
 ## Colour
 

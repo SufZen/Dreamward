@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { X, Send, Square, Plus, Search, Sparkles, Bot, Settings as SettingsIcon } from 'lucide-react';
-import { Button, cn } from '@dreamward/design-system';
+import { X, Send, Square, Plus, Search, Sparkles, Settings as SettingsIcon } from 'lucide-react';
+import { Button, ClarityAvatar, cn } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
 import { useProviders } from '@/features/settings/useLlmProviders';
 import { useAssistantStore } from './store';
@@ -83,10 +83,20 @@ function suggestionsFor(route: string, categoryId: string | undefined, lang: 'he
     : ['What should I focus on today?', 'Remind me where I’m really headed'];
 }
 
-function ChatSession({ conversationId, onNewChat }: { conversationId: string | null; onNewChat: () => void }) {
+function ChatSession({
+  conversationId,
+  onNewChat,
+  onStreamingChange,
+}: {
+  conversationId: string | null;
+  onNewChat: () => void;
+  /** Lets the header avatar show Clarity thinking while a reply streams. */
+  onStreamingChange: (streaming: boolean) => void;
+}) {
   const { lang, t } = useLang();
   const pageContext = usePageContext();
   const { messages, streaming, send, stop, markProposal } = useAgentChat(conversationId);
+  useEffect(() => onStreamingChange(streaming), [streaming, onStreamingChange]);
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const consumeAutoSend = useAssistantStore((s) => s.consumeAutoSend);
@@ -123,8 +133,8 @@ function ChatSession({ conversationId, onNewChat }: { conversationId: string | n
             <Sparkles size={32} className="text-primary" />
             <p className="text-sm">
               {lang === 'he'
-                ? 'היי, אני חיימי 👋 כאן בשבילך — לחלום, למקד, ולצעוד יחד אל החזון שלך.'
-                : "Hey, I'm Lify 👋 Here for you — to dream, focus, and walk toward your vision together."}
+                ? 'היי, כאן Clarity 👋 בוא נעשה סדר: מה באמת חשוב לך, לאן אתה הולך, ומה הצעד הבא בדרך.'
+                : "Hi, I'm Clarity 👋 Let's make things clear: what you truly want, where you're heading, and the next step to get there."}
             </p>
             <div className="flex flex-col gap-2">
               {suggestionsFor(pageContext.route, pageContext.categoryId, lang).map((s) => (
@@ -163,7 +173,7 @@ function ChatSession({ conversationId, onNewChat }: { conversationId: string | n
               }
             }}
             rows={1}
-            placeholder={lang === 'he' ? 'כתוב לחיימי…' : 'Message Lify…'}
+            placeholder={lang === 'he' ? 'כתיבה ל-Clarity…' : 'Message Clarity…'}
             className="max-h-32 min-h-9 flex-1 resize-none rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-primary focus:outline-none"
           />
           {streaming ? (
@@ -186,6 +196,7 @@ export function AssistantPanel() {
   const { open, conversationId, focusMode, close, setConversationId } = useAssistantStore();
   const { data: providers } = useProviders();
   const [newCounter, setNewCounter] = useState(0);
+  const [streaming, setStreaming] = useState(false);
   const hasActiveProvider = providers?.some((p) => p.isActive);
 
   const sessionKey = conversationId ?? `new-${newCounter}`;
@@ -203,8 +214,8 @@ export function AssistantPanel() {
         )}
       >
         <header className="flex items-center gap-2 border-b border-border px-4 py-3">
-          <Bot size={18} className="text-primary" />
-          <span className="font-semibold">{lang === 'he' ? 'חיימי' : 'Lify'}</span>
+          <ClarityAvatar size={28} state={streaming ? 'thinking' : 'idle'} aria-hidden title="" />
+          <span className="font-semibold">Clarity</span>
           <button onClick={close} className="ms-auto text-fg-muted hover:text-foreground">
             <X size={18} />
           </button>
@@ -212,11 +223,11 @@ export function AssistantPanel() {
 
         {hasActiveProvider === false ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center text-fg-muted">
-            <Bot size={32} className="text-primary" />
+            <ClarityAvatar size={56} aria-hidden title="" />
             <p className="text-sm">
               {lang === 'he'
-                ? 'חיימי כמעט מוכן לפגוש אותך — חבר מודל AI בהגדרות כדי להתחיל.'
-                : 'Lify is almost ready to meet you — connect an AI model in Settings to begin.'}
+                ? 'עוד צעד אחד כדי לפגוש את Clarity — חבר מודל AI בהגדרות כדי להתחיל.'
+                : 'Clarity is almost ready to meet you — connect an AI model in Settings to begin.'}
             </p>
             <Link to="/settings" onClick={close}>
               <Button size="sm">
@@ -228,6 +239,7 @@ export function AssistantPanel() {
           <ChatSession
             key={sessionKey}
             conversationId={conversationId}
+            onStreamingChange={setStreaming}
             onNewChat={() => {
               setConversationId(null);
               setNewCounter((c) => c + 1);

@@ -100,7 +100,7 @@ llm/dispatch.ts ──── kind=openai-compat ───► llm/client.ts (fetc
   ChatGPT subscription via PKCE paste-back and adapts the Responses API onto
   the same `StreamEvent` union. See [ai-providers.md](ai-providers.md).
 
-### Lify's tool loop and the proposal gate
+### Clarity's tool loop and the proposal gate
 
 The built-in agent has five deliberately-small tools (`search_content`,
 `get_item`, `list_goals`, `list_actions`, `propose`) — weak models degrade

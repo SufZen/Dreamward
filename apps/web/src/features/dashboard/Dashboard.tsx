@@ -93,11 +93,11 @@ export function Dashboard() {
 
       <DashboardMeaning />
 
-      {/* Pending proposals from Lify — inline approve/reject */}
+      {/* Pending proposals from Clarity — inline approve/reject */}
       {pendingItems.length > 0 && (
         <section className="flex flex-col gap-2">
           <h2 className="flex items-center gap-2 text-sm font-mono uppercase tracking-wider text-fg-faint">
-            <Sparkles size={14} className="text-primary" /> {he ? 'הצעות מחיימי' : 'Suggestions from Lify'}
+            <Sparkles size={14} className="text-primary" /> {he ? 'הצעות מ-Clarity' : 'Suggestions from Clarity'}
             <Badge variant="accent">{pendingItems.length}</Badge>
           </h2>
           {pendingItems.slice(0, 3).map((p) => (

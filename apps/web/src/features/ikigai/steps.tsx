@@ -23,7 +23,7 @@ import { useAiAvailable, useIkigaiSuggest } from './hooks';
 const newId = () => crypto.randomUUID().slice(0, 12);
 const circleDef = (id: IkigaiCircle) => IKIGAI_CIRCLES.find((c) => c.id === id)!;
 
-/* ── Lify suggestions (ghost chips) ──────────────────────────────────────── */
+/* ── Clarity suggestions (ghost chips) ──────────────────────────────────────── */
 
 function SuggestBox({
   request,
@@ -54,8 +54,8 @@ function SuggestBox({
             ? 'אין ספק AI פעיל'
             : 'No active AI provider'
           : he
-            ? 'חיימי לא הצליח להציע כרגע — נסה שוב'
-            : 'Lify couldn’t suggest right now — try again',
+            ? 'לא התקבלו הצעות מ-Clarity כרגע — נסה שוב'
+            : 'Clarity couldn’t suggest anything right now — try again',
       );
     } finally {
       setLoading(false);
@@ -66,7 +66,7 @@ function SuggestBox({
     <div className="flex flex-col gap-2 rounded-lg border border-dashed border-[color:var(--rz-border-accent)] p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-xs text-fg-muted">
-          {he ? 'חיימי יכול להציע רעיונות מתוך ספר החיים שלך' : 'Lify can suggest ideas from your own book'}
+          {he ? 'רעיונות מ-Clarity, מתוך ספר החיים שלך' : 'Clarity can suggest ideas from your own book'}
         </span>
         <Button variant="ghost" size="sm" onClick={run} loading={loading}>
           <Sparkles size={14} className="text-primary" /> {label}
@@ -115,6 +115,7 @@ export function CircleStep({
   const suggest = useIkigaiSuggest();
   const mine = items.filter((it) => it.circles.includes(circle));
 
+  // 'lify' is the stored value for assistant suggestions (data format, never renamed).
   const add = (text: string, source: 'user' | 'lify' = 'user') => {
     const existing = items.find((it) => it.text.trim().toLowerCase() === text.trim().toLowerCase());
     if (existing) {

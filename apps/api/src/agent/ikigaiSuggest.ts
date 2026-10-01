@@ -1,6 +1,6 @@
 /* ============================================================================
  * apps/api — agent/ikigaiSuggest.ts
- * One-shot Lify suggestions for the IKIGAI wizard: candidate items for a
+ * One-shot Clarity suggestions for the IKIGAI wizard: candidate items for a
  * circle, everyday joys, or draft statements. Grounded in the user's own
  * Dreamward digest. Nothing is written here — the user accepting a suggestion
  * chip in the wizard IS the approval.
@@ -53,7 +53,7 @@ Ground every suggestion in something concrete from their book below — vision, 
     task = `Draft 3 alternative IKIGAI statements for this person — each 1-2 sentences, first person, warm and specific, synthesizing where what they love, what they are good at, what the world needs and what they can be paid for overlap. Base them on their IKIGAI work so far and their Dreamward.`;
   }
 
-  const system = `You are Lify, a warm personal-growth companion inside Dreamward, the user's personal life-design book.
+  const system = `You are Clarity, the personal assistant inside Dreamward, the user's life-vision book, who helps them see clearly what matters.
 ${task}
 Write the suggestions in ${language}. Never invent facts that are not supported by the content.
 Reply with ONLY a JSON array of strings, nothing else.

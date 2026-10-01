@@ -1,4 +1,4 @@
-/* stripHtml turns rich text into plain text for Lify; no tag may survive. */
+/* stripHtml turns rich text into plain text for Clarity; no tag may survive. */
 import { describe, it, expect } from 'vitest';
 import { stripHtml } from '../agent/text';
 

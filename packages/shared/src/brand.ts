@@ -8,8 +8,8 @@ export const BRAND = {
   name: 'Dreamward',
   slug: 'dreamward',
   tagline: { en: 'Move toward the life you envision', he: 'להתקדם אל החיים שאתם מדמיינים' },
-  /** The AI companion's persona. */
-  companion: { en: 'Lify', he: 'חיימי' },
+  /** The personal assistant's name: the same in every language (never translated). */
+  companion: { en: 'Clarity', he: 'Clarity' },
   site: 'https://dreamward.life',
   repo: 'SufZen/Dreamward',
   repoUrl: 'https://github.com/SufZen/Dreamward',

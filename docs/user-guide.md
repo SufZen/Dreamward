@@ -34,7 +34,7 @@ that deliberately wait) and **No longer acceptable** (what you stop
 normalising — your decision filter). When the season ends, close the chapter
 with a short reflection and start the next one; past chapters stay listed.
 
-Lify reads the chapter first: it prioritises your focus areas and won't push
+Clarity reads the chapter first: it prioritises your focus areas and won't push
 things from your *not now* list.
 
 ## Identity & the life wheel
@@ -66,7 +66,7 @@ get up in the morning*, right now:
    fullness — but no wealth yet").
 4. **Everyday ikigai** — the small joys, in the spirit of the original Japanese
    meaning.
-5. **My IKIGAI** — write the sentence (or let Lify draft options), say how
+5. **My IKIGAI** — write the sentence (or let Clarity draft options), say how
    true it feels, and add one small first step as an action.
 
 Everything autosaves, so you can stop and resume. Later, **Revisit** starts a
@@ -88,7 +88,7 @@ dashboard collects goals needing attention in one place.
 done: a title, a priority, an optional due date, and an optional link to a
 goal (or any other part of your book). Add with one line + Enter, check off
 as you go, filter by status/priority/goal, and reorder. Actions created by
-Lify or an external agent are marked with a small robot icon, so you always
+Clarity or an external agent are marked with a small robot icon, so you always
 know where a task came from. Deleting an action is reversible-by-design
 (soft delete).
 
@@ -106,14 +106,19 @@ Visual collages: upload images (stored privately, auto-resized), arrange them
 on the canvas, add text, start from templates. **Snapshots** capture the state
 of your boards/content so you can compare or restore later.
 
-## Lify — your companion (חיימי)
+## Clarity — your personal assistant
 
-Meet **Lify** (in Hebrew, **חיימי**) — a warm, motivating companion who knows
-your whole book and walks the journey toward your vision with you. Lify
-chats over *your* content — searching it, reading items, reviewing goals, and
-**proposing** changes. Proposals are never applied automatically: you review
-and approve/reject each one. Lify's voice is encouraging, emotionally aware,
-and grounded in what you actually wrote — never inventing content.
+Meet **Clarity** (the same name in Hebrew): a personal assistant that brings
+clarity to your life. It knows your whole book and helps you see what you truly
+want, find your real direction, and turn it into steps that happen. Clarity is
+calm, warm and brief: it reflects back what it hears, checks that an idea
+serves your vision and current chapter, asks one good question at a time, and
+ends with one small next step.
+
+Clarity chats over *your* content — searching it, reading items, reviewing
+goals, and **proposing** changes. Proposals are never applied automatically:
+you review and approve/reject each one. It is grounded in what you actually
+wrote — never inventing content.
 
 To enable it, add an AI provider in **Settings → AI models**:
 
@@ -126,8 +131,8 @@ Details and the experimental ChatGPT option: [ai-providers.md](ai-providers.md).
 
 ### Autonomous routines
 
-Once a provider is active you can let Lify work for you on a schedule
-(**Settings → Autonomous Lify routines**): a **daily plan** that reviews your
+Once a provider is active you can let Clarity work for you on a schedule
+(**Settings → Autonomous Clarity routines**): a **daily plan** that reviews your
 goals and proposes today's 3–5 priorities (and refreshes the morning
 briefing), a **weekly review prep** every Friday, and a **goal drift** check
 that flags stalled goals with suggested next steps. Proposals wait for your
@@ -137,7 +142,7 @@ routine shows when it last ran and what it did, and has a "Run now" button.
 
 ## External AI agents
 
-Beyond the built-in Lify, you can plug in outside agents — Claude Code,
+Beyond the built-in Clarity, you can plug in outside agents — Claude Code,
 Codex, Hermes, or anything MCP-capable — with a personal API key
 (**Settings → AI agent access**). Keys are scoped (read-only or read &
 write), shown once, revocable at any time, and **everything an agent changes

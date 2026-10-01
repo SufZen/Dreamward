@@ -17,7 +17,7 @@ in the audit log (**Settings → AI agent access**).
   Start with `get_overview` (the whole book as compact markdown).
 - **Resources**: `dreamward://overview`, `dreamward://chapter`,
   `dreamward://ikigai`, `dreamward://wheel`, `dreamward://category/{categoryId}`.
-- **Prompts** (Lify's rituals, EN/HE via the `language` argument):
+- **Prompts** (Clarity's rituals, EN/HE via the `language` argument):
   `daily-plan`, `weekly-review`, `ikigai-coach`, `chapter-reset`,
   `rate-my-wheel` — so your own AI subscription runs the coaching.
 

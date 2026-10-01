@@ -1,6 +1,6 @@
 /* ============================================================================
  * apps/api — agent/routines.ts
- * Autonomous agent routines ("the reality engine"): scheduled Lify runs that
+ * Autonomous agent routines ("the reality engine"): scheduled Clarity runs that
  * review the dreamward and act. Each run is a normal agent turn in a
  * kind='routine' conversation — writes flow through the proposal system, and
  * when autoApprove is on, action-scoped proposals (create/update/complete —

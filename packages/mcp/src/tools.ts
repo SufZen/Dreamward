@@ -129,7 +129,7 @@ export const TOOLS: DreamwardTool[] = [
   },
   {
     name: 'get_latest_briefing',
-    description: "Get the most recent cached morning briefing Lify generated for the user (markdown).",
+    description: "Get the most recent cached morning briefing Clarity generated for the user (markdown).",
     schema: {},
     run: (c) => c.get('/briefings/latest'),
   },

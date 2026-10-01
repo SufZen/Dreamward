@@ -1,7 +1,7 @@
 import ReactMarkdown from 'react-markdown';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Sparkles, RefreshCw, CalendarCheck } from 'lucide-react';
-import { Button, Card } from '@dreamward/design-system';
+import { Button, Card, ClarityAvatar } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
 import { api, ApiError } from '@/lib/api';
 import { useAssistantStore } from './store';
@@ -47,8 +47,8 @@ export function BriefingCard() {
   return (
     <Card featured className="p-5">
       <div className="mb-3 flex items-center gap-2">
-        <Sparkles size={18} className="text-primary" />
-        <h2 className="text-lg font-semibold">{lang === 'he' ? 'הבוקר שלך עם חיימי' : 'Your morning with Lify'}</h2>
+        <ClarityAvatar size={28} state={briefing.isLoading || regenerate.isPending ? 'thinking' : 'idle'} aria-hidden title="" />
+        <h2 className="text-lg font-semibold">{lang === 'he' ? 'הבוקר שלך עם Clarity' : 'Your morning with Clarity'}</h2>
         <button
           onClick={() => regenerate.mutate()}
           disabled={regenerate.isPending}
@@ -60,7 +60,7 @@ export function BriefingCard() {
       </div>
 
       {briefing.isLoading || regenerate.isPending ? (
-        <p className="text-sm text-fg-muted">{lang === 'he' ? 'חיימי מכין לך משהו…' : 'Lify is preparing something for you…'}</p>
+        <p className="text-sm text-fg-muted">{lang === 'he' ? 'התדריך של Clarity בדרך…' : 'Clarity is preparing something for you…'}</p>
       ) : briefing.data ? (
         <div dir="auto" className="dw-prose prose-sm">
           <ReactMarkdown>{briefing.data.content}</ReactMarkdown>

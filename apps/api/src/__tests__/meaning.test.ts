@@ -280,7 +280,7 @@ describe('ikigai profiles', () => {
     expect((await req('DELETE', `/ikigai/${d.id}`)).statusCode).toBe(200);
   });
 
-  it('shows up in the Lify digest and in snapshots', async () => {
+  it('shows up in the Clarity digest and in snapshots', async () => {
     const digest = runAsUser(adminUid, 'admin', () => buildDigest('compact').markdown);
     expect(digest).toContain('Teaching as a way of life');
     expect(digest).toContain('גלגל החיים');
