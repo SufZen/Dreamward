@@ -82,6 +82,11 @@ Identity sections take `statement`, `states`, `standards` and `beliefShifts`
    The generated config launches `dreamward mcp` (the MCP server is built into
    the CLI). Add `--npx` to launch it via `npx -y dreamward mcp` instead.
 
+   The dry run shows only the `dreamward` entry it will add, never the rest of
+   the file (other servers' keys stay off your screen and out of agent
+   transcripts). Your API key is masked (`lbk_…1a2b`). Add `--show-key` when you
+   need it in full to copy-paste (`claude-code`, `other`).
+
    **Desktop app?** Log in with `--url desktop`: agents then always reach the
    running app, whatever local port it got (see [desktop.md](desktop.md)).
 
