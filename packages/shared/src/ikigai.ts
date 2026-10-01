@@ -141,6 +141,7 @@ export interface IkigaiItem {
   id: string;
   text: string;
   circles: IkigaiCircle[];
+  /** 'lify' = suggested by the assistant (Clarity); kept as stored. */
   source?: 'user' | 'lify';
 }
 

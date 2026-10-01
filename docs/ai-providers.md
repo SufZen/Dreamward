@@ -15,7 +15,7 @@ and excluded from data exports. Each user sees their own usage (*Settings → AI
 | **A subscription** (Claude Pro/Max, ChatGPT Plus/Pro, Gemini) | **bring your agent** — see below |
 
 The model picker (⇣) lists the provider's models and fills in the context
-length when the provider reports it (OpenRouter does). Lify adapts to smaller
+length when the provider reports it (OpenRouter does). Clarity adapts to smaller
 context windows and to models without native tool-calling automatically.
 
 ### Subscriptions: bring your agent
@@ -25,7 +25,7 @@ subscription login, so Dreamward doesn't try. Instead, **your subscribed agent
 comes to your Dreamward**: connect Claude Code / Claude Desktop, Codex, Gemini
 CLI or any MCP client with a personal API key (see
 [agent-access.md](agent-access.md)). The MCP server exposes your book *and*
-Lify's rituals as ready-made prompts — daily plan, weekly review, IKIGAI
+Clarity's rituals as ready-made prompts — daily plan, weekly review, IKIGAI
 coaching, chapter reset — so they run on **your** subscription, in the agent
 you already pay for. Everything the agent writes is audited.
 

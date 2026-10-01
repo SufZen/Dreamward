@@ -4,7 +4,7 @@
  *   • tools     — every /api/v1 capability, with safety annotations; write
  *                 tools are only offered when the API key can write
  *   • resources — dreamward://overview · chapter · ikigai · wheel · category/{id}
- *   • prompts   — Lify's rituals (daily plan, weekly review, IKIGAI coach,
+ *   • prompts   — Clarity's rituals (daily plan, weekly review, IKIGAI coach,
  *                 chapter reset, life-wheel check-in) for ANY agent, so users
  *                 can run them on their own AI subscription
  * ========================================================================= */

@@ -2,7 +2,7 @@
  * apps/api — services/meaning.ts
  * The "meaning & focus" layer: the Current Life Chapter, the life-wheel
  * ratings and IKIGAI profiles. Single source of truth for the REST routes,
- * the Lify digest and the agent tools.
+ * the Clarity digest and the agent tools.
  * ========================================================================= */
 import { and, asc, desc, eq, inArray } from 'drizzle-orm';
 import {

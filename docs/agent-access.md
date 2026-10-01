@@ -5,7 +5,7 @@ agent (Claude Code, Claude Desktop, Codex, Gemini CLI, Cursor, VS Code,
 Windsurf, OpenCode, Hermes…) or automation (n8n, scripts) gets access to your
 book — authenticated with personal API keys, scoped read or read & write, and
 fully audited. It's also how **AI subscriptions** plug in: your Claude /
-ChatGPT / Gemini agent runs Lify's rituals on *your* subscription.
+ChatGPT / Gemini agent runs Clarity's rituals on *your* subscription.
 
 ## Personal API keys
 
@@ -103,7 +103,7 @@ before changing anything.
 **Resources** — `dreamward://overview` (markdown), `dreamward://chapter`,
 `dreamward://ikigai`, `dreamward://wheel`, `dreamward://category/{id}`.
 
-**Prompts (Lify's rituals — run them on your own AI subscription)** —
+**Prompts (Clarity's rituals — run them on your own AI subscription)** —
 `daily-plan`, `weekly-review`, `ikigai-coach`, `chapter-reset`,
 `rate-my-wheel`, each with an optional `language` argument (`en` / `he`).
 In Claude Code they appear as `/dreamward:weekly-review`; in Claude Desktop
@@ -195,7 +195,7 @@ Config lives in `~/.dreamward/config.json` (0600); `DREAMWARD_URL` /
 
 ## Autonomous routines ("the reality engine")
 
-**Settings → Autonomous Lify routines.** Scheduled Lify runs (5-minute
+**Settings → Autonomous Clarity routines.** Scheduled Clarity runs (5-minute
 scheduler tick, once per routine per day, only with an active AI provider):
 
 - **Daily plan** — reviews goals (with progress/risk rollups) and open

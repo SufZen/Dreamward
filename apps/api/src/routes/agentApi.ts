@@ -57,7 +57,7 @@ export default async function agentApiRoutes(app: FastifyInstance) {
   });
 
   /**
-   * The whole book as compact markdown — the same digest Lify reads. Ideal
+   * The whole book as compact markdown — the same digest Clarity reads. Ideal
    * context for an external agent (MCP resource dreamward://overview).
    */
   app.get('/overview', async (req) => {
@@ -67,7 +67,7 @@ export default async function agentApiRoutes(app: FastifyInstance) {
     return { markdown: digest.markdown, version: digest.version, detail: tier };
   });
 
-  /** Full-text search across the whole dreamward (FTS5, same index Lify uses). */
+  /** Full-text search across the whole dreamward (FTS5, same index Clarity uses). */
   app.get('/search', async (req) => {
     const { q, limit } = req.query as { q?: string; limit?: string };
     if (!q?.trim()) return { hits: [] };

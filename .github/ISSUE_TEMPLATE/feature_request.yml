@@ -17,4 +17,4 @@ body:
     id: area
     attributes:
       label: Area
-      options: [Book & categories, Chapter / wheel / identity, IKIGAI, Goals & actions, Journal, Lify (AI), Agents (MCP/CLI/API), Self-hosting & upgrades, Desktop app, Translations, Other]
+      options: [Book & categories, Chapter / wheel / identity, IKIGAI, Goals & actions, Journal, Clarity (AI), Agents (MCP/CLI/API), Self-hosting & upgrades, Desktop app, Translations, Other]

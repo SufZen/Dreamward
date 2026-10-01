@@ -15,12 +15,12 @@
 - **Your Dreamward, structured** — cover, life vision Q&A, per-category vision / purpose / strategy / goals sections, implementation pages.
 - **Meaning & focus** — a **Current Life Chapter** (focus vs. maintenance areas, a *not now* list, an anti-vision), a per-category **identity** layer and **life wheel** ("how close is today to my vision", with history), and a guided, interactive **IKIGAI** wizard with a live four-circle diagram.
 - **Goals & progress** — goals with status history, plus computed progress rollups: % of linked actions completed, weekly momentum, and *stalled / at-risk* signals surfaced on the dashboard.
-- **Actions** — granular next steps below goals: priority, due dates, links to any dreamward entity, provenance (who created it — you, Lify, or an external agent), soft delete.
+- **Actions** — granular next steps below goals: priority, due dates, links to any dreamward entity, provenance (who created it — you, Clarity, or an external agent), soft delete.
 - **Journal** — rich-text entries with full-text search (FTS5).
 - **Visual moodboards** — Konva-based collage editor with image upload, templates and snapshots.
-- **Lify (חיימי) — your AI companion** — a warm, motivating, emotionally-aware guide over your own Dreamward. Provider-agnostic (OpenRouter, OpenAI-compatible APIs, local Ollama / Lemonade, experimental ChatGPT/Codex sign-in). Streams chat, reads your content through tools, and proposes changes you approve.
-- **Autonomous routines** — scheduled Lify runs: a daily plan (with optional auto-applied action proposals), weekly-review prep, and goal-drift detection.
-- **Agent access (MCP + CLI + REST)** — connect any external AI agent (Claude Code, Codex, Hermes, any MCP client) with personal API keys: an MCP server (tools, resources and Lify's rituals as prompts), a `dreamward` CLI with one-command agent setup, and a bearer-authenticated `/api/v1` surface — every agent mutation lands in an audit trail with prior-state capture.
+- **Clarity — your AI companion** — a warm, motivating, emotionally-aware guide over your own Dreamward. Provider-agnostic (OpenRouter, OpenAI-compatible APIs, local Ollama / Lemonade, experimental ChatGPT/Codex sign-in). Streams chat, reads your content through tools, and proposes changes you approve.
+- **Autonomous routines** — scheduled Clarity runs: a daily plan (with optional auto-applied action proposals), weekly-review prep, and goal-drift detection.
+- **Agent access (MCP + CLI + REST)** — connect any external AI agent (Claude Code, Codex, Hermes, any MCP client) with personal API keys: an MCP server (tools, resources and Clarity's rituals as prompts), a `dreamward` CLI with one-command agent setup, and a bearer-authenticated `/api/v1` surface — every agent mutation lands in an audit trail with prior-state capture.
 - **Calendar feed** — subscribe to your due actions and dated goals from Google/Apple/Outlook Calendar (read-only ICS).
 - **True multi-user isolation** — every account gets its **own SQLite database and asset directory** (`data/users/<uid>/`). No shared content tables, no cross-tenant queries by construction.
 - **Admin dashboard** — invite links, enable/disable/delete users, per-user storage & AI token usage, audit log.
@@ -81,7 +81,7 @@ First boot prints a one-time setup link (`http://localhost:5173/setup?token=…`
    node packages/cli/dist/index.js login --url https://your-dreamward --key lbk_…
    node packages/cli/dist/index.js setup claude-desktop --write   # or claude-code, cursor, vscode, gemini, codex, opencode…
    ```
-3. Ask your agent to *"run the weekly review"* — the MCP server gives it 37 tools, your book as resources, and Lify's rituals as prompts, on **your own AI subscription**.
+3. Ask your agent to *"run the weekly review"* — the MCP server gives it 37 tools, your book as resources, and Clarity's rituals as prompts, on **your own AI subscription**.
 
 Full guide (every harness, n8n/OpenAPI, Hermes/OpenClaw, calendar feed): [docs/agent-access.md](docs/agent-access.md).
 

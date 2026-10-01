@@ -34,7 +34,7 @@ const OPS: Op[] = [
   { method: 'get', path: '/whoami', tag: 'Agent', summary: 'Who am I: account, key scope, server version', response: z.object({ user: z.object({ id: z.number(), email: z.string() }).nullable(), key: z.object({ name: z.string().nullable(), scope: z.enum(['read', 'write']) }), server: z.object({ version: z.string(), schema: z.number() }) }) },
   { method: 'get', path: '/overview', tag: 'Agent', summary: 'The whole book as compact markdown (best context)', query: { detail: z.enum(['minimal', 'compact', 'full']).optional() }, response: z.object({ markdown: z.string(), version: z.number(), detail: z.string() }) },
   { method: 'get', path: '/search', tag: 'Agent', summary: 'Full-text search across the book', query: { q: z.string(), limit: z.number().int().optional() } },
-  { method: 'get', path: '/briefings/latest', tag: 'Agent', summary: "Latest morning briefing Lify wrote" },
+  { method: 'get', path: '/briefings/latest', tag: 'Agent', summary: "Latest morning briefing Clarity wrote" },
   // meaning & focus
   { method: 'get', path: '/chapters/current', tag: 'Chapter', summary: 'Current Life Chapter', response: z.object({ chapter: S.chapterSchema.nullable() }) },
   { method: 'get', path: '/chapters', tag: 'Chapter', summary: 'All chapters (newest first)', response: z.array(S.chapterSchema) },

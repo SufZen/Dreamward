@@ -275,6 +275,7 @@ export const ikigaiItemSchema = z.object({
   id: z.string().min(1),
   text: z.string().min(1).max(300),
   circles: z.array(z.enum(IKIGAI_CIRCLE_IDS)).min(1),
+  /** 'lify' = suggested by the assistant (stored value from before it was named Clarity; never renamed). */
   source: z.enum(['user', 'lify']).optional(),
 });
 

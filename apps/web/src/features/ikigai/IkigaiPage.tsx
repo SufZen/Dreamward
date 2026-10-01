@@ -65,8 +65,8 @@ function Landing() {
       <h2 className="text-2xl font-semibold">{he ? 'גלה את האיקיגאי שלך' : 'Discover your IKIGAI'}</h2>
       <p className="max-w-xl text-fg-muted">
         {he
-          ? 'תהליך מודרך של כ-15 דקות: ארבעה מעגלים, מפה של החפיפות, והמשפט שמתאר את הסיבה שלך לקום בבוקר — כרגע. חיימי יכול לעזור עם רעיונות מתוך ספר החיים שלך.'
-          : 'A guided ~15-minute process: four circles, a map of their overlaps, and the sentence that captures your reason to get up in the morning — for now. Lify can help with ideas drawn from your book.'}
+          ? 'תהליך מודרך של כ-15 דקות: ארבעה מעגלים, מפה של החפיפות, והמשפט שמתאר את הסיבה שלך לקום בבוקר — כרגע. ואפשר לקבל מ-Clarity רעיונות מתוך ספר החיים שלך.'
+          : 'A guided ~15-minute process: four circles, a map of their overlaps, and the sentence that captures your reason to get up in the morning — for now. Clarity can help with ideas drawn from your book.'}
       </p>
       <Button size="lg" onClick={() => start.mutate(false)} loading={start.isPending}>
         <Sparkles size={16} /> {he ? 'בוא נתחיל' : 'Let’s begin'}

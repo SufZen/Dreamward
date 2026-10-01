@@ -1,5 +1,5 @@
 /* ============================================================================
- * Settings → Agent routines: enable/disable the autonomous Lify runs
+ * Settings → Agent routines: enable/disable the autonomous Clarity runs
  * (daily plan, weekly review prep, goal drift), pick the hour, and decide
  * whether action proposals apply automatically or wait for approval.
  * ========================================================================= */
@@ -23,8 +23,8 @@ const KIND_META: Record<RoutineRow['kind'], { he: string; en: string; heDesc: st
   daily_plan: {
     he: 'תוכנית יומית',
     en: 'Daily plan',
-    heDesc: 'חיימי סוקר מטרות ופעולות ומרכיב את מיקוד היום (מרענן את תדריך הבוקר)',
-    enDesc: 'Lify reviews goals & actions and builds today’s focus (refreshes the morning briefing)',
+    heDesc: 'סקירה של המטרות והפעולות ובניית מיקוד היום (מרענן את תדריך הבוקר)',
+    enDesc: 'Clarity reviews goals & actions and builds today’s focus (refreshes the morning briefing)',
   },
   weekly_review_prep: {
     he: 'הכנה לסקירה שבועית',
@@ -59,12 +59,12 @@ export function RoutinesSettings() {
   return (
     <Card className="p-6">
       <h2 className="mb-1 flex items-center gap-2 text-lg font-semibold">
-        <Sparkles size={18} className="text-primary" /> {he ? 'ריצות אוטומטיות של חיימי' : 'Autonomous Lify routines'}
+        <Sparkles size={18} className="text-primary" /> {he ? 'ריצות אוטומטיות של Clarity' : 'Autonomous Clarity routines'}
       </h2>
       <p className="mb-4 text-sm text-fg-muted">
         {he
-          ? 'חיימי רץ לבד לפי לוח זמנים, מנתח את ספר החיים ומציע (או מיישם) פעולות. דורש ספק AI פעיל.'
-          : 'Lify runs on a schedule, analyzes your book and proposes (or applies) actions. Requires an active AI provider.'}
+          ? 'ריצות של Clarity ברקע, לפי לוח זמנים: סקירה של ספר החיים והצעה (או יישום) של פעולות. דורש ספק AI פעיל.'
+          : 'Clarity runs on a schedule, reviews your book and proposes (or applies) actions. Requires an active AI provider.'}
       </p>
 
       <div className="flex flex-col gap-4">
