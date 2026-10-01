@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",
-    "@types/node": "^22.10.7",
+    "@types/node": "^25.9.8",
     "drizzle-kit": "^0.31.11",
     "tsup": "^8.3.5",
     "tsx": "^4.23.15",
