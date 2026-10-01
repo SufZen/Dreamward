@@ -94,7 +94,18 @@ branch (tag + `gh release create`); cherry-pick the fix to `main`.
   `dreamward-web` public (Package settings → Change visibility) so anyone can
   pull the images.
 - **Variables** (Settings → Secrets and variables → Actions):
-  - `NPM_PUBLISH=true` together with the `NPM_TOKEN` secret, to publish the `dreamward`, `@dreamward/client` and `@dreamward/mcp` packages
+  - `NPM_PUBLISH=true` to publish the `dreamward`, `@dreamward/client` and `@dreamward/mcp` packages (see npm below)
   - `DESKTOP_RELEASE=false` to skip the desktop installers
   - `DEPLOY_ENABLED=true`, `DEPLOY_URL` and `DEPLOY_PATH`, to deploy your own instance (see [deployment.md](deployment.md))
 - **Desktop signing secrets**: see [desktop.md](desktop.md).
+- **`release` environment**: the images, assets, npm, desktop and checksums
+  jobs run in it. Only `main` and `v*` tags may deploy to it.
+- **npm: trusted publishing (no token).** For each of the three packages on
+  npmjs.com: *Settings → Trusted publishing → GitHub Actions*, with
+  organization `SufZen`, repository `Dreamward`, workflow filename
+  `release-please.yml` (npm checks the *calling* workflow; the publish step
+  lives in `release.yml`), and environment `release`. Then, under *Publishing
+  access*, choose "Require two-factor authentication and disallow tokens", and
+  delete the `NPM_TOKEN` repository secret.
+- **Actions are pinned by commit SHA.** Dependabot proposes the updates; never
+  replace a SHA with a tag.
