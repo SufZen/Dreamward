@@ -30,6 +30,7 @@ const STEPS: (StepperStep & { key: OnboardingStep; motion: MotionName })[] = [
 
 /* Per-browser conveniences only — the book itself is the source of truth. */
 const SCORES_KEY = 'dw.start.scores';
+const LOW_SCORE = 6;
 const IKIGAI_SEEN_KEY = 'dw.start.ikigaiSeen';
 const readSession = <T,>(key: string, fallback: T): T => {
   try {
@@ -95,6 +96,11 @@ function Flow({ chapter }: { chapter: Chapter | null }) {
 
   useEffect(() => writeSession(SCORES_KEY, Object.keys(scores).length ? scores : null), [scores]);
   useEffect(() => heading.current?.focus(), [step, done]);
+  // Everything is already in the book (e.g. back from the IKIGAI detour): record it as completed.
+  useEffect(() => {
+    if (done && onboarding?.status === 'pending') setStatus.mutate('completed');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [done]);
 
   const latestScore = useMemo(() => {
     const m: Record<string, number> = {};
@@ -102,11 +108,11 @@ function Flow({ chapter }: { chapter: Chapter | null }) {
     return m;
   }, [latest]);
   const scoreOf = (id: string): number | undefined => scores[id] ?? latestScore[id];
-  // The three lowest-rated areas are hinted as focus candidates.
+  // Up to three of the lowest-rated areas (6 or below) are hinted as focus candidates.
   const lowest = useMemo(
     () =>
       (categories ?? [])
-        .filter((c) => scoreOf(c.id) !== undefined)
+        .filter((c) => (scoreOf(c.id) ?? Infinity) <= LOW_SCORE)
         .sort((a, b) => scoreOf(a.id)! - scoreOf(b.id)!)
         .slice(0, 3)
         .map((c) => c.id),
@@ -237,7 +243,7 @@ function Flow({ chapter }: { chapter: Chapter | null }) {
   );
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6">
+    <div className="mx-auto flex max-w-3xl flex-col gap-6 pb-24 md:pb-0">
       <header className="flex items-center justify-between gap-4">
         <div className="flex flex-col">
           <span className="text-xs uppercase tracking-wide text-fg-faint">{he ? 'התחלה מודרכת' : 'Guided start'}</span>
@@ -327,7 +333,7 @@ function Flow({ chapter }: { chapter: Chapter | null }) {
                       {areaLabel(c.id)}
                       {scoreOf(c.id) !== undefined && <span className="ms-1.5 font-mono text-xs opacity-70">{scoreOf(c.id)}</span>}
                       {!on && lowest.includes(c.id) && (
-                        <span className="ms-1.5 text-xs text-warning">{he ? '· פער' : '· gap'}</span>
+                        <span className="ms-1.5 text-xs text-warning">{he ? '· נמוך' : '· low'}</span>
                       )}
                     </button>
                   );
