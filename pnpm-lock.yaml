@@ -56,8 +56,8 @@ importers:
         specifier: ^5.12.5
         version: 5.12.5
       fastify-plugin:
-        specifier: ^5.0.1
-        version: 5.1.0
+        specifier: ^6.0.0
+        version: 6.0.0
       fflate:
         specifier: ^0.8.3
         version: 0.8.3
