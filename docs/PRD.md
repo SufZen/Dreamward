@@ -19,7 +19,7 @@ vision into a practice:
 - IKIGAI
 - goals and actions with honest progress
 - a journal and vision boards
-- Lify, an AI companion that runs on the person's own AI provider
+- Clarity, an AI companion that runs on the person's own AI provider
 
 It runs as a desktop app or self-hosted. Data stays with the person, and their
 own AI agents can work with it over MCP, the CLI or a REST API.
@@ -34,7 +34,7 @@ own AI agents can work with it over MCP, the CLI or a REST API.
 - I turn vision into goals and small actions, and see which goals are stalling.
 - I write in Hebrew or English freely, and each renders in the right direction.
 - I keep a journal and search it; I build vision boards and export them for my phone and desktop wallpapers.
-- I talk to Lify (in my language) about my book; Lify proposes changes and I approve them.
+- I talk to Clarity (in my language) about my book; Clarity proposes changes and I approve them.
 - I connect the AI I already pay for (an API key, a local model, or my Claude/ChatGPT/Gemini agent over MCP).
 - I download my whole book at any time and can move it between desktop and server.
 
@@ -47,7 +47,7 @@ own AI agents can work with it over MCP, the CLI or a REST API.
   - Actions with priority, due date and links to any entity.
   - A calendar feed.
 - **Journal, vision boards, snapshots.** Full-text search, a collage editor with multi-format export, and dated snapshots with comparison.
-- **Lify.**
+- **Clarity.**
   - Streaming chat with tools and approval-gated proposals.
   - Scheduled routines: daily plan, weekly review prep, goal drift.
 - **Agents.** Personal API keys (read or write), an audited `/api/v1`, an MCP server (tools, resources, ritual prompts), a CLI with one-command agent setup, and OpenAPI.

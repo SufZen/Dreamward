@@ -99,7 +99,7 @@ Full guide (every harness, n8n/OpenAPI, Hermes/OpenClaw, calendar feed): [docs/a
 | [docs/ai-providers.md](docs/ai-providers.md) | Connecting OpenRouter / local models / ChatGPT (Codex) |
 | [docs/security-privacy.md](docs/security-privacy.md) | Threat model, what's encrypted, data ownership |
 | [docs/backup-restore.md](docs/backup-restore.md) | Backup layout, retention, full restore procedure |
-| [docs/roadmap-2.0.md](docs/roadmap-2.0.md) | Dreamward 2.0 analysis — what ships, what waits, what's missing |
+| [docs/roadmap.md](docs/roadmap.md) | Roadmap — what has shipped, Now / Next / Later, what we deliberately skip |
 | [docs/PRD.md](docs/PRD.md) | Original product requirements |
 | [CHANGELOG.md](CHANGELOG.md) | Release history |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Repo layout, scripts, conventions |

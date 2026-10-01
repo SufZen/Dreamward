@@ -26,4 +26,4 @@ Key facts for agents:
 
 - [Architecture](docs/architecture.md)
 - [Contributing](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) for coding agents
-- [Roadmap](docs/roadmap-2.0.md)
+- [Roadmap](docs/roadmap.md)
