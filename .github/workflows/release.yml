@@ -3,7 +3,9 @@ name: Release
 # The release pipeline for a vX.Y.Z tag:
 #   verify   → versions in sync + match the tag, typecheck, tests, build
 #   images   → multi-arch (amd64 + arm64) images with SBOM + provenance
-#   assets   → install.sh / docker-compose.yml / .env.example / ctl on the Release
+#   assets   → install.sh / docker-compose.yml (images pinned by digest) /
+#              .env.example / ctl on the Release
+#   checksums→ SHA256SUMS over every Release asset (the installer verifies it)
 #   npm      → agent packages via npm trusted publishing (opt-in: repo variable NPM_PUBLISH=true)
 #   desktop  → Windows / macOS / Linux installers + auto-update manifests
 #              (unsigned unless signing secrets are set; opt-out: DESKTOP_RELEASE=false)
@@ -133,15 +135,29 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ env.TAG }}
+      - name: Pin the images by digest in the release compose file
+        run: |
+          owner="${GITHUB_REPOSITORY_OWNER,,}"; v="${TAG#v}"
+          digest() { docker buildx imagetools inspect "$1" --format '{{json .Manifest}}' | jq -r .digest; }
+          api=$(digest "ghcr.io/$owner/$IMAGE_NAME_PREFIX-api:$v")
+          web=$(digest "ghcr.io/$owner/$IMAGE_NAME_PREFIX-web:$v")
+          caddy_ref=$(sed -n 's/^ *image: \(caddy:[^ ]*\).*/\1/p' deploy/docker-compose.yml)
+          caddy=$(digest "docker.io/library/$caddy_ref")
+          mkdir -p out
+          cp deploy/install.sh deploy/Caddyfile deploy/dreamward-ctl out/
+          # GitHub renames dot-files on upload; publish it under its final name.
+          cp deploy/.env.example out/default.env.example
+          sed -E \
+            -e "s#(-api):\\\$\{DREAMWARD_VERSION[^}]*\}#\1:$v@$api#" \
+            -e "s#(-web):\\\$\{DREAMWARD_VERSION\}#\1:$v@$web#" \
+            -e "s#image: $caddy_ref\$#image: $caddy_ref@$caddy#" \
+            deploy/docker-compose.yml > out/docker-compose.yml
+          grep -n 'image:' out/docker-compose.yml
+          [ "$(grep -c '@sha256:' out/docker-compose.yml)" = 3 ] || { echo "::error::expected 3 digest-pinned images"; exit 1; }
       - name: Attach self-host files to the GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          files=()
-          for f in deploy/install.sh deploy/docker-compose.yml deploy/Caddyfile deploy/.env.example deploy/dreamward-ctl; do
-            [ -f "$f" ] && files+=("$f")
-          done
-          [ ${#files[@]} -gt 0 ] && gh release upload "$TAG" "${files[@]}" --clobber || echo "no assets to attach"
+        run: gh release upload "$TAG" out/* --clobber
 
   npm:
     needs: [verify]
@@ -233,6 +249,27 @@ jobs:
           files=( *.exe *.dmg *.zip *.AppImage *.deb *.blockmap latest*.yml )
           ls -la "${files[@]}"
           gh release upload "$TAG" "${files[@]}" --clobber --repo "$GITHUB_REPOSITORY"
+
+  # One SHA256SUMS for everything on the Release (installers, self-host files).
+  # install.sh and dreamward-ctl verify their downloads against it.
+  checksums:
+    needs: [assets, desktop]
+    if: ${{ !cancelled() && needs.assets.result == 'success' }}
+    environment: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Write and attach SHA256SUMS
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir dl && cd dl
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --skip-existing
+          rm -f SHA256SUMS
+          sha256sum -- * > ../SHA256SUMS
+          cat ../SHA256SUMS
+          gh release upload "$TAG" ../SHA256SUMS --clobber --repo "$GITHUB_REPOSITORY"
 
   # Refresh dreamward.life so its download buttons point at the new installers.
   site:

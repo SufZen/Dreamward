@@ -71,10 +71,26 @@ wait_version() { # wait_version VERSION SECONDS
   return 1
 }
 
+sha256() { if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | cut -d' ' -f1; else shasum -a 256 "$1" | cut -d' ' -f1; fi; }
+
 fetch_deploy_files() { # refresh compose/Caddyfile/ctl for a version (keeps .env)
-  local ref="$1" raw="https://raw.githubusercontent.com/$REPO/$1/deploy" f
+  local ref="$1" f asset want base sums=""
+  base="https://github.com/$REPO/releases/download/$ref"
+  case "$ref" in
+    main|v0.[0-5].*) # edge, or a release from before SHA256SUMS existed
+      warn "$ref has no checksums: files are not verified"
+      base="https://raw.githubusercontent.com/$REPO/$ref/deploy" ;;
+    *) sums=$(curl -fsSL "$base/SHA256SUMS" 2>/dev/null) || die "Could not download SHA256SUMS for $ref — not updating." ;;
+  esac
   for f in docker-compose.yml Caddyfile dreamward-ctl; do
-    if curl -fsSL "$raw/$f" -o "$f.new" 2>/dev/null; then cp -f "$f" "$f.prev" 2>/dev/null || true; mv "$f.new" "$f"; else rm -f "$f.new"; fi
+    curl -fsSL "$base/$f" -o "$f.new" 2>/dev/null || { rm -f ./*.new; die "Download failed: $base/$f"; }
+    if [ -n "$sums" ]; then
+      want=$(printf '%s\n' "$sums" | awk -v a="$f" '$2 == a || $2 == "*" a { print $1 }')
+      [ -n "$want" ] && [ "$(sha256 "$f.new")" = "$want" ] || { rm -f ./*.new; die "Checksum mismatch for $f ($ref) — not updating."; }
+    fi
+  done
+  for f in docker-compose.yml Caddyfile dreamward-ctl; do
+    cp -f "$f" "$f.prev" 2>/dev/null || true; mv "$f.new" "$f"
   done
   chmod +x dreamward-ctl
 }

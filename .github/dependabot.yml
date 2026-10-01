@@ -32,3 +32,12 @@ updates:
         patterns: ["*"]
     commit-message:
       prefix: build
+  - package-ecosystem: docker-compose
+    directory: /deploy
+    schedule:
+      interval: monthly
+    groups:
+      compose:
+        patterns: ["*"]
+    commit-message:
+      prefix: build

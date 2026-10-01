@@ -83,11 +83,31 @@ cd "$DIR"
 info "folder $DIR"
 
 # ── Files (compose, Caddyfile, lifecycle tool) ────────────────────────────
-RAW="https://raw.githubusercontent.com/$REPO/$REF/deploy"
-for f in docker-compose.yml Caddyfile dreamward-ctl .env.example; do
-  curl -fsSL "$RAW/$f" -o "$f.new" || die "Download failed: $RAW/$f"
-  mv "$f.new" "$f"
-done
+# Releases carry these files with the images pinned by digest, plus a
+# SHA256SUMS that every download is checked against. "edge" follows main.
+sha256() { if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | cut -d' ' -f1; else shasum -a 256 "$1" | cut -d' ' -f1; fi; }
+fetch() { curl -fsSL "$1" -o "$2" || die "Download failed: $1"; }
+FILES="docker-compose.yml Caddyfile dreamward-ctl .env.example"
+BASE="https://github.com/$REPO/releases/download/v$VERSION"
+# edge follows main, and releases before v0.6 have no SHA256SUMS. Every newer
+# release must verify: a missing checksum file is an error, not a fallback.
+case "$VERSION" in edge|0.[0-5].*) UNVERIFIED=1 ;; *) UNVERIFIED=0 ;; esac
+if [ "$UNVERIFIED" -eq 1 ]; then
+  warn "v$VERSION has no checksums: files are not verified"
+  for f in $FILES; do fetch "https://raw.githubusercontent.com/$REPO/$REF/deploy/$f" "$f.new"; done
+else
+  fetch "$BASE/SHA256SUMS" SHA256SUMS.new
+  for f in $FILES; do
+    asset="$f"; [ "$f" = ".env.example" ] && asset="default.env.example" # GitHub renames dot-files
+    fetch "$BASE/$asset" "$f.new"
+    want=$(awk -v a="$asset" '$2 == a || $2 == "*" a { print $1 }' SHA256SUMS.new)
+    [ -n "$want" ] || die "$asset is missing from SHA256SUMS of v$VERSION"
+    [ "$(sha256 "$f.new")" = "$want" ] || die "Checksum mismatch for $asset (v$VERSION) — not installing."
+  done
+  rm -f SHA256SUMS.new
+  info "files verified against SHA256SUMS"
+fi
+for f in $FILES; do mv "$f.new" "$f"; done
 chmod +x dreamward-ctl
 
 # ── Settings (.env) — created once, never overwritten ─────────────────────
@@ -107,16 +127,19 @@ else
     case "$(ask "Reachable from other devices on your network? (y/N)" "n")" in y|Y|yes) LAN=1 ;; esac
   fi
 
+  USERS=10
   if [ "$LOCAL" -eq 1 ]; then
+    USERS=$(ask "How many people will use it? (1 = just you)" "1")
+    case "$USERS" in ''|*[!0-9]*|0) USERS=1 ;; esac
     if [ "$LAN" -eq 1 ]; then
       HOST_IP=$( (hostname -I 2>/dev/null || ipconfig getifaddr en0 2>/dev/null || echo localhost) | awk '{print $1}')
       ORIGIN="http://$HOST_IP:$PORT"; BIND="0.0.0.0"
     else
       ORIGIN="http://localhost:$PORT"; BIND="127.0.0.1"
     fi
-    PROFILES=""; SECURE=false; PRIVATE_AI=true
+    PROFILES=""; SECURE=false
   else
-    ORIGIN="https://$DOMAIN"; BIND="127.0.0.1"; PROFILES="https"; SECURE=true; PRIVATE_AI=false
+    ORIGIN="https://$DOMAIN"; BIND="127.0.0.1"; PROFILES="https"; SECURE=true
   fi
 
   umask 077
@@ -132,11 +155,12 @@ WEB_BIND=$BIND
 WEB_PORT=$PORT
 JWT_SECRET=$(rand)
 KEY_ENCRYPTION_SECRET=$(rand)
-MAX_USERS=10
+MAX_USERS=$USERS
 BACKUP_HOUR=3
 BACKUP_RETENTION_DAYS=14
 TZ=$( (cat /etc/timezone 2>/dev/null || echo UTC) | head -1)
-ALLOW_PRIVATE_AI_URLS=$PRIVATE_AI
+# Local AI servers (Ollama, LM Studio): empty = allowed only when MAX_USERS=1.
+ALLOW_PRIVATE_AI_URLS=
 CODEX_ENABLED=false
 EOF
   chmod 600 .env

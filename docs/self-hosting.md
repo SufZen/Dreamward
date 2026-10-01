@@ -76,6 +76,25 @@ Major versions (1.x → 2.x) ask for `--yes` after you've read the release notes
 
 Changed your mind after an update? `dreamward-ctl rollback`.
 
+## Verifying what you install
+
+Every release from v0.6 on is checked end to end:
+
+- `install.sh` and `dreamward-ctl update` download the release's files and
+  compare each one with the release's `SHA256SUMS`. A mismatch stops the
+  install or update before anything changes.
+- The release `docker-compose.yml` pins every image **by digest**
+  (`…/dreamward-api:X.Y.Z@sha256:…`), so a moved tag can't swap the code you run.
+- The images carry signed build provenance. To check that an image was built
+  by this repository's release workflow:
+
+```bash
+gh attestation verify oci://ghcr.io/sufzen/dreamward-api:X.Y.Z --repo SufZen/Dreamward
+```
+
+Prefer to read before you run? Download `install.sh` first, look at it, then
+run `bash install.sh`.
+
 ## Your data
 
 | Volume | Contents |
