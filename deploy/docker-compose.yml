@@ -34,6 +34,10 @@ services:
       BACKUP_HOUR: ${BACKUP_HOUR:-3}
       BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
       ALLOW_PRIVATE_AI_URLS: ${ALLOW_PRIVATE_AI_URLS:-}
+      # Proxies in front of the API: auto = nginx (+ Caddy in https mode). If you
+      # put your own reverse proxy in front of web, set TRUST_PROXY=2 in .env.
+      TRUST_PROXY: ${TRUST_PROXY:-auto}
+      DEPLOY_PROFILES: ${COMPOSE_PROFILES:-}
       CODEX_ENABLED: ${CODEX_ENABLED:-false}
       FRAMEWORK_PACK_FILE: ${FRAMEWORK_PACK_FILE:-}
       TZ: ${TZ:-UTC}

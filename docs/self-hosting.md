@@ -112,7 +112,11 @@ it. Then set in `.env`:
 ```bash
 PUBLIC_ORIGIN=https://life.example.com
 COOKIE_SECURE=true
+TRUST_PROXY=2   # your proxy + the bundled nginx (login rate limits see the real client)
 ```
+
+Your proxy must *replace* any `X-Forwarded-For` it receives from the internet
+(Traefik, Caddy and Cloudflare do this by default).
 
 and `docker compose up -d`. Keep streaming working: disable response buffering
 for `/api/` (e.g. nginx `proxy_buffering off;`) and allow request bodies up to
@@ -135,6 +139,7 @@ Traefik-labelled example.
 | `MAX_USERS` | `10` | account cap |
 | `BACKUP_HOUR`, `BACKUP_RETENTION_DAYS` | `3`, `14` | daily backup schedule |
 | `ALLOW_PRIVATE_AI_URLS` | per install mode | allow local model servers |
+| `TRUST_PROXY` | `auto` | proxies in front of the API: `auto` = nginx (+ Caddy in https mode); `2` behind your own proxy |
 | `TZ` | `UTC` | timezone for backups and routines |
 
 ## Troubleshooting

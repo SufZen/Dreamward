@@ -30,6 +30,8 @@ services:
       CODEX_ENABLED: ${CODEX_ENABLED:-false}
       BACKUP_HOUR: ${BACKUP_HOUR:-3}
       BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
+      # Traefik -> nginx -> api: trust exactly those two hops.
+      TRUST_PROXY: ${TRUST_PROXY:-2}
       COOKIE_SECURE: "true"
       PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?set PUBLIC_ORIGIN in .env}
     volumes:
