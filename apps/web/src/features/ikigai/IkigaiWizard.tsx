@@ -12,6 +12,7 @@ import { Button, Card, cn } from '@dreamward/design-system';
 import { useLang, pickLabel } from '@/lib/lang';
 import { useAutosave } from '@/lib/useAutosave';
 import { SaveIndicator } from '@/components/SaveIndicator';
+import { Stepper } from '@/components/Stepper';
 import { CircleStep, EverydayStep, MapStep, SynthesisStep, VennStep } from './steps';
 import { useCompleteIkigai, useDiscardIkigaiDraft, useUpdateIkigai } from './hooks';
 
@@ -81,37 +82,12 @@ export function IkigaiWizard({ draft, isRevisit }: { draft: IkigaiProfile; isRev
 
   return (
     <div className="flex flex-col gap-6">
-      {/* stepper */}
-      <nav aria-label={he ? 'שלבים' : 'Steps'} className="flex flex-col gap-2">
-        <div className="flex items-center justify-between text-xs text-fg-muted">
-          <span>
-            {he ? `שלב ${step + 1} מתוך ${STEPS.length}` : `Step ${step + 1} of ${STEPS.length}`} ·{' '}
-            {pickLabel(lang, current.en, current.he)}
-          </span>
-          <SaveIndicator status={status} />
-        </div>
-        <ol className="flex gap-1">
-          {STEPS.map((s, i) => {
-            const color = s.circle ? IKIGAI_CIRCLES.find((c) => c.id === s.circle)!.color : undefined;
-            return (
-              <li key={s.key} className="flex-1">
-                <button
-                  type="button"
-                  onClick={() => go(i)}
-                  title={pickLabel(lang, s.en, s.he)}
-                  aria-current={i === step ? 'step' : undefined}
-                  className={cn(
-                    'block h-1.5 w-full rounded-full transition-colors',
-                    i > step && 'bg-surface-hover',
-                    i <= step && !color && 'bg-primary',
-                  )}
-                  style={i <= step && color ? { background: color } : undefined}
-                />
-              </li>
-            );
-          })}
-        </ol>
-      </nav>
+      <Stepper
+        steps={STEPS.map((s) => ({ ...s, color: s.circle ? IKIGAI_CIRCLES.find((c) => c.id === s.circle)!.color : undefined }))}
+        step={step}
+        onGo={go}
+        aside={<SaveIndicator status={status} />}
+      />
 
       <Card className="p-6">
         {current.key === 'intro' && <Intro isRevisit={isRevisit} />}
