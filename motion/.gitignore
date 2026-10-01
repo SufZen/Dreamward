@@ -1,0 +1,8 @@
+node_modules
+dist
+.DS_Store
+.env
+
+# Render scratch (the finished loops go to apps/web/public/motion)
+out
+frames

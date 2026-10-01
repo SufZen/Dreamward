@@ -8,6 +8,7 @@ import { useProviders } from '@/features/settings/useLlmProviders';
 import { useAssistantStore } from './store';
 import { usePageContext } from './usePageContext';
 import { useAgentChat, type UiMessage } from './useAgentChat';
+import { OnboardingMotion } from '@/components/OnboardingMotion';
 import { ProposalCard } from './ProposalCard';
 
 function ToolChip({ name }: { name: string }) {
@@ -223,7 +224,7 @@ export function AssistantPanel() {
 
         {hasActiveProvider === false ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center text-fg-muted">
-            <ClarityAvatar size={56} aria-hidden title="" />
+            <OnboardingMotion name="clarity" className="max-w-[280px]" />
             <p className="text-sm">
               {lang === 'he'
                 ? 'עוד צעד אחד כדי לפגוש את Clarity — חבר מודל AI בהגדרות כדי להתחיל.'

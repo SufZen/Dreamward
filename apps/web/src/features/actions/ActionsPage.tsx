@@ -4,6 +4,7 @@ import { ArrowDown, ArrowUp, Bot, Check, Pencil, Plus, Target, Trash2, X } from 
 import { ACTION_PRIORITIES, type ActionPriority } from '@dreamward/shared';
 import { Badge, Button, Card, Input, cn } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
+import { OnboardingMotion } from '@/components/OnboardingMotion';
 import { useGoals } from '@/features/goals/hooks';
 import { useActions, useCreateAction, useUpdateAction, useDeleteAction, useReorderActions, type Action } from './hooks';
 
@@ -304,8 +305,17 @@ export function ActionsPage() {
               onMove={(dir) => move(i, dir)}
             />
           ))
-        ) : (
+        ) : statusFilter !== 'todo' || priorityFilter || goalFilter ? (
           <p className="py-4 text-sm text-fg-faint">{t('empty')}</p>
+        ) : (
+          <div className="grid items-center gap-5 py-4 sm:grid-cols-[minmax(0,260px)_1fr]">
+            <OnboardingMotion name="steps" />
+            <p className="text-sm text-fg-muted">
+              {lang === 'he'
+                ? 'צעד אחד בכל פעם. הוסף פעולה קטנה מספיק כדי לעשות אותה השבוע, ותן לה תאריך.'
+                : 'One step at a time. Add an action small enough to do this week, and give it a date.'}
+            </p>
+          </div>
         )}
       </Card>
     </div>

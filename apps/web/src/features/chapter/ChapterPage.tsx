@@ -8,6 +8,7 @@ import { useAutosave } from '@/lib/useAutosave';
 import { SaveIndicator } from '@/components/SaveIndicator';
 import { EditableList } from '@/components/editor/EditableList';
 import { Icon } from '@/components/Icon';
+import { OnboardingMotion } from '@/components/OnboardingMotion';
 import { useChapters, useCloseChapter, useCreateChapter, useCurrentChapter, useUpdateChapter } from './hooks';
 
 const toDateInput = (ms: number | null) => (ms ? new Date(ms).toISOString().slice(0, 10) : '');
@@ -77,28 +78,31 @@ function StartChapter({ onDone }: { onDone?: () => void }) {
   const [title, setTitle] = useState('');
 
   return (
-    <Card featured className="flex flex-col gap-4 p-6">
-      <div className="flex items-center gap-2 text-primary">
-        <Sparkles size={18} />
-        <h2 className="text-xl font-semibold">{he ? 'תן שם לתקופה הזו' : 'Name this season of your life'}</h2>
+    <Card featured className="grid items-center gap-6 p-6 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-2 text-primary">
+          <Sparkles size={18} />
+          <h2 className="text-xl font-semibold">{he ? 'תן שם לתקופה הזו' : 'Name this season of your life'}</h2>
+        </div>
+        <p className="text-sm text-fg-muted">
+          {he
+            ? 'למשל: "בונה בסיס חדש", "שנת הבריאות", "פרק ההתחלה מחדש". אחרי זה תבחר 1-5 תחומי מיקוד.'
+            : 'For example: "Building a new base", "The health year", "Starting over". Next you’ll pick 1–5 focus areas.'}
+        </p>
+        <form
+          className="flex flex-col gap-3 sm:flex-row"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (title.trim()) create.mutate({ title: title.trim() }, { onSuccess: () => onDone?.() });
+          }}
+        >
+          <Input dir="auto" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={he ? 'שם הפרק' : 'Chapter name'} />
+          <Button type="submit" loading={create.isPending} disabled={!title.trim()}>
+            <Flag size={15} /> {he ? 'התחל פרק' : 'Start chapter'}
+          </Button>
+        </form>
       </div>
-      <p className="text-sm text-fg-muted">
-        {he
-          ? 'למשל: "בונה בסיס חדש", "שנת הבריאות", "פרק ההתחלה מחדש". אחרי זה תבחר 1-5 תחומי מיקוד.'
-          : 'For example: "Building a new base", "The health year", "Starting over". Next you’ll pick 1–5 focus areas.'}
-      </p>
-      <form
-        className="flex flex-col gap-3 sm:flex-row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (title.trim()) create.mutate({ title: title.trim() }, { onSuccess: () => onDone?.() });
-        }}
-      >
-        <Input dir="auto" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={he ? 'שם הפרק' : 'Chapter name'} />
-        <Button type="submit" loading={create.isPending} disabled={!title.trim()}>
-          <Flag size={15} /> {he ? 'התחל פרק' : 'Start chapter'}
-        </Button>
-      </form>
+      <OnboardingMotion name="chapter" className="order-first md:order-none" />
     </Card>
   );
 }

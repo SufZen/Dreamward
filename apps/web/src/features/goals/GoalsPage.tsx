@@ -4,6 +4,7 @@ import { GOAL_STATUSES, type GoalProgress, type GoalStatus } from '@dreamward/sh
 import { Badge, Button, Card, Input, cn } from '@dreamward/design-system';
 import { useLang, pickLabel } from '@/lib/lang';
 import { useCategories } from '@/features/book/hooks';
+import { OnboardingMotion } from '@/components/OnboardingMotion';
 import {
   useGoals,
   useGoalsSummary,
@@ -159,7 +160,14 @@ export function GoalsPage() {
         ) : goals?.length ? (
           goals.map((g) => <GoalRow key={g.id} goal={g} progress={progressMap?.[g.id]} />)
         ) : (
-          <p className="py-4 text-sm text-fg-faint">{t('empty')}</p>
+          <div className="grid items-center gap-5 py-4 sm:grid-cols-[minmax(0,260px)_1fr]">
+            <OnboardingMotion name="steps" />
+            <p className="text-sm text-fg-muted">
+              {lang === 'he'
+                ? 'מטרה היא כוכב שאתה הולך אליו. הוסף אחת למעלה, ואז פרק אותה לצעדים קטנים בעמוד הפעולות. כל צעד שתסמן יקרב אותך.'
+                : 'A goal is a star you walk toward. Add one above, then break it into small steps on the Actions page. Every step you check off brings you closer.'}
+            </p>
+          </div>
         )}
       </Card>
     </div>
