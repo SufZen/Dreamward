@@ -50,7 +50,7 @@ Run typecheck and the API tests before you say a change is done.
    - Exports strip AI keys.
    - Never commit `.env`, `data/` or DB files.
 5. **Bilingual.** Every user-facing string has EN and HE variants. Keep `dir` handling intact.
-6. **Never run the dev server against the maintainer's real data.** Point `DATA_DIR` and `BACKUP_DIR` at a scratch folder when you boot the API for verification.
+6. **Never run the dev server against the maintainer's real data.** Use `node scripts/dev-sandbox.mjs` (launch config `dreamward-sandbox`): it points `DATA_DIR` and `BACKUP_DIR` at a temp sandbox with its own test account.
 7. **Agent surface parity.** A new `/api/v1` endpoint needs:
    - an MCP tool with correct annotations, and read or write access in `toolAccess`
    - an OpenAPI entry
