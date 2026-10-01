@@ -1,8 +1,7 @@
 import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Link from '@tiptap/extension-link';
-import Image from '@tiptap/extension-image';
-import Youtube from '@tiptap/extension-youtube';
+import { StarterKit } from '@tiptap/starter-kit';
+import { Image } from '@tiptap/extension-image';
+import { Youtube } from '@tiptap/extension-youtube';
 import { useEffect } from 'react';
 import { Toolbar } from './Toolbar';
 
@@ -19,12 +18,18 @@ interface Props {
 export function RichTextEditor({ value, onChange, minimal }: Props) {
   const editor = useEditor({
     extensions: [
-      StarterKit,
-      Link.configure({ openOnClick: false, autolink: true, HTMLAttributes: { rel: 'noopener noreferrer', target: '_blank' } }),
+      // TipTap 3's StarterKit includes Link and Underline. Underline stays off:
+      // the toolbar has no button for it and saved content never used <u>.
+      StarterKit.configure({
+        link: { openOnClick: false, autolink: true, HTMLAttributes: { rel: 'noopener noreferrer', target: '_blank' } },
+        underline: false,
+      }),
       Image.configure({ inline: false, HTMLAttributes: { class: 'rounded-md' } }),
       Youtube.configure({ nocookie: true, controls: true, width: 480, height: 270 }),
     ],
     content: value || '<p></p>',
+    // The toolbar reads its active states with useEditorState instead.
+    shouldRerenderOnTransaction: false,
     editorProps: {
       attributes: {
         dir: 'auto',
@@ -39,7 +44,8 @@ export function RichTextEditor({ value, onChange, minimal }: Props) {
     if (!editor) return;
     const current = editor.getHTML();
     if (value && value !== current && !editor.isFocused) {
-      editor.commands.setContent(value, false);
+      // emitUpdate: false — syncing from the server must not echo back as an edit.
+      editor.commands.setContent(value, { emitUpdate: false });
     }
   }, [value, editor]);
 

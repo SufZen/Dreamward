@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Editor } from '@tiptap/react';
+import { useEditorState, type Editor } from '@tiptap/react';
 import {
   Bold,
   Italic,
@@ -23,6 +23,9 @@ function Btn({ active, onClick, title, children }: { active?: boolean; onClick: 
   return (
     <button
       type="button"
+      // Keep focus and the selection in the editor: a toolbar click must not
+      // blur it, or the next keystrokes land on the button.
+      onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
       title={title}
       className={cn(
@@ -44,6 +47,22 @@ export function Toolbar({ editor }: { editor: Editor }) {
   const [picker, setPicker] = useState(false);
   const [ytOpen, setYtOpen] = useState(false);
   const [ytUrl, setYtUrl] = useState('');
+  // Re-render only when a button's active state changes (TipTap 3 no longer
+  // re-renders on every transaction).
+  const active = useEditorState({
+    editor,
+    selector: ({ editor: ed }) => ({
+      bold: ed.isActive('bold'),
+      italic: ed.isActive('italic'),
+      strike: ed.isActive('strike'),
+      h2: ed.isActive('heading', { level: 2 }),
+      h3: ed.isActive('heading', { level: 3 }),
+      bulletList: ed.isActive('bulletList'),
+      orderedList: ed.isActive('orderedList'),
+      blockquote: ed.isActive('blockquote'),
+      link: ed.isActive('link'),
+    }),
+  });
 
   const setLink = () => {
     const prev = editor.getAttributes('link').href as string | undefined;
@@ -62,33 +81,33 @@ export function Toolbar({ editor }: { editor: Editor }) {
 
   return (
     <div className="relative flex flex-wrap items-center gap-0.5 border-b border-border pb-2" dir={he ? 'rtl' : 'ltr'}>
-      <Btn active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()} title={he ? 'מודגש' : 'Bold'}>
+      <Btn active={active.bold} onClick={() => editor.chain().focus().toggleBold().run()} title={he ? 'מודגש' : 'Bold'}>
         <Bold size={15} />
       </Btn>
-      <Btn active={editor.isActive('italic')} onClick={() => editor.chain().focus().toggleItalic().run()} title={he ? 'נטוי' : 'Italic'}>
+      <Btn active={active.italic} onClick={() => editor.chain().focus().toggleItalic().run()} title={he ? 'נטוי' : 'Italic'}>
         <Italic size={15} />
       </Btn>
-      <Btn active={editor.isActive('strike')} onClick={() => editor.chain().focus().toggleStrike().run()} title={he ? 'קו חוצה' : 'Strikethrough'}>
+      <Btn active={active.strike} onClick={() => editor.chain().focus().toggleStrike().run()} title={he ? 'קו חוצה' : 'Strikethrough'}>
         <Strikethrough size={15} />
       </Btn>
       <Divider />
-      <Btn active={editor.isActive('heading', { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} title={he ? 'כותרת' : 'Heading'}>
+      <Btn active={active.h2} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} title={he ? 'כותרת' : 'Heading'}>
         <Heading2 size={15} />
       </Btn>
-      <Btn active={editor.isActive('heading', { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} title={he ? 'כותרת משנה' : 'Subheading'}>
+      <Btn active={active.h3} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} title={he ? 'כותרת משנה' : 'Subheading'}>
         <Heading3 size={15} />
       </Btn>
-      <Btn active={editor.isActive('bulletList')} onClick={() => editor.chain().focus().toggleBulletList().run()} title={he ? 'רשימה' : 'Bullet list'}>
+      <Btn active={active.bulletList} onClick={() => editor.chain().focus().toggleBulletList().run()} title={he ? 'רשימה' : 'Bullet list'}>
         <List size={15} />
       </Btn>
-      <Btn active={editor.isActive('orderedList')} onClick={() => editor.chain().focus().toggleOrderedList().run()} title={he ? 'רשימה ממוספרת' : 'Numbered list'}>
+      <Btn active={active.orderedList} onClick={() => editor.chain().focus().toggleOrderedList().run()} title={he ? 'רשימה ממוספרת' : 'Numbered list'}>
         <ListOrdered size={15} />
       </Btn>
-      <Btn active={editor.isActive('blockquote')} onClick={() => editor.chain().focus().toggleBlockquote().run()} title={he ? 'ציטוט' : 'Quote'}>
+      <Btn active={active.blockquote} onClick={() => editor.chain().focus().toggleBlockquote().run()} title={he ? 'ציטוט' : 'Quote'}>
         <Quote size={15} />
       </Btn>
       <Divider />
-      <Btn active={editor.isActive('link')} onClick={setLink} title={he ? 'קישור' : 'Link'}>
+      <Btn active={active.link} onClick={setLink} title={he ? 'קישור' : 'Link'}>
         <Link2 size={15} />
       </Btn>
       <Btn onClick={() => setPicker(true)} title={he ? 'תמונה' : 'Image'}>
