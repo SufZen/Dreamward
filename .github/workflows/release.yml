@@ -185,10 +185,6 @@ jobs:
       # needs npm >= 11.5.1; Node 22 ships npm 10.
       - run: npm install -g npm@11
       - name: Publish agent packages
-        env:
-          # Fallback only until trusted publishing is configured on npmjs.com;
-          # delete the NPM_TOKEN secret afterwards (docs/releasing.md).
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           dist_tag=latest
           [ "${{ needs.verify.outputs.prerelease }}" = "true" ] && dist_tag=next
