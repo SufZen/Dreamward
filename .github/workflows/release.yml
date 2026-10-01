@@ -4,7 +4,7 @@ name: Release
 #   verify   → versions in sync + match the tag, typecheck, tests, build
 #   images   → multi-arch (amd64 + arm64) images with SBOM + provenance
 #   assets   → install.sh / docker-compose.yml / .env.example / ctl on the Release
-#   npm      → agent packages (opt-in: repo variable NPM_PUBLISH=true)
+#   npm      → agent packages via npm trusted publishing (opt-in: repo variable NPM_PUBLISH=true)
 #   desktop  → Windows / macOS / Linux installers + auto-update manifests
 #              (unsigned unless signing secrets are set; opt-out: DESKTOP_RELEASE=false)
 #
@@ -151,7 +151,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # npm provenance
+      id-token: write # npm trusted publishing + provenance
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -164,14 +164,24 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter "./packages/{client,mcp,cli}" build
+      # Trusted publishing (OIDC): npm exchanges this job's GitHub identity for a
+      # short-lived publish token, so no long-lived npm token is needed. It
+      # needs npm >= 11.5.1; Node 22 ships npm 10.
+      - run: npm install -g npm@11
       - name: Publish agent packages
         env:
+          # Fallback only until trusted publishing is configured on npmjs.com;
+          # delete the NPM_TOKEN secret afterwards (docs/releasing.md).
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: 'true'
         run: |
           dist_tag=latest
           [ "${{ needs.verify.outputs.prerelease }}" = "true" ] && dist_tag=next
-          pnpm --filter "./packages/{client,mcp,cli}" publish --access public --no-git-checks --tag "$dist_tag"
+          # pnpm pack turns workspace:* dependencies into real versions; npm publishes.
+          out="$RUNNER_TEMP/pkgs"; mkdir -p "$out"
+          for pkg in client mcp cli; do
+            tarball=$(cd "packages/$pkg" && pnpm pack --pack-destination "$out" | tail -1)
+            npm publish "$tarball" --access public --tag "$dist_tag" --provenance
+          done
 
   desktop:
     needs: [verify]
