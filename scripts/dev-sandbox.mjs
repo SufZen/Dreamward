@@ -4,7 +4,7 @@
  *
  *   node scripts/dev-sandbox.mjs          (or the "dreamward-sandbox" launch config)
  *
- * Runs `pnpm dev` (API on :4000, web on :5173) with DATA_DIR and BACKUP_DIR in
+ * Runs the API (:4000) and web app (:5173) in dev mode with DATA_DIR and BACKUP_DIR in
  * a sandbox folder under the OS temp dir (SANDBOX_DIR overrides it). A test
  * account and fresh secrets are generated on first run and kept in
  * <sandbox>/sandbox.json, so the sandbox survives restarts. Delete the folder
@@ -37,13 +37,18 @@ try {
 const state = JSON.parse(readFileSync(stateFile, 'utf8'));
 
 console.log(`[sandbox] data in ${dir} — sign in with the account in ${stateFile}`);
-const child = spawn('pnpm', ['dev'], {
+// Only the API and the web app (the root `pnpm dev` also starts the CLI and the
+// desktop shell). Run through pnpm, not turbo: turbo's strict env mode drops
+// DATA_DIR & co., and the API would then fall back to a local .env.
+const child = spawn('pnpm --parallel --filter @dreamward/api --filter @dreamward/web run dev', {
   cwd: repo,
   stdio: 'inherit',
-  shell: process.platform === 'win32',
+  shell: true,
   env: {
     ...process.env,
     NODE_ENV: 'development',
+    // The web dev server proxies /api to :4000; a PORT inherited from a launcher would hijack it.
+    PORT: '4000',
     DATA_DIR: join(dir, 'data'),
     BACKUP_DIR: join(dir, 'backups'),
     // Setting the secrets here also keeps the API from loading a local .env.
