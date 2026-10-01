@@ -7,7 +7,7 @@
  * The launch command defaults to THIS CLI (`node <cli> mcp`) so it works
  * before anything is published; `--npx` uses `npx -y dreamward mcp`.
  * ========================================================================= */
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { homedir, platform } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -85,9 +85,18 @@ export const AGENTS: AgentTarget[] = [
 
 /* ── format writers ─────────────────────────────────────────────────────── */
 
-function readJson(file: string): Record<string, unknown> {
-  if (!existsSync(file)) return {};
-  const raw = readFileSync(file, 'utf8').trim();
+/** The file's text, or null when it doesn't exist (one read, no exists-then-read race). */
+export function readIfExists(file: string): string | null {
+  try {
+    return readFileSync(file, 'utf8');
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') return null;
+    throw err;
+  }
+}
+
+function parseJson(existing: string, file: string): Record<string, unknown> {
+  const raw = existing.trim();
   if (!raw) return {};
   try {
     return JSON.parse(raw) as Record<string, unknown>;
@@ -96,8 +105,9 @@ function readJson(file: string): Record<string, unknown> {
   }
 }
 
-export function applyJson(format: NonNullable<AgentTarget['format']>, file: string, l: Launch): string {
-  const cfg = readJson(file);
+/** The agent's JSON config with Dreamward added; `existing` is the file's current text ('' if none). */
+export function applyJson(format: NonNullable<AgentTarget['format']>, existing: string, file: string, l: Launch): string {
+  const cfg = parseJson(existing, file);
   if (format === 'json-mcpServers') {
     const servers = (cfg.mcpServers as Record<string, unknown>) ?? {};
     servers.dreamward = { command: l.command, args: l.args, env: l.env };
@@ -117,8 +127,8 @@ export function applyJson(format: NonNullable<AgentTarget['format']>, file: stri
 
 const tomlStr = (s: string) => JSON.stringify(s); // TOML basic strings share JSON escaping for our inputs
 
-export function applyCodexToml(file: string, l: Launch): string {
-  const existing = existsSync(file) ? readFileSync(file, 'utf8') : '';
+/** Codex's config.toml with Dreamward added; `existing` is the file's current text ('' if none). */
+export function applyCodexToml(existing: string, l: Launch): string {
   const block = [
     '[mcp_servers.dreamward]',
     `command = ${tomlStr(l.command)}`,
@@ -185,29 +195,34 @@ export async function runSetup(agentId: string | undefined, opts: SetupOptions):
     }
   } else if (agent.file && agent.format) {
     const file = agent.file();
+    // Read once; everything below works from this snapshot.
+    const before = readIfExists(file);
     let next: string;
     try {
-      next = agent.format === 'toml-codex' ? applyCodexToml(file, launch) : applyJson(agent.format, file, launch);
+      next = agent.format === 'toml-codex' ? applyCodexToml(before ?? '', launch) : applyJson(agent.format, before ?? '', file, launch);
     } catch (err) {
       console.error((err as Error).message);
       console.log(JSON.stringify({ dreamward: { command: launch.command, args: launch.args, env: launch.env } }, null, 2));
       process.exit(1);
     }
-    console.log(`File: ${file}${existsSync(file) ? '' : '  (will be created)'}\n`);
+    console.log(`File: ${file}${before === null ? '  (will be created)' : ''}\n`);
     console.log(next);
     if (!opts.write) {
       console.log('Dry run — nothing written. Re-run with --write to apply (a .bak copy is kept).');
     } else if (opts.yes || (await confirm(`Write ${file}?`))) {
-      mkdirSync(dirname(file), { recursive: true });
-      let backedUp = false;
-      try {
-        copyFileSync(file, `${file}.bak`);
-        backedUp = true;
-      } catch (err) {
-        if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err; // no previous file: nothing to back up
+      // The agent may have rewritten its config while we waited for "yes":
+      // never overwrite changes we didn't read.
+      if (readIfExists(file) !== before) {
+        console.error(`${file} changed while you were deciding. Nothing was written; run the command again.`);
+        process.exit(1);
       }
-      writeFileSync(file, next, { mode: 0o600 });
-      console.log(`Written ✓${backedUp ? `  (previous version: ${file}.bak)` : ''}`);
+      mkdirSync(dirname(file), { recursive: true });
+      if (before !== null) writeFileSync(`${file}.bak`, before, { mode: 0o600 });
+      // Write a temp file, then rename: the config is never half-written.
+      const tmp = `${file}.dreamward-${process.pid}.tmp`;
+      writeFileSync(tmp, next, { mode: 0o600 });
+      renameSync(tmp, file);
+      console.log(`Written ✓${before !== null ? `  (previous version: ${file}.bak)` : ''}`);
     }
   } else {
     console.log(JSON.stringify({ mcpServers: { dreamward: { command: launch.command, args: launch.args, env: launch.env } } }, null, 2));
