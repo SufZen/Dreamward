@@ -14,7 +14,7 @@ COPY packages packages
 COPY apps/web apps/web
 RUN pnpm --filter @dreamward/web build
 
-FROM nginx:1.29-alpine AS run
+FROM nginx:1.31-alpine AS run
 COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /repo/apps/web/dist /usr/share/nginx/html
 EXPOSE 80
