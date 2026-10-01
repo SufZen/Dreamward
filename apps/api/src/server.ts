@@ -4,7 +4,7 @@ import multipart from '@fastify/multipart';
 import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { join, resolve, sep, extname } from 'node:path';
-import { loadEnv } from './env';
+import { loadEnv, resolveTrustProxy } from './env';
 import { resolveDataDir } from './lib/paths';
 import { openControlDb, ensureAdminUser, closeControlDb } from './db/control';
 import { runWithDbContext, getUserDataRoot } from './db/client';
@@ -36,6 +36,12 @@ const MEDIA_TYPES: Record<string, string> = {
   '.avif': 'image/avif',
 };
 
+/** Fastify's option type has no plain number; a hop count is "the first n hops". */
+function fastifyTrust(trust: false | number | string[]): boolean | string | ((addr: string, hop: number) => boolean) {
+  if (typeof trust === 'number') return (_addr, hop) => hop < trust;
+  return Array.isArray(trust) ? trust.join(',') : trust;
+}
+
 export async function buildServer() {
   const env = loadEnv();
   activeFramework(); // validate a custom framework pack before touching any data
@@ -60,7 +66,9 @@ export async function buildServer() {
       redact: ['req.headers.authorization', 'req.headers.cookie', '*.apiKey', '*.password', '*.token'],
     },
     bodyLimit: 25 * 1024 * 1024, // 25MB — accommodates image uploads
-    trustProxy: true, // behind Traefik/nginx in production — req.ip = client ip
+    // Trust only the proxies we ship (nginx, plus Caddy in https mode): req.ip
+    // is then the real client and cannot be spoofed with X-Forwarded-For.
+    trustProxy: fastifyTrust(resolveTrustProxy(env)),
   });
 
   // Global backstop: 300 req/min per client IP (trustProxy gives the real ip

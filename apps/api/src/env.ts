@@ -73,6 +73,17 @@ const envSchema = z.object({
    */
   ALLOW_PRIVATE_AI_URLS: z.enum(['true', 'false']).optional(),
 
+  /**
+   * How many reverse proxies sit in front of the API. Only their
+   * X-Forwarded-For entries are trusted; anything further left is written by
+   * the client and must never decide its IP (rate limits key on it).
+   * `auto` → 1 (the bundled nginx), or 2 when the https profile puts Caddy in
+   * front of it. Also: a number, `false`, or a comma list of proxy IPs/CIDRs.
+   */
+  TRUST_PROXY: z.string().default('auto'),
+  /** COMPOSE_PROFILES of the self-host stack, passed through for TRUST_PROXY=auto. */
+  DEPLOY_PROFILES: z.string().optional(),
+
   /** Optional custom framework pack (JSON) — the wording of the book's structure. */
   FRAMEWORK_PACK_FILE: z.string().optional(),
 
@@ -144,4 +155,24 @@ export function loadEnv(): Env {
     }
   }
   return env;
+}
+
+/**
+ * Fastify `trustProxy` from TRUST_PROXY. Never `true`: trusting every hop lets
+ * a client pick its own IP with an X-Forwarded-For header and slip past the
+ * login rate limit.
+ */
+export function resolveTrustProxy(env: Pick<Env, 'TRUST_PROXY' | 'DEPLOY_PROFILES' | 'DESKTOP_MODE'>): false | number | string[] {
+  if (env.DESKTOP_MODE) return false; // localhost only, nothing in front
+  const value = env.TRUST_PROXY.trim().toLowerCase();
+  if (value === 'auto') {
+    const profiles = (env.DEPLOY_PROFILES ?? '').split(',').map((p) => p.trim());
+    return profiles.includes('https') ? 2 : 1;
+  }
+  if (value === 'false' || value === '0') return false;
+  if (/^\d+$/.test(value)) return Number(value);
+  if (value === 'true') {
+    throw new Error('TRUST_PROXY=true would trust client-supplied X-Forwarded-For; set the number of proxies in front of the API instead');
+  }
+  return value.split(',').map((s) => s.trim()).filter(Boolean);
 }
