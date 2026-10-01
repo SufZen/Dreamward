@@ -64,7 +64,7 @@ services:
     logging: *logging
 
   caddy:
-    image: caddy:2-alpine
+    image: caddy:2.11.4-alpine
     profiles: [https]
     ports:
       - "80:80"
