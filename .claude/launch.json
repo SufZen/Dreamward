@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "dreamward-sandbox",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["scripts/dev-sandbox.mjs"],
+      "port": 5173
+    },
+    {
       "name": "dreamward-dev",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["dev"],
