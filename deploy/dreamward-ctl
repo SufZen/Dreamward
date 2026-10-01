@@ -75,12 +75,13 @@ sha256() { if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | cut -d
 
 fetch_deploy_files() { # refresh compose/Caddyfile/ctl for a version (keeps .env)
   local ref="$1" f asset want base sums=""
-  if [ "$ref" = "main" ]; then
-    base="https://raw.githubusercontent.com/$REPO/main/deploy"
-  else
-    base="https://github.com/$REPO/releases/download/$ref"
-    sums=$(curl -fsSL "$base/SHA256SUMS" 2>/dev/null) || die "Could not download SHA256SUMS for $ref — not updating."
-  fi
+  base="https://github.com/$REPO/releases/download/$ref"
+  case "$ref" in
+    main|v0.[0-5].*) # edge, or a release from before SHA256SUMS existed
+      warn "$ref has no checksums: files are not verified"
+      base="https://raw.githubusercontent.com/$REPO/$ref/deploy" ;;
+    *) sums=$(curl -fsSL "$base/SHA256SUMS" 2>/dev/null) || die "Could not download SHA256SUMS for $ref — not updating." ;;
+  esac
   for f in docker-compose.yml Caddyfile dreamward-ctl; do
     curl -fsSL "$base/$f" -o "$f.new" 2>/dev/null || { rm -f ./*.new; die "Download failed: $base/$f"; }
     if [ -n "$sums" ]; then

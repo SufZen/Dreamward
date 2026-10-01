@@ -88,11 +88,14 @@ info "folder $DIR"
 sha256() { if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | cut -d' ' -f1; else shasum -a 256 "$1" | cut -d' ' -f1; fi; }
 fetch() { curl -fsSL "$1" -o "$2" || die "Download failed: $1"; }
 FILES="docker-compose.yml Caddyfile dreamward-ctl .env.example"
-if [ "$VERSION" = "edge" ]; then
-  warn "edge follows the main branch: files are not checksum-verified"
-  for f in $FILES; do fetch "https://raw.githubusercontent.com/$REPO/main/deploy/$f" "$f.new"; done
+BASE="https://github.com/$REPO/releases/download/v$VERSION"
+# edge follows main, and releases before v0.6 have no SHA256SUMS. Every newer
+# release must verify: a missing checksum file is an error, not a fallback.
+case "$VERSION" in edge|0.[0-5].*) UNVERIFIED=1 ;; *) UNVERIFIED=0 ;; esac
+if [ "$UNVERIFIED" -eq 1 ]; then
+  warn "v$VERSION has no checksums: files are not verified"
+  for f in $FILES; do fetch "https://raw.githubusercontent.com/$REPO/$REF/deploy/$f" "$f.new"; done
 else
-  BASE="https://github.com/$REPO/releases/download/v$VERSION"
   fetch "$BASE/SHA256SUMS" SHA256SUMS.new
   for f in $FILES; do
     asset="$f"; [ "$f" = ".env.example" ] && asset="default.env.example" # GitHub renames dot-files
