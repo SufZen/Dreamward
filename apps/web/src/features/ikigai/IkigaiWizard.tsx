@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, Trash2 } from 'lucide-react';
 import {
   IKIGAI_CIRCLES,
@@ -34,6 +35,9 @@ export function IkigaiWizard({ draft, isRevisit }: { draft: IkigaiProfile; isRev
   const update = useUpdateIkigai(draft.id);
   const complete = useCompleteIkigai();
   const discard = useDiscardIkigaiDraft();
+  const navigate = useNavigate();
+  // Opened from the guided start → return there once the IKIGAI is complete.
+  const fromStart = useSearchParams()[0].get('from') === 'start';
 
   const [step, setStep] = useState(Math.min(draft.step, STEPS.length - 1));
   const [items, setItems] = useState<IkigaiItem[]>(draft.items);
@@ -77,7 +81,7 @@ export function IkigaiWizard({ draft, isRevisit }: { draft: IkigaiProfile; isRev
       reflections: { ...draft.reflections, why },
       step,
     });
-    complete.mutate(draft.id);
+    complete.mutate(draft.id, { onSuccess: () => fromStart && navigate('/start?from=ikigai') });
   };
 
   return (

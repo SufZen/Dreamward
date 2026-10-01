@@ -16,6 +16,7 @@ import { BriefingCard } from '@/features/assistant/BriefingCard';
 import { ProposalCard } from '@/features/assistant/ProposalCard';
 import { DashboardMeaning } from '@/features/chapter/DashboardMeaning';
 import { useCurrentChapter } from '@/features/chapter/hooks';
+import { useOnboarding } from '@/features/onboarding/hooks';
 
 const DAY = 86_400_000;
 
@@ -52,8 +53,9 @@ export function Dashboard() {
   });
 
   const pendingItems = pending.data?.items ?? [];
-  // A new book (no chapter, no goals yet) → show the welcome card.
-  const fresh = chapter === null && goals?.length === 0;
+  // A new book (no chapter, no goals yet) that hasn't dismissed or finished the guided start.
+  const { data: onboarding } = useOnboarding();
+  const fresh = onboarding?.fresh === true && onboarding.status === 'pending';
   const recentJournal = (journal ?? []).slice(0, 3);
   const streak = journalStreak((journal ?? []).map((j) => j.entryDate));
 
@@ -338,8 +340,8 @@ function WelcomeCard() {
         <h2 className="text-2xl font-semibold">{he ? 'ברוך הבא ל-Dreamward' : 'Welcome to Dreamward'}</h2>
         <p className="text-fg-muted">
           {he
-            ? 'חלום, כיוון, וצעד אחד בכל פעם. שלושה צעדים ראשונים, כ-15 דקות:'
-            : 'A dream, a direction, and one step at a time. Three first steps, about 15 minutes:'}
+            ? 'חלום, כיוון, וצעד אחד בכל פעם. שלושה צעדים ראשונים, כ-10 דקות:'
+            : 'A dream, a direction, and one step at a time. Three first steps, about 10 minutes:'}
         </p>
         <ol className="flex flex-col gap-2 text-sm">
           {steps.map((s, i) => (
@@ -351,9 +353,14 @@ function WelcomeCard() {
             </li>
           ))}
         </ol>
-        <Link to="/chapter" className={buttonVariants({ className: 'mt-1 self-start' })}>
-          {he ? 'נתחיל בפרק' : 'Start with your chapter'} <ArrowRight size={15} className="rtl:rotate-180" />
-        </Link>
+        <div className="mt-1 flex flex-wrap items-center gap-3">
+          <Link to="/start" className={buttonVariants()}>
+            {he ? 'בוא נתחיל · כ-10 דקות' : 'Start · about 10 min'} <ArrowRight size={15} className="rtl:rotate-180" />
+          </Link>
+          <Link to="/chapter" className="text-sm text-fg-muted underline-offset-4 hover:underline">
+            {he ? 'או התחל ישר מהפרק' : 'Or start with your chapter'}
+          </Link>
+        </div>
       </div>
     </Card>
   );

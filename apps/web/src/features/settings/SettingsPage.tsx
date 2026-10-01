@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { KeyRound, Languages } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Compass, KeyRound, Languages } from 'lucide-react';
 import { Button, Card, Input } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
 import { api, ApiError } from '@/lib/api';
@@ -8,6 +9,7 @@ import { ApiKeysSettings } from './ApiKeysSettings';
 import { RoutinesSettings } from './RoutinesSettings';
 import { DataSettings } from './DataSettings';
 import { isDesktop } from '@/lib/desktop';
+import { useSetOnboardingStatus } from '@/features/onboarding/hooks';
 
 export function SettingsPage() {
   const { t, lang, setLang } = useLang();
@@ -15,6 +17,8 @@ export function SettingsPage() {
   const [next, setNext] = useState('');
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const navigate = useNavigate();
+  const setOnboarding = useSetOnboardingStatus();
 
   const changePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +57,25 @@ export function SettingsPage() {
       <ApiKeysSettings />
 
       <DataSettings />
+
+      <Card className="p-6">
+        <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold">
+          <Compass size={18} className="text-primary" /> {lang === 'he' ? 'התחלה מודרכת' : 'Guided start'}
+        </h2>
+        <p className="mb-4 text-sm text-fg-muted">
+          {lang === 'he'
+            ? 'פרק, גלגל חיים, מיקוד וצעד ראשון — בכ-10 דקות. מה שכבר כתבת נשמר.'
+            : 'A chapter, a life wheel, a focus and a first move — in about 10 minutes. What you already wrote is kept.'}
+        </p>
+        <Button
+          variant="secondary"
+          size="sm"
+          loading={setOnboarding.isPending}
+          onClick={() => setOnboarding.mutate('pending', { onSuccess: () => navigate('/start') })}
+        >
+          {lang === 'he' ? 'פתח את ההתחלה המודרכת' : 'Open guided start'}
+        </Button>
+      </Card>
 
       <Card className="p-6">
         <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
