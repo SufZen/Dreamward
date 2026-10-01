@@ -76,6 +76,19 @@ describe('cross-user isolation', () => {
     expect(userList.json()).toHaveLength(0);
   });
 
+  it('keeps the onboarding status private to its user', async () => {
+    const set = await app.inject({
+      method: 'PUT',
+      url: '/api/onboarding',
+      headers: { cookie: adminCookie },
+      payload: { status: 'dismissed' },
+    });
+    expect(set.json()).toMatchObject({ status: 'dismissed' });
+
+    const user = await app.inject({ method: 'GET', url: '/api/onboarding', headers: { cookie: userCookie } });
+    expect(user.json()).toMatchObject({ status: 'pending' });
+  });
+
   it('keeps isolation under parallel interleaved requests', async () => {
     const results = await Promise.all(
       Array.from({ length: 20 }, (_, i) =>
