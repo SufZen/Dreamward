@@ -3,6 +3,7 @@ import { History, RefreshCw, Sparkles, Sun } from 'lucide-react';
 import { IKIGAI_CIRCLES, type IkigaiProfile } from '@dreamward/shared';
 import { Badge, Button, Card } from '@dreamward/design-system';
 import { useLang, pickLabel } from '@/lib/lang';
+import { OnboardingMotion } from '@/components/OnboardingMotion';
 import { IkigaiWizard } from './IkigaiWizard';
 import { VennInsights } from './steps';
 import { useIkigai, useStartIkigaiDraft, type IkigaiState } from './hooks';
@@ -49,19 +50,7 @@ function Landing() {
   const start = useStartIkigaiDraft();
   return (
     <Card featured className="flex flex-col items-center gap-5 p-8 text-center">
-      <div className="relative h-28 w-28" aria-hidden>
-        {IKIGAI_CIRCLES.map((c, i) => (
-          <span
-            key={c.id}
-            className="absolute h-16 w-16 rounded-full opacity-60 mix-blend-screen"
-            style={{
-              background: c.color,
-              top: ['0%', '22%', '22%', '44%'][i],
-              left: ['21%', '0%', '42%', '21%'][i],
-            }}
-          />
-        ))}
-      </div>
+      <OnboardingMotion name="ikigai" className="max-w-md" />
       <h2 className="text-2xl font-semibold">{he ? 'גלה את האיקיגאי שלך' : 'Discover your IKIGAI'}</h2>
       <p className="max-w-xl text-fg-muted">
         {he

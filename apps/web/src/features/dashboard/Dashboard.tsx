@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Target, NotebookPen, Flame, CalendarClock, Sparkles, AlertTriangle, ListTodo } from 'lucide-react';
+import { Target, NotebookPen, Flame, CalendarClock, Sparkles, AlertTriangle, ListTodo, ArrowRight } from 'lucide-react';
 import type { ProposalRow } from '@dreamward/shared';
-import { Card, Badge, Skeleton, DreamwardLogo } from '@dreamward/design-system';
+import { Card, Badge, Skeleton, DreamwardLogo, buttonVariants } from '@dreamward/design-system';
 import { api } from '@/lib/api';
 import { useLang, pickLabel } from '@/lib/lang';
 import { Icon } from '@/components/Icon';
+import { OnboardingMotion } from '@/components/OnboardingMotion';
 import { useCategories } from '@/features/book/hooks';
 import { useGoals, useGoalsSummary, useGoalsProgress } from '@/features/goals/hooks';
 import { useActions } from '@/features/actions/hooks';
@@ -51,6 +52,8 @@ export function Dashboard() {
   });
 
   const pendingItems = pending.data?.items ?? [];
+  // A new book (no chapter, no goals yet) → show the welcome card.
+  const fresh = chapter === null && goals?.length === 0;
   const recentJournal = (journal ?? []).slice(0, 3);
   const streak = journalStreak((journal ?? []).map((j) => j.entryDate));
 
@@ -88,6 +91,8 @@ export function Dashboard() {
           {he ? 'כל חלום מתחיל בעמוד אחד. זה שלך — בוא נכתוב אותו יחד.' : 'Every dream starts on one page. This one’s yours — let’s write it.'}
         </p>
       </header>
+
+      {fresh && <WelcomeCard />}
 
       <BriefingCard />
 
@@ -316,5 +321,40 @@ function StatCard({
         {loading ? <Skeleton className="h-6 w-3/4" /> : body}
       </Card>
     </Link>
+  );
+}
+
+/** First-run welcome: the Dream → Ward → Step method, and where to begin. */
+function WelcomeCard() {
+  const { lang } = useLang();
+  const he = lang === 'he';
+  const steps = he
+    ? ['תן שם לפרק שאתה חי עכשיו', 'דרג כמה קרוב היום לחזון', 'בחר צעד קטן אחד לשבוע הזה']
+    : ['Name the chapter you’re living now', 'Rate how close today is to your vision', 'Choose one small step for this week'];
+  return (
+    <Card featured className="grid items-center gap-6 p-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+      <OnboardingMotion name="welcome" />
+      <div className="flex flex-col gap-3">
+        <h2 className="text-2xl font-semibold">{he ? 'ברוך הבא ל-Dreamward' : 'Welcome to Dreamward'}</h2>
+        <p className="text-fg-muted">
+          {he
+            ? 'חלום, כיוון, וצעד אחד בכל פעם. שלושה צעדים ראשונים, כ-15 דקות:'
+            : 'A dream, a direction, and one step at a time. Three first steps, about 15 minutes:'}
+        </p>
+        <ol className="flex flex-col gap-2 text-sm">
+          {steps.map((s, i) => (
+            <li key={s} className="flex items-center gap-3">
+              <span className="flex h-6 w-6 flex-none items-center justify-center rounded-full border border-[color:var(--rz-accent)] font-mono text-xs text-primary">
+                {i + 1}
+              </span>
+              {s}
+            </li>
+          ))}
+        </ol>
+        <Link to="/chapter" className={buttonVariants({ className: 'mt-1 self-start' })}>
+          {he ? 'נתחיל בפרק' : 'Start with your chapter'} <ArrowRight size={15} className="rtl:rotate-180" />
+        </Link>
+      </div>
+    </Card>
   );
 }

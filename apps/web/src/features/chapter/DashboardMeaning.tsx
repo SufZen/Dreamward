@@ -4,6 +4,7 @@ import { Badge, Card } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
 import { useAreaLabel } from '@/features/book/hooks';
 import { IkigaiCard } from '@/features/ikigai/IkigaiPage';
+import { OnboardingMotion } from '@/components/OnboardingMotion';
 import { LifeWheel } from './LifeWheel';
 import { useCurrentChapter, useLatestRatings } from './hooks';
 
@@ -73,11 +74,14 @@ export function DashboardMeaning() {
           <span className="text-xs text-fg-faint">{he ? '· כמה קרוב היום לחזון (1-10)' : '· how close today is to the vision (1–10)'}</span>
         </div>
         {rated.length === 0 ? (
-          <p className="py-4 text-sm text-fg-muted">
-            {he
-              ? 'עוד לא דירגת אף תחום. פתח קטגוריה ודרג "איפה אני עכשיו" — זה לוקח 30 שניות ומראה לך איפה הפער הכי גדול.'
-              : 'You haven’t rated any area yet. Open a category and rate “where I am now” — it takes 30 seconds and shows where the biggest gap is.'}
-          </p>
+          <div className="grid items-center gap-4 py-2 sm:grid-cols-[minmax(0,240px)_1fr]">
+            <OnboardingMotion name="wheel" />
+            <p className="text-sm text-fg-muted">
+              {he
+                ? 'עוד לא דירגת אף תחום. פתח קטגוריה ודרג "איפה אני עכשיו" — זה לוקח 30 שניות ומראה לך איפה הפער הכי גדול.'
+                : 'You haven’t rated any area yet. Open a category and rate “where I am now” — it takes 30 seconds and shows where the biggest gap is.'}
+            </p>
+          </div>
         ) : (
           <div className="grid items-center gap-4 md:grid-cols-[1fr_240px]">
             <LifeWheel ratings={ratings ?? []} focus={focus} />
