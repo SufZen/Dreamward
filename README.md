@@ -4,7 +4,7 @@
 
 # Dreamward
 
-**[dreamward.life](https://dreamward.life)** · move toward the life you envision.
+**[dreamward.life](https://dreamward.life)** · your dream, one step at a time. (The website lives in [SufZen/dreamward-site](https://github.com/SufZen/dreamward-site).)
 
 **Dreamward** — a private app for turning the life you envision into the life you live: a book of your 12 life areas, goals with measurable progress, granular actions, a journal, visual moodboards, and AI agents (built-in and external) that work over your own content. Bilingual (English + Hebrew, full RTL), dark + gold REALIZEOS design language.
 
