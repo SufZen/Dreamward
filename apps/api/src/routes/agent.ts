@@ -1,6 +1,6 @@
 import type { FastifyInstance, FastifyReply } from 'fastify';
 import { desc, eq } from 'drizzle-orm';
-import { ikigaiSuggestSchema, pageContextSchema, type AgentSseEvent, type ProposalRow, type ProposalType } from '@dreamward/shared';
+import { ikigaiSuggestSchema, onboardingSuggestSchema, pageContextSchema, type AgentSseEvent, type ProposalRow, type ProposalType } from '@dreamward/shared';
 import { getDb, schema } from '../db/client';
 import { uuid, nowMs } from '../lib/id';
 import { getActiveProvider } from '../llm/providers';
@@ -8,6 +8,7 @@ import { runAgentTurn } from '../agent/loop';
 import { WEEKLY_REVIEW_KICKOFF } from '../agent/prompts';
 import { getOrCreateBriefing } from '../agent/briefing';
 import { suggestIkigai } from '../agent/ikigaiSuggest';
+import { suggestFirstMove } from '../agent/onboardingSuggest';
 
 /** Local 'YYYY-MM-DD' of the most recent Saturday (today if Saturday). */
 function currentSaturday(): string {
@@ -144,6 +145,15 @@ export default async function agentRoutes(app: FastifyInstance) {
     if (!parsed.success) return reply.code(400).send({ error: 'bad_request' });
     const lang = body.lang === 'en' ? 'en' : 'he';
     const result = await suggestIkigai({ ...parsed.data, lang });
+    if ('error' in result) return reply.code(result.error === 'no_active_provider' ? 409 : 503).send(result);
+    return result;
+  });
+
+  /* ── Guided start: Clarity suggests a first move (one-shot, nothing written) */
+  app.post('/agent/onboarding/suggest', async (req, reply) => {
+    const parsed = onboardingSuggestSchema.safeParse(req.body ?? {});
+    if (!parsed.success) return reply.code(400).send({ error: 'bad_request' });
+    const result = await suggestFirstMove(parsed.data.lang ?? 'he');
     if ('error' in result) return reply.code(result.error === 'no_active_provider' ? 409 : 503).send(result);
     return result;
   });
