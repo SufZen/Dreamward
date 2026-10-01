@@ -12,6 +12,23 @@ a password (8+ characters) — that's your login at the site root from then on.
 Change your password any time in **Settings**. The interface runs in English
 or Hebrew (full RTL) — toggle from the sidebar or login screen.
 
+## Guided start
+
+A new, empty book shows a welcome card on the dashboard. **Start · about 10
+min** opens the guided start (`/start`), which takes you from an empty book to
+a first move:
+
+1. **Name your chapter** — the season of life you are in, and what it is meant to create.
+2. **Rate your wheel** — a quick 1–10 for each life area (skip any you like).
+3. **Pick your focus** — 1–5 focus areas, and the biggest gap in each.
+4. **IKIGAI** (optional) — do it now or later; finishing it brings you back.
+5. **Your first move** — one small action for this week. With an AI provider
+   set, Clarity can suggest a few.
+
+Every step saves into your book as you go, so you can stop at any time and
+pick up where you left off. **Not now** hides the welcome card; reopen the
+guided start any time from **Settings → Guided start**.
+
 ## Your book
 
 - **Dashboard** — your current chapter, IKIGAI and life wheel, your categories
