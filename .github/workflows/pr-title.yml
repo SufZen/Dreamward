@@ -2,8 +2,12 @@ name: PR title
 
 # PR titles become the squash-commit subject, which release-please reads to
 # decide the next version and write the CHANGELOG. Enforce Conventional Commits.
+#
+# `pull_request` (not `pull_request_target`) so it also runs on the release
+# bot's PRs, which are opened with GITHUB_TOKEN: the check needs only a
+# read-only token and never checks out the PR's code.
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, edited, synchronize, reopened]
 
 permissions:
