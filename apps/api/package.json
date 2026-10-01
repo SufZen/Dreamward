@@ -25,7 +25,7 @@
     "@fastify/jwt": "^10.2.2",
     "@fastify/multipart": "^9.0.3",
     "@fastify/rate-limit": "^10.2.2",
-    "@fastify/static": "^10.1.2",
+    "@fastify/static": "^10.1.5",
     "@dreamward/shared": "workspace:*",
     "argon2": "^0.45.1",
     "better-sqlite3": "^13.0.3",
@@ -33,7 +33,7 @@
     "fastify": "^5.12.5",
     "fastify-plugin": "^5.0.1",
     "fflate": "^0.8.3",
-    "sharp": "^0.35.4",
+    "sharp": "^0.35.5",
     "zod": "^3.24.1"
   },
   "devDependencies": {
