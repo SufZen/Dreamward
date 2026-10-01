@@ -12,7 +12,7 @@
  * ========================================================================= */
 import { spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -23,13 +23,16 @@ const stateFile = join(dir, 'sandbox.json');
 mkdirSync(join(dir, 'data'), { recursive: true });
 mkdirSync(join(dir, 'backups'), { recursive: true });
 
-if (!existsSync(stateFile)) {
-  const secret = () => randomBytes(24).toString('hex');
+const secret = () => randomBytes(24).toString('hex');
+try {
+  // 'wx': create only if it doesn't exist yet (no check-then-write race).
   writeFileSync(
     stateFile,
     JSON.stringify({ email: 'sandbox@example.test', password: `sandbox-${secret().slice(0, 16)}`, jwtSecret: secret(), keySecret: secret() }, null, 2),
-    { mode: 0o600 },
+    { mode: 0o600, flag: 'wx' },
   );
+} catch (err) {
+  if (err.code !== 'EEXIST') throw err; // existing sandbox: keep its account
 }
 const state = JSON.parse(readFileSync(stateFile, 'utf8'));
 
