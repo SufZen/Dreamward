@@ -105,7 +105,7 @@ branch (tag + `gh release create`); cherry-pick the fix to `main`.
   organization `SufZen`, repository `Dreamward`, workflow filename
   `release-please.yml` (npm checks the *calling* workflow; the publish step
   lives in `release.yml`), and environment `release`. Then, under *Publishing
-  access*, choose "Require two-factor authentication and disallow tokens", and
-  delete the `NPM_TOKEN` repository secret.
+  access*, choose "Require two-factor authentication and disallow tokens". No
+  npm token is stored anywhere (configured for all three packages since v0.6.1).
 - **Actions are pinned by commit SHA.** Dependabot proposes the updates; never
   replace a SHA with a tag.
