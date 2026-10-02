@@ -1,6 +1,6 @@
 {
   "name": "@dreamward/mcp",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "license": "AGPL-3.0-only",
   "description": "MCP server for Dreamward — connect Claude, Codex, Gemini, Cursor and any MCP agent to your private life-vision system.",
   "keywords": [
