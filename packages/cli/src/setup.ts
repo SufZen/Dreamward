@@ -105,31 +105,34 @@ function parseJson(existing: string, file: string): Record<string, unknown> {
   }
 }
 
+type JsonFormat = Exclude<NonNullable<AgentTarget['format']>, 'toml-codex'>;
+
+/** The JSON key that holds the server entries, per format. */
+const JSON_CONTAINER: Record<JsonFormat, string> = { 'json-mcpServers': 'mcpServers', 'json-vscode': 'servers', 'json-opencode': 'mcp' };
+
+/** The `dreamward` server entry in the given JSON format. */
+function jsonEntry(format: JsonFormat, l: Launch): Record<string, unknown> {
+  if (format === 'json-vscode') return { type: 'stdio', command: l.command, args: l.args, env: l.env };
+  if (format === 'json-opencode') return { type: 'local', command: [l.command, ...l.args], environment: l.env, enabled: true };
+  return { command: l.command, args: l.args, env: l.env };
+}
+
 /** The agent's JSON config with Dreamward added; `existing` is the file's current text ('' if none). */
 export function applyJson(format: NonNullable<AgentTarget['format']>, existing: string, file: string, l: Launch): string {
+  if (format === 'toml-codex') throw new Error('applyJson: codex uses TOML');
   const cfg = parseJson(existing, file);
-  if (format === 'json-mcpServers') {
-    const servers = (cfg.mcpServers as Record<string, unknown>) ?? {};
-    servers.dreamward = { command: l.command, args: l.args, env: l.env };
-    cfg.mcpServers = servers;
-  } else if (format === 'json-vscode') {
-    const servers = (cfg.servers as Record<string, unknown>) ?? {};
-    servers.dreamward = { type: 'stdio', command: l.command, args: l.args, env: l.env };
-    cfg.servers = servers;
-  } else if (format === 'json-opencode') {
-    const mcp = (cfg.mcp as Record<string, unknown>) ?? {};
-    mcp.dreamward = { type: 'local', command: [l.command, ...l.args], environment: l.env, enabled: true };
-    cfg.mcp = mcp;
-    cfg.$schema ??= 'https://opencode.ai/config.json';
-  }
+  const key = JSON_CONTAINER[format];
+  const servers = (cfg[key] as Record<string, unknown>) ?? {};
+  servers.dreamward = jsonEntry(format, l);
+  cfg[key] = servers;
+  if (format === 'json-opencode') cfg.$schema ??= 'https://opencode.ai/config.json';
   return JSON.stringify(cfg, null, 2) + '\n';
 }
 
 const tomlStr = (s: string) => JSON.stringify(s); // TOML basic strings share JSON escaping for our inputs
 
-/** Codex's config.toml with Dreamward added; `existing` is the file's current text ('' if none). */
-export function applyCodexToml(existing: string, l: Launch): string {
-  const block = [
+function codexBlock(l: Launch): string {
+  return [
     '[mcp_servers.dreamward]',
     `command = ${tomlStr(l.command)}`,
     `args = [${l.args.map(tomlStr).join(', ')}]`,
@@ -138,6 +141,41 @@ export function applyCodexToml(existing: string, l: Launch): string {
     ...Object.entries(l.env).map(([k, v]) => `${k} = ${tomlStr(v)}`),
     '',
   ].join('\n');
+}
+
+/* ── secret masking ─────────────────────────────────────────────────────── */
+
+/**
+ * A secret shown safely: `lbk_…a1b2` (keeps a known prefix and the last 4).
+ * Short values are hidden entirely so the tail isn't most of the secret.
+ */
+export function maskSecret(value: string): string {
+  if (value.length < 12) return '••••';
+  const prefix = value.match(/^(lbk_|sk-|Bearer\s+)/i)?.[0] ?? '';
+  return `${prefix}…${value.slice(-4)}`;
+}
+
+/**
+ * The launch with every env value masked — env is where MCP configs keep keys
+ * and tokens. DREAMWARD_URL is not a secret and stays readable.
+ */
+export function maskLaunch(l: Launch): Launch {
+  const env = Object.fromEntries(Object.entries(l.env).map(([k, v]) => [k, k === 'DREAMWARD_URL' ? v : maskSecret(v)]));
+  return { ...l, env };
+}
+
+/**
+ * What a dry run shows: ONLY the Dreamward entry that will be added, never the
+ * rest of the file — other servers' entries hold their own keys.
+ */
+export function previewEntry(format: NonNullable<AgentTarget['format']>, l: Launch): string {
+  if (format === 'toml-codex') return codexBlock(l);
+  return JSON.stringify({ [JSON_CONTAINER[format]]: { dreamward: jsonEntry(format, l) } }, null, 2) + '\n';
+}
+
+/** Codex's config.toml with Dreamward added; `existing` is the file's current text ('' if none). */
+export function applyCodexToml(existing: string, l: Launch): string {
+  const block = codexBlock(l);
   // Remove any previous dreamward block (the table and its sub-tables).
   const lines = existing.split(/\r?\n/);
   const out: string[] = [];
@@ -159,6 +197,8 @@ export interface SetupOptions {
   write: boolean;
   yes: boolean;
   npx: boolean;
+  /** print the API key in full (for copy-paste); masked otherwise */
+  showKey?: boolean;
 }
 
 export function launchFor(opts: SetupOptions): Launch {
@@ -183,12 +223,16 @@ export async function runSetup(agentId: string | undefined, opts: SetupOptions):
     process.exit(agentId ? 1 : 0);
   }
   const launch = launchFor(opts);
+  // Everything printed uses `shown`; only what is written or run uses `launch`.
+  const shown = opts.showKey ? launch : maskLaunch(launch);
+  const keyHint = opts.showKey ? '' : '\n(API key masked. Re-run with --show-key to print it for copy-paste.)';
   console.log(`Connecting ${agent.label} to ${opts.url}\n`);
 
   if (agent.command) {
     const cmd = agent.command(launch);
     console.log('Run:\n');
-    console.log('  ' + cmd.map((p) => (/[\s"]/.test(p) ? JSON.stringify(p) : p)).join(' ') + '\n');
+    console.log('  ' + agent.command(shown).map((p) => (/[\s"]/.test(p) ? JSON.stringify(p) : p)).join(' ') + '\n');
+    if (!opts.write && keyHint) console.log(keyHint.trimStart() + '\n');
     if (opts.write && (opts.yes || (await confirm('Run it now?')))) {
       const res = spawnSync(cmd[0]!, cmd.slice(1), { stdio: 'inherit', shell: platform() === 'win32' });
       if (res.status !== 0) throw new Error(`${cmd[0]} exited with ${res.status}`);
@@ -202,11 +246,16 @@ export async function runSetup(agentId: string | undefined, opts: SetupOptions):
       next = agent.format === 'toml-codex' ? applyCodexToml(before ?? '', launch) : applyJson(agent.format, before ?? '', file, launch);
     } catch (err) {
       console.error((err as Error).message);
-      console.log(JSON.stringify({ dreamward: { command: launch.command, args: launch.args, env: launch.env } }, null, 2));
+      console.log(previewEntry(agent.format, shown) + keyHint);
       process.exit(1);
     }
     console.log(`File: ${file}${before === null ? '  (will be created)' : ''}\n`);
-    console.log(next);
+    console.log(
+      before === null
+        ? 'Will contain:\n'
+        : 'Adds (or replaces) only this entry — the rest of the file is kept as is and not shown:\n',
+    );
+    console.log(previewEntry(agent.format, shown));
     if (!opts.write) {
       console.log('Dry run — nothing written. Re-run with --write to apply (a .bak copy is kept).');
     } else if (opts.yes || (await confirm(`Write ${file}?`))) {
@@ -225,7 +274,7 @@ export async function runSetup(agentId: string | undefined, opts: SetupOptions):
       console.log(`Written ✓${before !== null ? `  (previous version: ${file}.bak)` : ''}`);
     }
   } else {
-    console.log(JSON.stringify({ mcpServers: { dreamward: { command: launch.command, args: launch.args, env: launch.env } } }, null, 2));
+    console.log(previewEntry('json-mcpServers', shown) + keyHint);
   }
   if (agent.notes) console.log(`\n${agent.notes}`);
   console.log('\nThe config contains your API key — keep it private. Revoke keys any time in Dreamward → Settings.');

@@ -341,10 +341,11 @@ program
   .option('--write', 'apply the change (default: dry run that only shows it)')
   .option('--yes', 'do not ask for confirmation')
   .option('--npx', 'launch via "npx -y dreamward mcp" instead of this installed CLI')
-  .action(async (agent: string | undefined, opts: { write?: boolean; yes?: boolean; npx?: boolean }) => {
+  .option('--show-key', 'print the API key in full (masked by default)')
+  .action(async (agent: string | undefined, opts: { write?: boolean; yes?: boolean; npx?: boolean; showKey?: boolean }) => {
     const cfg = agent ? requireConfig() : { url: '', apiKey: '' };
     try {
-      await runSetup(agent, { url: cfg.url, apiKey: cfg.apiKey, write: !!opts.write, yes: !!opts.yes, npx: !!opts.npx });
+      await runSetup(agent, { url: cfg.url, apiKey: cfg.apiKey, write: !!opts.write, yes: !!opts.yes, npx: !!opts.npx, showKey: !!opts.showKey });
     } catch (err) {
       fail(err);
     }
