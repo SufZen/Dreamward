@@ -19,26 +19,18 @@ Status legend: ✅ shipped · 🟢 now · 🔜 next · 🧭 later · ✂️ deli
 | **Execution** | Goals with status history and progress/risk rollups; actions with priority, due dates and links; journal; vision boards with multi-format export; snapshots with comparison; an ICS calendar feed. |
 | **Clarity** (the assistant) | Streaming chat with tools; every write is a proposal you approve. Routines: daily plan, weekly review prep, goal drift. ✨ suggestions inside the IKIGAI wizard. |
 | **Bring your own AI** | 13 provider presets (API keys, local models, ChatGPT via Codex). See [ai-providers.md](ai-providers.md). |
-| **Agents** | A REST `/api/v1` with OpenAPI 3.1; an MCP server (37 tools, resources, ritual prompts); the `dreamward` CLI with `dreamward setup <agent>`; read or write API keys, every call audited. See [agent-access.md](agent-access.md). |
+| **Agents** | A REST `/api/v1` with OpenAPI 3.1; an MCP server (37 tools, resources, ritual prompts); the `dreamward` CLI with `dreamward setup <agent>` (its dry run shows only the Dreamward entry, with keys masked); read or write API keys, every call audited. See [agent-access.md](agent-access.md). |
 | **Running it** | A desktop app (one local account) and self-hosting with an installer, invites, an admin dashboard and backups. A sandbox dev server (`node scripts/dev-sandbox.mjs`) keeps development away from real data. |
-| **First-run hints** | A dashboard welcome card and short animated loops at first-run moments (chapter, wheel, IKIGAI, goals, Clarity). They point the way, but there is no guided path yet — see Now. |
+| **Guided start** (roadmap item 1) | A new book is offered a skippable, resumable path at `/start`: name the chapter → rate the wheel → pick 1–5 focus areas and their biggest gap → optional IKIGAI → a first action, with Clarity ideas when an AI provider is set. EN/HE with full RTL. Reached from the dashboard welcome card and Settings; short animated loops mark the other first-run moments. |
 
 ## 2. Now, Next, Later
 
 The order is the priority. Each item says why it is where it is.
 
+Item 1, first-run onboarding, has shipped (see *Guided start* above). The
+numbers stay as they were, so links to "item 2" keep working.
+
 ### 🟢 Now
-
-**1. First-run onboarding: from an empty book to a first move in 10 minutes.**
-A guided path: name the chapter → rate the wheel → pick 1–5 focus areas →
-(optional) IKIGAI → turn the first leverage move into an action. It is
-skippable and resumable, reuses the IKIGAI stepper, and Clarity helps when an
-AI provider is set. Bilingual EN/HE with full RTL. It grows out of the
-existing welcome card.
-*Why first:* every new user starts from an empty book, and today the welcome
-card can only point at pages.
-
-### 🔜 Next
 
 **2. Connect from claude.ai and ChatGPT: a remote MCP endpoint.**
 Streamable HTTP + OAuth 2.1 on the self-hosted server and the desktop app,
@@ -49,10 +41,12 @@ edges in the local setup found in practice:
 - on Windows, `npx` must be launched through `cmd /c`;
 - inside a checkout of this repo, `npx dreamward` resolves the local workspace
   and fails with "could not determine executable to run";
-- `dreamward setup <client>` dry-run prints the whole target config, including
-  other servers' secrets, unmasked.
+- ✅ `dreamward setup <client>` dry-run no longer prints the whole target
+  config: it shows only the Dreamward entry, with keys masked.
 
 *Why:* most users live in claude.ai or ChatGPT, not in a terminal.
+
+### 🔜 Next
 
 **3. The review rhythm: weekly → monthly → quarterly.**
 Generalise weekly reviews into cadenced reviews. **Monthly** re-rates the wheel
