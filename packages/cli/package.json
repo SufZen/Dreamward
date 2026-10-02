@@ -1,6 +1,6 @@
 {
   "name": "dreamward",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "license": "AGPL-3.0-only",
   "description": "Dreamward from the terminal — and one-command MCP setup for Claude, Codex, Gemini, Cursor, VS Code and more.",
   "keywords": [
