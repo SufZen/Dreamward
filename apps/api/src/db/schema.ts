@@ -389,3 +389,10 @@ export const ikigaiProfiles = sqliteTable('ikigai_profiles', {
   updatedAt: integer('updated_at').notNull().default(now),
   completedAt: integer('completed_at'),
 });
+
+/* ── Per-user UI flags (key → JSON), e.g. the onboarding status ──────────── */
+export const userFlags = sqliteTable('user_flags', {
+  key: text('key').primaryKey(),
+  value: text('value', { mode: 'json' }).notNull(),
+  updatedAt: integer('updated_at').notNull().default(now),
+});

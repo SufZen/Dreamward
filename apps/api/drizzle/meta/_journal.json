@@ -50,6 +50,13 @@
       "when": 1790639378626,
       "tag": "0006_pale_night_thrasher",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1790864110647,
+      "tag": "0007_violet_doctor_doom",
+      "breakpoints": true
     }
   ]
 }

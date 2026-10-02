@@ -26,6 +26,7 @@ const BoardGallery = lazyNamed(() => import('@/features/moodboard/BoardGallery')
 const CollageEditor = lazyNamed(() => import('@/features/moodboard/CollageEditor'), 'CollageEditor');
 const ChapterPage = lazyNamed(() => import('@/features/chapter/ChapterPage'), 'ChapterPage');
 const IkigaiPage = lazyNamed(() => import('@/features/ikigai/IkigaiPage'), 'IkigaiPage');
+const StartPage = lazyNamed(() => import('@/features/onboarding/StartPage'), 'StartPage');
 
 const Loading = () => <p className="p-6 text-fg-muted">…</p>;
 
@@ -45,6 +46,7 @@ function ShellRoutes() {
         <Route index element={<Dashboard />} />
         <Route path="chapter" element={<ChapterPage />} />
         <Route path="ikigai" element={<IkigaiPage />} />
+        <Route path="start" element={<StartPage />} />
         <Route path="book/cover" element={<ContentBlockPage />} />
         <Route path="book/front/:blockId" element={<ContentBlockPage />} />
         <Route path="book/implementation/:blockId" element={<ContentBlockPage />} />

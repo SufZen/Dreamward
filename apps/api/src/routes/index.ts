@@ -19,6 +19,7 @@ import chapterRoutes from './chapters';
 import ratingRoutes from './ratings';
 import ikigaiRoutes from './ikigai';
 import portabilityRoutes from './portability';
+import onboardingRoutes from './onboarding';
 
 /** Registers all authenticated feature routes (mounted under /api). */
 export async function registerFeatureRoutes(app: FastifyInstance) {
@@ -41,6 +42,8 @@ export async function registerFeatureRoutes(app: FastifyInstance) {
   await app.register(ratingRoutes);
   await app.register(ikigaiRoutes);
   await app.register(portabilityRoutes);
+  // Web-only UI preference — deliberately not in registerAgentApiRoutes.
+  await app.register(onboardingRoutes);
 }
 
 /**

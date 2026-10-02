@@ -17,3 +17,4 @@ export * from './templates';
 export * from './agent';
 export * from './ikigai';
 export * from './rituals';
+export * from './onboarding';
