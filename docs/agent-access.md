@@ -170,9 +170,15 @@ Re-copy the bundle after Dreamward releases that change MCP tools.
 
 ### Coming next
 
-A remote MCP endpoint (Streamable HTTP + OAuth 2.1) so web assistants
-(claude.ai, ChatGPT connectors) can connect without a local process;
-fine-grained key scopes with expiry; outgoing webhooks.
+**Next** on the [roadmap](roadmap.md#-next) (item 2): a remote MCP endpoint
+(Streamable HTTP + OAuth 2.1, on the self-hosted server and the desktop app)
+so web assistants (claude.ai, ChatGPT connectors) can connect without a local
+process. It comes with read, read-write and propose-only scopes, where
+propose-only sends changes to Clarity's approval inbox. The same work fixes
+local-setup rough edges: `npx` on Windows, `npx dreamward` inside a checkout of
+this repo, and `setup` dry-runs that print other servers' secrets.
+
+**Later**: API key expiry and outgoing webhooks.
 
 ## CLI (`packages/cli`)
 
