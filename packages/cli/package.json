@@ -38,7 +38,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "commander": "^13.0.0"
+    "commander": "^15.0.0"
   },
   "devDependencies": {
     "@dreamward/client": "workspace:*",
