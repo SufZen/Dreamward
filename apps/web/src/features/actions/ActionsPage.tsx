@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowDown, ArrowUp, Bot, Check, Pencil, Plus, Target, Trash2, X } from 'lucide-react';
 import { ACTION_PRIORITIES, type ActionPriority } from '@dreamward/shared';
-import { Badge, Button, Card, Input, cn } from '@dreamward/design-system';
+import { Badge, Button, Card, Check as DoneCheck, Input, cn } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
 import { OnboardingMotion } from '@/components/OnboardingMotion';
 import { useGoals } from '@/features/goals/hooks';
@@ -31,7 +31,37 @@ function ActionRow({
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(action.title);
 
-  const done = action.status === 'done';
+  // Completing lands before the row leaves: show the check (and its spark) at
+  // once, send the update a beat later. If the row unmounts first, send it now.
+  const [landing, setLanding] = useState<'done' | null>(null);
+  const pending = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const flush = useRef<(() => void) | null>(null);
+  useEffect(
+    () => () => {
+      if (pending.current) clearTimeout(pending.current);
+      flush.current?.();
+    },
+    [],
+  );
+  const setDone = (v: boolean) => {
+    if (!v) {
+      if (pending.current) clearTimeout(pending.current);
+      const wasPending = flush.current !== null;
+      flush.current = null;
+      setLanding(null);
+      // never sent? then there is nothing to undo on the server
+      if (!wasPending) update.mutate({ id: action.id, status: 'todo' });
+      return;
+    }
+    setLanding('done');
+    flush.current = () => {
+      flush.current = null;
+      update.mutate({ id: action.id, status: 'done' });
+    };
+    pending.current = setTimeout(() => flush.current?.(), 550);
+  };
+
+  const done = landing === 'done' || action.status === 'done';
   const overdue = !done && action.dueDate !== null && action.dueDate < Date.now();
 
   const saveTitle = () => {
@@ -42,16 +72,11 @@ function ActionRow({
 
   return (
     <div className="flex items-center gap-3 border-b border-border py-3 last:border-b-0">
-      <button
-        onClick={() => update.mutate({ id: action.id, status: done ? 'todo' : 'done' })}
-        aria-label={done ? 'mark todo' : 'mark done'}
-        className={cn(
-          'flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors',
-          done ? 'border-primary bg-primary text-white' : 'border-border hover:border-primary',
-        )}
-      >
-        {done && <Check size={13} />}
-      </button>
+      <DoneCheck
+        checked={done}
+        onChange={setDone}
+        label={done ? (lang === 'he' ? 'סימון כפתוחה' : 'Mark as open') : lang === 'he' ? 'סימון כבוצעה' : 'Mark as done'}
+      />
 
       <div className="min-w-0 flex-1">
         {editing ? (
@@ -103,7 +128,7 @@ function ActionRow({
       <select
         value={action.priority}
         onChange={(e) => update.mutate({ id: action.id, priority: e.target.value as ActionPriority })}
-        className="h-8 rounded-md border border-border bg-surface px-2 text-xs text-foreground focus:border-primary focus:outline-none"
+        className="rz-select h-8 rounded-md border border-border bg-surface px-2 text-xs text-foreground"
         aria-label="priority"
       >
         {ACTION_PRIORITIES.map((p) => (
@@ -205,7 +230,7 @@ export function ActionsPage() {
           <select
             value={priority}
             onChange={(e) => setPriority(e.target.value as ActionPriority)}
-            className="h-9 rounded-md border border-border bg-surface px-2 text-sm text-foreground focus:border-primary focus:outline-none"
+            className="rz-select h-9 rounded-md border border-border bg-surface px-2 text-sm text-foreground"
             aria-label="new action priority"
           >
             {ACTION_PRIORITIES.map((p) => (
@@ -217,7 +242,7 @@ export function ActionsPage() {
           <select
             value={goalId}
             onChange={(e) => setGoalId(e.target.value)}
-            className="h-9 max-w-52 rounded-md border border-border bg-surface px-2 text-sm text-foreground focus:border-primary focus:outline-none"
+            className="rz-select h-9 max-w-52 rounded-md border border-border bg-surface px-2 text-sm text-foreground"
             aria-label="link to goal"
           >
             <option value="">{lang === 'he' ? 'ללא מטרה' : 'No goal'}</option>
@@ -231,7 +256,7 @@ export function ActionsPage() {
             type="date"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
-            className="h-9 rounded-md border border-border bg-surface px-2 text-sm text-foreground focus:border-primary focus:outline-none"
+            className="h-9 rounded-md border border-border bg-surface px-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-[color:var(--rz-accent-ring)] transition-[border-color,box-shadow]"
             aria-label="due date"
           />
           <Button type="submit" disabled={!title.trim() || create.isPending}>
@@ -248,7 +273,7 @@ export function ActionsPage() {
             className={cn(
               'rounded-full border px-3 py-1 text-xs transition-colors',
               statusFilter === s
-                ? 'border-primary bg-primary text-white'
+                ? 'border-primary bg-primary text-[color:var(--rz-accent-fg)]'
                 : 'border-border text-fg-muted hover:text-foreground',
             )}
           >
@@ -268,7 +293,7 @@ export function ActionsPage() {
         <select
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value as '' | ActionPriority)}
-          className="h-7 rounded-full border border-border bg-surface px-2 text-xs text-fg-muted focus:border-primary focus:outline-none"
+          className="rz-select h-7 rounded-full border border-border bg-surface px-2 text-xs text-fg-muted"
           aria-label="filter by priority"
         >
           <option value="">{lang === 'he' ? 'כל העדיפויות' : 'All priorities'}</option>
@@ -281,7 +306,7 @@ export function ActionsPage() {
         <select
           value={goalFilter}
           onChange={(e) => setGoalFilter(e.target.value)}
-          className="h-7 max-w-48 rounded-full border border-border bg-surface px-2 text-xs text-fg-muted focus:border-primary focus:outline-none"
+          className="rz-select h-7 max-w-48 rounded-full border border-border bg-surface px-2 text-xs text-fg-muted"
           aria-label="filter by goal"
         >
           <option value="">{lang === 'he' ? 'כל המטרות' : 'All goals'}</option>

@@ -175,7 +175,7 @@ function ChatSession({
             }}
             rows={1}
             placeholder={lang === 'he' ? 'כתיבה ל-Clarity…' : 'Message Clarity…'}
-            className="max-h-32 min-h-9 flex-1 resize-none rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            className="max-h-32 min-h-9 flex-1 resize-none rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-[color:var(--rz-accent-ring)] transition-[border-color,box-shadow]"
           />
           {streaming ? (
             <Button size="icon" variant="secondary" onClick={stop} title="עצור">

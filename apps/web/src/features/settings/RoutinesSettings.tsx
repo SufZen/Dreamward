@@ -92,7 +92,7 @@ export function RoutinesSettings() {
                   <select
                     value={r.scheduleHour}
                     onChange={(e) => update.mutate({ id: r.id, scheduleHour: Number(e.target.value) })}
-                    className="h-7 rounded-md border border-border bg-surface px-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                    className="rz-select h-7 rounded-md border border-border bg-surface px-1.5 text-xs text-foreground"
                   >
                     {Array.from({ length: 24 }, (_, h) => (
                       <option key={h} value={h}>

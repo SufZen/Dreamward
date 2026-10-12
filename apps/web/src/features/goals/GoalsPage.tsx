@@ -77,7 +77,7 @@ function GoalRow({ goal, progress }: { goal: Goal; progress?: GoalProgress }) {
       <select
         value={goal.status}
         onChange={(e) => setStatus.mutate({ id: goal.id, status: e.target.value as GoalStatus })}
-        className="h-8 rounded-md border border-border bg-surface px-2 text-xs text-foreground focus:border-primary focus:outline-none"
+        className="rz-select h-8 rounded-md border border-border bg-surface px-2 text-xs text-foreground"
       >
         {GOAL_STATUSES.map((s) => (
           <option key={s} value={s}>
@@ -139,7 +139,7 @@ export function GoalsPage() {
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="h-9 rounded-md border border-border bg-surface px-2 text-sm text-foreground focus:border-primary focus:outline-none"
+            className="rz-select h-9 rounded-md border border-border bg-surface px-2 text-sm text-foreground"
           >
             <option value="">{lang === 'he' ? 'ללא קטגוריה' : 'No category'}</option>
             {categories?.map((c) => (

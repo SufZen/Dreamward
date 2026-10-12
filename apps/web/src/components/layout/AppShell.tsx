@@ -7,6 +7,7 @@ import { useLang } from '@/lib/lang';
 import { useLogout, useMe } from '@/features/auth/useAuth';
 import { AssistantLauncher } from '@/features/assistant/AssistantLauncher';
 import { isDesktop } from '@/lib/desktop';
+import { PageLoader } from '@dreamward/design-system';
 
 export function AppShell() {
   const { t, lang } = useLang();
@@ -22,7 +23,10 @@ export function AppShell() {
     <div className="flex h-screen overflow-hidden">
       <Sidebar open={navOpen} onClose={() => setNavOpen(false)} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="fx-glass sticky top-0 z-10 flex h-14 items-center gap-2 border-b border-border px-4">
+        <header
+          className="fx-glass sticky top-0 z-10 flex h-14 items-center gap-2 border-b border-border px-4"
+          style={{ viewTransitionName: 'header' }}
+        >
           <button
             onClick={() => setNavOpen(true)}
             className="-ms-1 inline-flex h-9 w-9 items-center justify-center rounded-md text-fg-muted hover:bg-surface hover:text-foreground sm:hidden"
@@ -42,8 +46,9 @@ export function AppShell() {
           )}
         </header>
         <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
-            <Suspense fallback={<p className="p-6 text-fg-muted">…</p>}>
+          {/* view-transition-name: only the page moves on navigation; the shell stays still */}
+          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8" style={{ viewTransitionName: 'page' }}>
+            <Suspense fallback={<PageLoader label={t('loading')} />}>
               <Outlet />
             </Suspense>
           </div>

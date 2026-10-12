@@ -75,7 +75,7 @@ function CurrentIkigai({ profile, history }: { profile: IkigaiProfile; history: 
     <>
       <Card featured className="flex flex-col gap-3 p-6">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-xs font-mono uppercase tracking-wider text-fg-faint">
+          <span className="text-xs font-medium text-fg-muted">
             {he ? 'האיקיגאי שלי · מאז ' : 'My IKIGAI · since '}
             {fmt(profile.completedAt, he)}
           </span>
@@ -124,7 +124,7 @@ function CurrentIkigai({ profile, history }: { profile: IkigaiProfile; history: 
           <button
             type="button"
             onClick={() => setShowHistory((s) => !s)}
-            className="flex items-center gap-2 self-start text-sm font-mono uppercase tracking-wider text-fg-faint hover:text-fg-muted"
+            className="flex items-center gap-2 self-start text-sm font-medium text-fg-muted hover:text-fg-muted"
           >
             <History size={14} /> {he ? `גרסאות קודמות (${archived.length})` : `Earlier versions (${archived.length})`}
           </button>

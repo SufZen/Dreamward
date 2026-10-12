@@ -2,7 +2,9 @@ import { forwardRef } from 'react';
 import { cn } from '../lib/cn';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** The screen's one focal surface: warm horizon light and a gold hairline. */
   featured?: boolean;
+  /** Clickable: lifts on hover and catches the pointer's light (pair with useSpotlight). */
   interactive?: boolean;
 }
 
@@ -11,9 +13,10 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     <div
       ref={ref}
       className={cn(
-        'rounded-lg border border-border bg-card p-4 transition-all duration-200 ease-out',
-        interactive && 'hover:border-border-strong hover:bg-surface-hover hover:shadow-rz-2',
-        featured && 'border-[color:var(--rz-border-accent)] shadow-glow',
+        'rounded-lg border border-border bg-card p-4 shadow-rz-1',
+        interactive && 'rz-lift fx-spotlight cursor-pointer hover:border-border-strong',
+        featured &&
+          'border-[color:color-mix(in_oklch,var(--rz-accent)_22%,transparent)] bg-[radial-gradient(120%_90%_at_100%_0%,var(--rz-accent-soft),transparent_55%)] rtl:bg-[radial-gradient(120%_90%_at_0%_0%,var(--rz-accent-soft),transparent_55%)]',
         className,
       )}
       {...props}

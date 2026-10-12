@@ -14,6 +14,7 @@ module.exports = {
         md: 'var(--rz-radius-md)',
         lg: 'var(--rz-radius-lg)',
         xl: 'var(--rz-radius-xl)',
+        '2xl': 'var(--rz-radius-2xl)',
         full: 'var(--rz-radius-full)',
       },
       colors: {
@@ -34,6 +35,8 @@ module.exports = {
         'brand-yellow-hover': 'var(--rz-accent-strong)',
         'bg-elevated': 'var(--rz-bg-sunken)',
         'bg-sunken': 'var(--rz-bg-sunken)',
+        'bg-deep': 'var(--rz-bg-deep)',
+        'accent-text': 'var(--rz-accent-text)',
         'bg-raised': 'var(--rz-bg-raised)',
         'bg-card-hover': 'var(--rz-surface-hover)',
         surface: 'var(--rz-surface)',
@@ -76,7 +79,27 @@ module.exports = {
         'rz-3': 'var(--rz-shadow-3)',
         glow: 'var(--rz-shadow-glow)',
       },
-      maxWidth: { site: '1200px' },
+      maxWidth: { site: '1200px', reader: '72ch' },
+      transitionDuration: {
+        instant: 'var(--rz-dur-instant)',
+        fast: 'var(--rz-dur-fast)',
+        DEFAULT: 'var(--rz-dur)',
+        moderate: 'var(--rz-dur-moderate)',
+        slow: 'var(--rz-dur-slow)',
+        ritual: 'var(--rz-dur-ritual)',
+        spring: 'var(--rz-spring-dur)',
+      },
+      transitionTimingFunction: {
+        DEFAULT: 'var(--rz-ease-standard)',
+        standard: 'var(--rz-ease-standard)',
+        enter: 'var(--rz-ease-enter)',
+        exit: 'var(--rz-ease-exit)',
+        emphasis: 'var(--rz-ease-emphasis)',
+        spring: 'var(--rz-spring)',
+        'spring-snappy': 'var(--rz-spring-snappy)',
+        'spring-dream': 'var(--rz-spring-dream)',
+        'spring-gentle': 'var(--rz-spring-gentle)',
+      },
       keyframes: {
         'accordion-down': { from: { height: '0' }, to: { height: 'var(--radix-accordion-content-height)' } },
         'accordion-up': { from: { height: 'var(--radix-accordion-content-height)' }, to: { height: '0' } },
@@ -89,13 +112,26 @@ module.exports = {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'fade-up': 'fade-up 0.5s var(--rz-ease-out) forwards',
+        'fade-up': 'rz-fade-in var(--rz-dur-slow) var(--rz-ease-out) both, rz-rise var(--rz-spring-dur) var(--rz-spring) both',
+        shimmer: 'rz-shimmer 1.6s var(--rz-ease-in-out) infinite',
+        breathe: 'rz-breathe 8s var(--rz-ease-in-out) infinite',
+        'spin-slow': 'rz-spin 1.1s linear infinite',
         'fade-in': 'fade-in 0.5s var(--rz-ease-out) forwards',
-        'popup-in': 'popup-in 0.3s var(--rz-ease-out) forwards',
+        'popup-in': 'popup-in var(--rz-dur-moderate) var(--rz-ease-enter) both',
         float: 'float 4s ease-in-out infinite',
         'float-slow': 'float-slow 6s ease-in-out infinite',
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [
+    require('tailwindcss-animate'),
+    // Gold as *text* needs a deeper step in light mode (#976b03, 4.7:1 on white)
+    // than gold as a fill. bg-primary stays the brand gold.
+    function ({ addUtilities }) {
+      addUtilities({
+        '.text-primary': { color: 'var(--rz-accent-text)' },
+        '.text-brand-yellow': { color: 'var(--rz-accent-text)' },
+      });
+    },
+  ],
 };

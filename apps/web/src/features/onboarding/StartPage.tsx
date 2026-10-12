@@ -246,7 +246,7 @@ function Flow({ chapter }: { chapter: Chapter | null }) {
     <div className="mx-auto flex max-w-3xl flex-col gap-6 pb-24 md:pb-0">
       <header className="flex items-center justify-between gap-4">
         <div className="flex flex-col">
-          <span className="text-xs uppercase tracking-wide text-fg-faint">{he ? 'התחלה מודרכת' : 'Guided start'}</span>
+          <span className="text-xs font-medium text-fg-subtle">{he ? 'התחלה מודרכת' : 'Guided start'}</span>
           <span className="text-sm text-fg-muted">{he ? 'כ-10 דקות. אפשר לעצור ולחזור.' : 'About 10 minutes. Stop and come back anytime.'}</span>
         </div>
         <Button variant="ghost" onClick={notNow} loading={setStatus.isPending && !saving}>

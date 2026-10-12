@@ -103,7 +103,7 @@ export function Dashboard() {
       {/* Pending proposals from Clarity — inline approve/reject */}
       {pendingItems.length > 0 && (
         <section className="flex flex-col gap-2">
-          <h2 className="flex items-center gap-2 text-sm font-mono uppercase tracking-wider text-fg-faint">
+          <h2 className="flex items-center gap-2 text-sm font-medium text-fg-muted">
             <Sparkles size={14} className="text-primary" /> {he ? 'הצעות מ-Clarity' : 'Suggestions from Clarity'}
             <Badge variant="accent">{pendingItems.length}</Badge>
           </h2>
@@ -230,7 +230,7 @@ export function Dashboard() {
       {/* Recent journal + moodboards */}
       <section className="grid gap-6 lg:grid-cols-2">
         <div>
-          <h2 className="mb-3 flex items-center gap-2 text-sm font-mono uppercase tracking-wider text-fg-faint">
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-medium text-fg-muted">
             <NotebookPen size={14} /> {he ? 'רשומות אחרונות' : 'Recent journal'}
           </h2>
           {!journal ? (
@@ -257,7 +257,7 @@ export function Dashboard() {
 
         {!!boards?.length && (
           <div>
-            <h2 className="mb-3 text-sm font-mono uppercase tracking-wider text-fg-faint">{t('moodboard')}</h2>
+            <h2 className="mb-3 text-sm font-medium text-fg-muted">{t('moodboard')}</h2>
             <div className="grid grid-cols-3 gap-2">
               {boards.slice(0, 6).map((b) => (
                 <Link key={b.id} to={`/moodboard/${b.id}`} title={b.title}>
@@ -278,7 +278,7 @@ export function Dashboard() {
       </section>
 
       <section>
-        <h2 className="mb-4 text-sm font-mono uppercase tracking-wider text-fg-faint">{t('categories')}</h2>
+        <h2 className="mb-4 text-sm font-medium text-fg-muted">{t('categories')}</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categories?.map((c) => (
             <Link key={c.id} to={`/book/category/${c.id}`}>

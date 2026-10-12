@@ -119,7 +119,7 @@ export function ApiKeysSettings() {
         <select
           value={scope}
           onChange={(e) => setScope(e.target.value as 'read' | 'write')}
-          className="h-9 rounded-md border border-border bg-surface px-2 text-sm text-foreground focus:border-primary focus:outline-none"
+          className="rz-select h-9 rounded-md border border-border bg-surface px-2 text-sm text-foreground"
           aria-label="key scope"
         >
           <option value="read">{he ? 'קריאה בלבד' : 'Read-only'}</option>

@@ -25,8 +25,9 @@
     border-color var(--rz-dur-fast) var(--rz-ease-out),
     color var(--rz-dur-fast) var(--rz-ease-out),
     box-shadow var(--rz-dur-fast) var(--rz-ease-out),
-    transform var(--rz-dur-fast) var(--rz-ease-out);
+    transform var(--rz-spring-snappy-dur) var(--rz-spring-snappy);
 }
+.rz-btn:active:not(:disabled) { transform: scale(0.97); transition-duration: var(--rz-dur-instant); }
 .rz-btn:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px var(--rz-accent-ring);
@@ -39,6 +40,8 @@
 .rz-btn--primary {
   background: var(--rz-accent);
   color: var(--rz-accent-fg);
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.35), 0 1px 2px oklch(0 0 0 / 0.25);
 }
 .rz-btn--primary:hover:not(:disabled) {
   background: var(--rz-accent-strong);
@@ -121,11 +124,9 @@ textarea.rz-input {
   gap: 6px;
   height: 22px;
   padding: 0 8px;
-  border-radius: var(--rz-radius-sm);
-  font-family: var(--rz-font-mono);
-  font-size: var(--rz-text-2xs);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  border-radius: var(--rz-radius-full);
+  font-size: var(--rz-text-xs);
+  font-weight: 500;
   border: 1px solid var(--rz-border);
   color: var(--rz-fg-muted);
   background: var(--rz-surface);
@@ -137,7 +138,7 @@ textarea.rz-input {
   background: currentColor;
 }
 
-.rz-badge--accent  { color: var(--rz-accent);  background: var(--rz-accent-soft);  border-color: transparent; }
+.rz-badge--accent  { color: var(--rz-accent-text);  background: var(--rz-accent-soft);  border-color: transparent; }
 .rz-badge--success { color: var(--rz-success); background: var(--rz-success-soft); border-color: transparent; }
 .rz-badge--warning { color: var(--rz-warning); background: var(--rz-warning-soft); border-color: transparent; }
 .rz-badge--danger  { color: var(--rz-danger);  background: var(--rz-danger-soft);  border-color: transparent; }
@@ -149,20 +150,22 @@ textarea.rz-input {
   border: 1px solid var(--rz-border);
   border-radius: var(--rz-radius-lg);
   padding: 16px;
+  box-shadow: var(--rz-shadow-1);
   transition:
-    border-color var(--rz-dur) var(--rz-ease-out),
-    background var(--rz-dur) var(--rz-ease-out),
-    box-shadow var(--rz-dur) var(--rz-ease-out),
-    transform var(--rz-dur) var(--rz-ease-out);
+    border-color var(--rz-dur) var(--rz-ease-standard),
+    background var(--rz-dur) var(--rz-ease-standard),
+    box-shadow var(--rz-dur) var(--rz-ease-standard),
+    transform var(--rz-spring-dur) var(--rz-spring);
 }
-.rz-card:hover {
+.rz-card--interactive:hover {
   border-color: var(--rz-border-strong);
-  background: var(--rz-surface-hover);
   box-shadow: var(--rz-shadow-2);
+  transform: translateY(-2px);
 }
+/* Featured: the screen's one focal surface — warm horizon light, not a gold frame. */
 .rz-card--featured {
-  border-color: var(--rz-border-accent);
-  box-shadow: var(--rz-shadow-glow);
+  background-image: radial-gradient(120% 90% at 100% 0%, var(--rz-accent-soft), transparent 55%);
+  border-color: color-mix(in oklch, var(--rz-accent) 22%, transparent);
 }
 .rz-card--empty {
   background: transparent;
@@ -205,7 +208,7 @@ textarea.rz-input {
 .dw-clarity { flex: none; overflow: visible; }
 .dw-clarity__halo { transform-origin: 24px 24px; }
 .dw-clarity__ring { transform-origin: 24px 24px; }
-.dw-clarity__star { filter: drop-shadow(0 0 1.5px rgba(255, 204, 0, 0.6)); }
+.dw-clarity__star { filter: drop-shadow(0 0 1.5px oklch(0.865 0.177 91 / 0.6)); }
 .dw-clarity--idle .dw-clarity__halo { animation: dw-clarity-breathe 4s ease-in-out infinite; }
 .dw-clarity--speaking .dw-clarity__halo { opacity: 1; transform: scale(1.08); }
 .dw-clarity--thinking .dw-clarity__ring { animation: dw-clarity-focus 1.6s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
@@ -220,3 +223,137 @@ textarea.rz-input {
   .dw-clarity__halo, .dw-clarity__ring, .dw-clarity__step { animation: none !important; }
   .dw-clarity--thinking .dw-clarity__step { opacity: 1; }
 }
+
+/* ── Motion components (src/motion) ────────────────────────────────────── */
+
+/* Star burst: particles fly from the parent's centre. */
+.dw-burst { position: absolute; inset: 50% auto auto 50%; width: 0; height: 0; pointer-events: none; z-index: 1; }
+.dw-burst__p {
+  position: absolute;
+  inset: 0 auto auto 0;
+  background: var(--rz-accent);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  filter: drop-shadow(0 0 4px oklch(0.865 0.177 91 / 0.9));
+  animation: rz-burst 760ms var(--rz-ease-enter) both;
+}
+.dw-burst__p:nth-child(3n) { background: oklch(0.97 0.05 95); }
+.dw-burst__flash {
+  position: absolute;
+  inset: 0 auto auto 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, oklch(0.865 0.177 91 / 0.35), transparent 65%);
+  animation: rz-ring-out 700ms var(--rz-ease-enter) both;
+}
+.dw-burst__ring {
+  position: absolute;
+  inset: 0 auto auto 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--rz-accent);
+  animation: rz-ring-out 600ms var(--rz-ease-enter) both;
+}
+
+/* Check: a ring that fills with gold as the stroke draws. */
+.dw-check {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: var(--rz-radius-full);
+  border: 1.5px solid var(--rz-border-strong);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background-color var(--rz-dur) var(--rz-ease-standard),
+    border-color var(--rz-dur) var(--rz-ease-standard),
+    transform var(--rz-spring-snappy-dur) var(--rz-spring-snappy);
+}
+.dw-check:hover { border-color: var(--rz-accent); }
+.dw-check svg { width: 14px; height: 14px; overflow: visible; }
+.dw-check path {
+  fill: none;
+  stroke: var(--rz-accent-fg);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.dw-check[data-checked] {
+  background: var(--rz-accent);
+  border-color: var(--rz-accent);
+  animation: rz-pop var(--rz-spring-dur) var(--rz-spring);
+}
+.dw-check[data-checked] path { animation: rz-draw 220ms var(--rz-ease-enter) 60ms forwards; }
+
+/* Progress ring: the fill springs to its value. */
+.dw-ring { position: relative; display: inline-grid; place-items: center; flex: none; }
+.dw-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+[dir="rtl"] .dw-ring svg { transform: rotate(-90deg) scaleY(-1); }
+.dw-ring circle { fill: none; }
+.dw-ring__track { stroke: var(--rz-surface-hover); }
+.dw-ring__fill {
+  stroke: var(--rz-accent);
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  transition: stroke-dashoffset var(--rz-spring-dream-dur) var(--rz-spring-dream);
+}
+.dw-ring__label { position: relative; font-size: calc(var(--ring-size, 56px) * 0.3); font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+
+/* Breathing orb: 4 s in, 4 s out. */
+.dw-orb { position: relative; display: grid; place-items: center; }
+.dw-orb__glow,
+.dw-orb__core { position: absolute; border-radius: 50%; }
+.dw-orb__glow {
+  inset: 0;
+  background: radial-gradient(circle, oklch(0.865 0.177 91 / 0.30), oklch(0.78 0.12 55 / 0.10) 45%, transparent 70%);
+  animation: rz-breathe 8s var(--rz-ease-in-out) infinite;
+}
+.dw-orb__core {
+  inset: 30%;
+  background: radial-gradient(circle at 40% 35%, oklch(0.97 0.06 95), var(--rz-accent) 55%, oklch(0.70 0.15 70));
+  box-shadow: 0 0 40px oklch(0.865 0.177 91 / 0.45);
+  animation: rz-breathe 8s var(--rz-ease-in-out) infinite;
+}
+.dw-orb__label { position: absolute; inset-block-start: 100%; margin-block-start: 12px; white-space: nowrap; color: var(--rz-fg-muted); font-size: var(--rz-text-sm); }
+
+/* Twinkles: a few stars on their own clocks. */
+.dw-twinkles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.dw-twinkles i {
+  position: absolute;
+  border-radius: 50%;
+  background: oklch(0.97 0.03 95);
+  animation: rz-twinkle 4s var(--rz-ease-in-out) infinite;
+}
+[data-mode="light"] .dw-twinkles i { background: oklch(0.70 0.10 85); }
+
+/* Empty-state mark: the steps appear one by one, then the star. */
+.dw-empty-mark__step { animation: rz-fade-in var(--rz-dur-moderate) var(--rz-ease-enter) both; animation-delay: calc(120ms + var(--i) * 90ms); }
+.dw-empty-mark__star { transform-origin: 56px 16px; animation: rz-zoom-in-95 var(--rz-spring-dream-dur) var(--rz-spring-dream) 520ms both; }
+.dw-empty-mark__halo { transform-origin: 56px 16px; animation: rz-breathe 8s var(--rz-ease-in-out) 900ms infinite; }
+
+/* Page loader: wait 250 ms before appearing, so quick loads never flash. */
+.dw-page-loader { animation: rz-fade-in var(--rz-dur-slow) var(--rz-ease-standard) 250ms both; }
+
+/* ── Select ─────────────────────────────────────────────────────────────── *
+ * Native <select> (keeps the OS picker and accessibility) with our chevron,
+ * placed at the inline end so it flips in RTL. Size with utilities.         */
+.rz-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-inline-end: 28px !important;
+  background-color: var(--rz-surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239a9db1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+  transition:
+    border-color var(--rz-dur-fast) var(--rz-ease-standard),
+    box-shadow var(--rz-dur-fast) var(--rz-ease-standard),
+    background-color var(--rz-dur-fast) var(--rz-ease-standard);
+}
+.rz-select:dir(rtl) { background-position: left 10px center; }
+.rz-select:hover { border-color: var(--rz-border-strong); }
+.rz-select:focus { outline: none; border-color: var(--rz-accent); box-shadow: 0 0 0 3px var(--rz-accent-ring); }
+.rz-select option { background: var(--rz-bg-raised); color: var(--rz-fg); }

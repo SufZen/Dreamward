@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CATEGORIES, RATING_MAX, type LatestRating } from '@dreamward/shared';
 import { useAreaLabel } from '@/features/book/hooks';
@@ -14,6 +15,8 @@ const point = (i: number, value: number) => {
 };
 
 const poly = (values: number[]) => values.map((v, i) => point(i, v)).map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+/** Same shape as a path: CSS can transition `d`, so a new rating springs into place. */
+const path = (values: number[]) => `M${poly(values).replace(/ /g, ' L')} Z`;
 
 /**
  * Dependency-free radar of the 12 categories: current "how close to my
@@ -23,6 +26,7 @@ const poly = (values: number[]) => values.map((v, i) => point(i, v)).map((p) => 
 export function LifeWheel({ ratings, focus = [] }: { ratings: LatestRating[]; focus?: string[] }) {
   const areaLabel = useAreaLabel();
   const navigate = useNavigate();
+  const lightId = useId();
   const byId = new Map(ratings.map((r) => [r.categoryId, r]));
   const current = CATEGORIES.map((c) => byId.get(c.id)?.latest?.score ?? 0);
   const previous = CATEGORIES.map((c) => byId.get(c.id)?.previousScore ?? byId.get(c.id)?.latest?.score ?? 0);
@@ -31,6 +35,13 @@ export function LifeWheel({ ratings, focus = [] }: { ratings: LatestRating[]; fo
   return (
     <div dir="ltr" className="w-full">
       <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="mx-auto w-full max-w-[420px]" role="img" aria-label="life wheel">
+        <defs>
+          {/* the shape is lit from the centre, like light from the star */}
+          <radialGradient id={lightId} gradientUnits="userSpaceOnUse" cx={C} cy={C} r={R}>
+            <stop offset="0%" stopColor="var(--rz-accent)" stopOpacity={0.42} />
+            <stop offset="100%" stopColor="var(--rz-accent)" stopOpacity={0.08} />
+          </radialGradient>
+        </defs>
         {/* rings */}
         {[2, 4, 6, 8, 10].map((v) => (
           <circle key={v} cx={C} cy={C} r={(R * v) / RATING_MAX} fill="none" stroke="var(--rz-border)" strokeWidth={v === 10 ? 1.2 : 0.7} />
@@ -64,12 +75,31 @@ export function LifeWheel({ ratings, focus = [] }: { ratings: LatestRating[]; fo
         {hasPrevious && (
           <polygon points={poly(previous)} fill="none" stroke="var(--rz-fg-faint)" strokeWidth={1.2} strokeDasharray="4 3" />
         )}
-        <polygon points={poly(current)} fill="var(--rz-accent)" fillOpacity={0.22} stroke="var(--rz-accent)" strokeWidth={2} />
+        {/* the d attribute is the fallback; CSS d (where supported) is what transitions */}
+        <path
+          className="dw-wheel-shape"
+          d={path(current)}
+          style={{ d: `path('${path(current)}')` }}
+          fill={`url(#${lightId})`}
+          stroke="var(--rz-accent)"
+          strokeWidth={2}
+          strokeLinejoin="round"
+        />
         {CATEGORIES.map((c, i) => {
           const v = current[i]!;
           if (!v) return null;
           const p = point(i, v);
-          return <circle key={c.id} cx={p.x} cy={p.y} r={focus.includes(c.id) ? 4.5 : 3} fill="var(--rz-accent)" />;
+          return (
+            <circle
+              key={c.id}
+              className="dw-wheel-dot"
+              cx={p.x}
+              cy={p.y}
+              style={{ cx: p.x, cy: p.y }}
+              r={focus.includes(c.id) ? 4.5 : 3}
+              fill="var(--rz-accent)"
+            />
+          );
         })}
       </svg>
     </div>

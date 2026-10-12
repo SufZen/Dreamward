@@ -27,6 +27,10 @@ const CollageEditor = lazyNamed(() => import('@/features/moodboard/CollageEditor
 const ChapterPage = lazyNamed(() => import('@/features/chapter/ChapterPage'), 'ChapterPage');
 const IkigaiPage = lazyNamed(() => import('@/features/ikigai/IkigaiPage'), 'IkigaiPage');
 const StartPage = lazyNamed(() => import('@/features/onboarding/StartPage'), 'StartPage');
+// Dev-only living reference for the design system (not shipped in production builds).
+const DesignSystemPage = import.meta.env.DEV
+  ? lazyNamed(() => import('@/features/design/DesignSystemPage'), 'DesignSystemPage')
+  : null;
 
 const Loading = () => <p className="p-6 text-fg-muted">…</p>;
 
@@ -61,6 +65,7 @@ function ShellRoutes() {
         <Route path="gallery" element={<GalleryPage />} />
         <Route path="snapshots" element={<SnapshotsPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        {DesignSystemPage && <Route path="design" element={<DesignSystemPage />} />}
         <Route
           path="admin"
           element={

@@ -164,7 +164,7 @@ export function AdminPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border text-start text-xs uppercase tracking-wider text-fg-faint">
+                <tr className="border-b border-border text-start text-xs font-medium text-fg-subtle">
                   <th className="px-2 py-2 text-start">Email</th>
                   <th className="px-2 py-2 text-start">Role</th>
                   <th className="px-2 py-2 text-start">Status</th>
@@ -280,7 +280,7 @@ export function AdminPage() {
             <select
               value={usageUser}
               onChange={(e) => setUsageUser(e.target.value)}
-              className="h-8 rounded-md border border-border bg-surface px-2 text-sm focus:border-primary focus:outline-none"
+              className="rz-select h-8 rounded-md border border-border bg-surface px-2 text-sm"
             >
               <option value="">{he ? 'כל המשתמשים' : 'All users'}</option>
               {(usersQ.data?.users ?? []).map((u) => (
@@ -297,7 +297,7 @@ export function AdminPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border text-xs uppercase tracking-wider text-fg-faint">
+                  <tr className="border-b border-border text-xs font-medium text-fg-subtle">
                     <th className="px-2 py-1.5 text-start">{he ? 'מודל' : 'Model'}</th>
                     <th className="px-2 py-1.5 text-end">{he ? 'קלט' : 'Prompt'}</th>
                     <th className="px-2 py-1.5 text-end">{he ? 'פלט' : 'Completion'}</th>
@@ -355,7 +355,7 @@ export function AdminPage() {
             <select
               value={auditFilter}
               onChange={(e) => setAuditFilter(e.target.value)}
-              className="h-8 rounded-md border border-border bg-surface px-2 text-sm focus:border-primary focus:outline-none"
+              className="rz-select h-8 rounded-md border border-border bg-surface px-2 text-sm"
             >
               <option value="">{he ? 'כל האירועים' : 'All events'}</option>
               {AUDIT_EVENTS.map((ev) => (
@@ -386,7 +386,7 @@ export function AdminPage() {
 function SysItem({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-2xs uppercase tracking-wider text-fg-faint">{label}</dt>
+      <dt className="text-xs text-fg-subtle">{label}</dt>
       <dd className="font-medium text-foreground">{value}</dd>
     </div>
   );

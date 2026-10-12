@@ -7,12 +7,14 @@ import { queryClient } from './lib/queryClient';
 import { LangProvider } from './lib/lang';
 import { setUnauthorizedHandler } from './lib/api';
 import { initTheme } from './lib/theme';
+import { initMotion } from './lib/motion';
 
 // On any 401, drop the cached session so ProtectedRoute redirects to /login.
 setUnauthorizedHandler(() => queryClient.setQueryData(['me'], null));
 
 // Apply the persisted dark/light mode before first paint.
 initTheme();
+initMotion();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

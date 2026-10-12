@@ -1,61 +1,231 @@
 /* ============================================================================
- * @dreamward/design-system — keyframes.css
- * Animation primitives lifted from realizeos-site/tailwind.config.js.
- * Both apps import this so motion stays consistent.
+ * @dreamward/design-system — keyframes.css  (v2 · motion)
+ *
+ * Motion in Dreamward answers the person: it shows what changed, where
+ * something came from, and that a step counted. Nothing moves on its own
+ * except the few ambient things that are part of the night sky.
+ *
+ *   Durations   instant 80 · fast 120 · base 200 · moderate 280 · slow 450 · ritual 900
+ *   Exits       ≈ 0.7 × the entrance
+ *   Springs     transform only (position, scale). Opacity and colour never overshoot.
+ *   Stagger     35 ms per item, capped at 8 items (--i on each child)
+ *   Reduced     spatial motion becomes a 120 ms cross-fade; ambient motion stops.
+ *               [data-motion="reduced" | "full"] on <html> overrides the OS setting.
  * ========================================================================= */
 
-@keyframes rz-fade-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+:root {
+  --rz-dur-instant:  80ms;
+  --rz-dur-fast:     120ms;
+  --rz-dur:          200ms;
+  --rz-dur-moderate: 280ms;
+  --rz-dur-slow:     450ms;
+  --rz-dur-ritual:   900ms;
 
+  /* Easing — cubic-béziers for opacity / colour, and for small UI. */
+  --rz-ease-out:      cubic-bezier(0.22, 1, 0.36, 1);   /* v1 name: default for UI */
+  --rz-ease-in-out:   cubic-bezier(0.65, 0, 0.35, 1);
+  --rz-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --rz-ease-enter:    cubic-bezier(0, 0, 0.3, 1);
+  --rz-ease-exit:     cubic-bezier(0.4, 0.14, 1, 1);
+  --rz-ease-emphasis: cubic-bezier(0.4, 0.14, 0.3, 1);
+
+  /* Springs — damped-spring curves sampled into linear(). Use with the
+   * matching duration; transform only. */
+  --rz-spring-snappy: linear(0, 0.05, 0.161, 0.296, 0.431, 0.554, 0.66, 0.747, 0.816, 0.869, 0.909, 0.939, 0.96, 0.975, 0.985, 0.992, 0.996, 0.999, 1, 1.001, 1.001, 1.002, 1.001, 1.001, 1);
+  --rz-spring-snappy-dur: 320ms;
+  --rz-spring: linear(0, 0.052, 0.17, 0.316, 0.464, 0.598, 0.712, 0.804, 0.875, 0.927, 0.964, 0.988, 1.003, 1.011, 1.014, 1.015, 1.014, 1.012, 1.01, 1.008, 1.006, 1.004, 1.003, 1.002, 1);
+  --rz-spring-dur: 430ms;
+  --rz-spring-dream: linear(0, 0.047, 0.158, 0.299, 0.445, 0.581, 0.7, 0.799, 0.876, 0.933, 0.974, 1.001, 1.017, 1.025, 1.028, 1.028, 1.025, 1.021, 1.017, 1.013, 1.009, 1.006, 1.004, 1.002, 1);
+  --rz-spring-dream-dur: 610ms;
+  --rz-spring-gentle: linear(0, 0.058, 0.18, 0.321, 0.455, 0.573, 0.671, 0.75, 0.812, 0.86, 0.897, 0.924, 0.945, 0.96, 0.971, 0.979, 0.985, 0.989, 0.992, 0.994, 0.996, 0.997, 0.998, 0.999, 1);
+  --rz-spring-gentle-dur: 650ms;
+
+  --rz-stagger: 35ms;
+  /* Logical direction for slide motion: flips in RTL. */
+  --rz-inline-dir: 1;
+}
+[dir="rtl"] { --rz-inline-dir: -1; }
+
+/* ── Keyframes ─────────────────────────────────────────────────────────── */
+@keyframes rz-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
 @keyframes rz-fade-in {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-
-@keyframes rz-popup-in {
-  from { opacity: 0; transform: scale(0.95) translateY(10px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
+@keyframes rz-fade-out {
+  to { opacity: 0; }
 }
-
+@keyframes rz-popup-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes rz-rise {               /* transform only — pair with rz-fade-in */
+  from { transform: translateY(14px) scale(0.985); }
+  to   { transform: none; }
+}
+@keyframes rz-slide-in-inline {
+  from { opacity: 0; transform: translateX(calc(24px * var(--rz-inline-dir))); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes rz-slide-in-right {     /* v1 name — logical now: from the inline end */
+  from { transform: translateX(calc(100% * var(--rz-inline-dir))); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+@keyframes rz-zoom-in-95 {
+  from { transform: scale(0.95); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
 @keyframes rz-float {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-6px); }
 }
-
 @keyframes rz-float-slow {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-4px); }
 }
-
 @keyframes rz-accordion-down {
   from { height: 0; }
   to   { height: var(--radix-accordion-content-height); }
 }
-
 @keyframes rz-accordion-up {
   from { height: var(--radix-accordion-content-height); }
   to   { height: 0; }
 }
-
-@keyframes rz-slide-in-right {
-  from { transform: translateX(100%); opacity: 0; }
-  to   { transform: translateX(0);    opacity: 1; }
+/* Skeleton: a slow band of light, like dawn crossing a page. */
+@keyframes rz-shimmer {
+  from { background-position: 150% 0; }
+  to   { background-position: -50% 0; }
+}
+/* Check: the stroke draws itself (pathLength="1"). */
+@keyframes rz-draw {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+/* Pop: a press that lands. */
+@keyframes rz-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+/* Star burst: each particle flies out along (--dx, --dy) and fades. */
+@keyframes rz-burst {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(0.4) rotate(0deg); }
+  70%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--rot, 90deg)); }
+}
+@keyframes rz-ring-out {
+  from { opacity: 0.7; transform: translate(-50%, -50%) scale(0.2); }
+  to   { opacity: 0;   transform: translate(-50%, -50%) scale(1); }
+}
+/* Breathing: 4 s in, 4 s out — the ritual's opening breath. */
+@keyframes rz-breathe {
+  0%, 100% { transform: scale(0.82); opacity: 0.75; }
+  50%      { transform: scale(1);    opacity: 1; }
+}
+/* Twinkle: stars in the sky, each on its own --delay. */
+@keyframes rz-twinkle {
+  0%, 100% { opacity: 0.25; }
+  50%      { opacity: 1; }
+}
+@keyframes rz-glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.865 0.177 91 / 0.0); }
+  50%      { box-shadow: 0 0 0 6px oklch(0.865 0.177 91 / 0.12); }
+}
+@keyframes rz-spin { to { transform: rotate(360deg); } }
+@keyframes rz-grow-y {
+  from { transform: scaleY(0); }
+  to   { transform: none; }
 }
 
-@keyframes rz-zoom-in-95 {
-  from { transform: scale(0.95); opacity: 0; }
-  to   { transform: scale(1);    opacity: 1; }
+/* ── Utilities ─────────────────────────────────────────────────────────── */
+.rz-animate-fade-up        { animation: rz-fade-in var(--rz-dur-slow) var(--rz-ease-out) both, rz-rise var(--rz-spring-dur) var(--rz-spring) both; }
+.rz-animate-fade-in        { animation: rz-fade-in var(--rz-dur-slow) var(--rz-ease-out) both; }
+.rz-animate-popup-in       { animation: rz-popup-in var(--rz-dur-moderate) var(--rz-ease-enter) both; }
+.rz-animate-float          { animation: rz-float 4s ease-in-out infinite; }
+.rz-animate-float-slow     { animation: rz-float-slow 6s ease-in-out infinite; }
+.rz-animate-accordion-down { animation: rz-accordion-down var(--rz-dur) var(--rz-ease-out); }
+.rz-animate-accordion-up   { animation: rz-accordion-up var(--rz-dur) var(--rz-ease-out); }
+.rz-animate-slide-in-right { animation: rz-slide-in-right var(--rz-dur-moderate) var(--rz-ease-enter) both; }
+.rz-animate-zoom-in        { animation: rz-zoom-in-95 var(--rz-dur) var(--rz-ease-enter) both; }
+
+/* Staggered entrance for a list: put .rz-stagger on the parent and
+ * style="--i: n" on each child (index; capped at 8 by the min()). */
+.rz-stagger > * {
+  animation:
+    rz-fade-in var(--rz-dur-slow) var(--rz-ease-out) both,
+    rz-rise var(--rz-spring-dur) var(--rz-spring) both;
+  animation-delay: calc(min(var(--i, 0), 8) * var(--rz-stagger));
 }
 
-/* Convenience utility classes */
-.rz-animate-fade-up       { animation: rz-fade-up 0.5s var(--rz-ease-out) forwards; }
-.rz-animate-fade-in       { animation: rz-fade-in 0.5s var(--rz-ease-out) forwards; }
-.rz-animate-popup-in      { animation: rz-popup-in var(--rz-dur-slow) var(--rz-ease-out) forwards; }
-.rz-animate-float         { animation: rz-float 4s ease-in-out infinite; }
-.rz-animate-float-slow    { animation: rz-float-slow 6s ease-in-out infinite; }
-.rz-animate-accordion-down{ animation: rz-accordion-down var(--rz-dur) var(--rz-ease-out); }
-.rz-animate-accordion-up  { animation: rz-accordion-up var(--rz-dur) var(--rz-ease-out); }
-.rz-animate-slide-in-right{ animation: rz-slide-in-right var(--rz-dur-slow) var(--rz-ease-out) forwards; }
-.rz-animate-zoom-in       { animation: rz-zoom-in-95 var(--rz-dur) var(--rz-ease-out) forwards; }
+/* Press: everything clickable sinks a little and springs back. */
+.rz-press { transition: transform var(--rz-spring-snappy-dur) var(--rz-spring-snappy); }
+.rz-press:active:not(:disabled) { transform: scale(0.97); transition-duration: var(--rz-dur-instant); }
+
+/* Lift: an interactive surface rises toward you on hover. */
+.rz-lift {
+  transition:
+    transform var(--rz-spring-dur) var(--rz-spring),
+    box-shadow var(--rz-dur) var(--rz-ease-standard),
+    background-color var(--rz-dur) var(--rz-ease-standard),
+    border-color var(--rz-dur) var(--rz-ease-standard);
+}
+@media (hover: hover) {
+  .rz-lift:hover { transform: translateY(-2px); box-shadow: var(--rz-shadow-2); }
+}
+
+/* ── View transitions (same-document; react-router's viewTransition or
+ * withViewTransition). The shell stays still: only the element named
+ * "page" moves — the old page fades out, the new one rises in. Shared
+ * elements (view-transition-name on both sides) morph on the spring. ──── */
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; }
+::view-transition-old(page) { animation: rz-fade-out var(--rz-dur-fast) var(--rz-ease-exit) both; }
+::view-transition-new(page) {
+  animation:
+    rz-fade-in var(--rz-dur-moderate) var(--rz-ease-enter) 40ms both,
+    rz-rise var(--rz-spring-dur) var(--rz-spring) 40ms both;
+}
+::view-transition-group(*) { animation-duration: var(--rz-spring-dur); animation-timing-function: var(--rz-spring); }
+::view-transition-group(page) { animation: none; }
+
+/* ── Reduced motion ────────────────────────────────────────────────────── *
+ * Not "turn everything off": spatial motion becomes a short cross-fade, so
+ * changes are still visible. Ambient loops stop. The in-app setting wins
+ * over the OS: data-motion="full" keeps motion, "reduced" forces this.     */
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion="full"]) { --rz-reduced: 1; }
+  :root:not([data-motion="full"]) *,
+  :root:not([data-motion="full"]) *::before,
+  :root:not([data-motion="full"]) *::after {
+    animation-duration: var(--rz-dur-fast) !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: var(--rz-dur-fast) !important;
+    scroll-behavior: auto !important;
+  }
+  :root:not([data-motion="full"]) :is(.rz-ambient, .rz-ambient *) { animation: none !important; }
+  :root:not([data-motion="full"])::view-transition-group(*),
+  :root:not([data-motion="full"])::view-transition-old(*),
+  :root:not([data-motion="full"])::view-transition-new(*) { animation-duration: var(--rz-dur-fast) !important; animation-delay: 0ms !important; }
+  :root:not([data-motion="full"]) .rz-lift:hover,
+  :root:not([data-motion="full"]) .rz-press:active { transform: none; }
+}
+:root[data-motion="reduced"] { --rz-reduced: 1; }
+:root[data-motion="reduced"] *,
+:root[data-motion="reduced"] *::before,
+:root[data-motion="reduced"] *::after {
+  animation-duration: var(--rz-dur-fast) !important;
+  animation-iteration-count: 1 !important;
+  animation-delay: 0ms !important;
+  transition-duration: var(--rz-dur-fast) !important;
+  scroll-behavior: auto !important;
+}
+:root[data-motion="reduced"] :is(.rz-ambient, .rz-ambient *) { animation: none !important; }
+:root[data-motion="reduced"]::view-transition-group(*),
+:root[data-motion="reduced"]::view-transition-old(*),
+:root[data-motion="reduced"]::view-transition-new(*) { animation-duration: var(--rz-dur-fast) !important; animation-delay: 0ms !important; }
+:root[data-motion="reduced"] .rz-lift:hover,
+:root[data-motion="reduced"] .rz-press:active { transform: none; }

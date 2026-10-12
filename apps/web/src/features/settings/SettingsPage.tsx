@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Compass, KeyRound, Languages } from 'lucide-react';
+import { Compass, KeyRound, Languages, Waves } from 'lucide-react';
 import { Button, Card, Input } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
 import { api, ApiError } from '@/lib/api';
@@ -9,6 +9,7 @@ import { ApiKeysSettings } from './ApiKeysSettings';
 import { RoutinesSettings } from './RoutinesSettings';
 import { DataSettings } from './DataSettings';
 import { isDesktop } from '@/lib/desktop';
+import { useMotionPreference } from '@/lib/motion';
 import { useSetOnboardingStatus } from '@/features/onboarding/hooks';
 
 export function SettingsPage() {
@@ -19,6 +20,7 @@ export function SettingsPage() {
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
   const setOnboarding = useSetOnboardingStatus();
+  const [motion, setMotion] = useMotionPreference();
 
   const changePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,6 +90,37 @@ export function SettingsPage() {
           <Button variant={lang === 'en' ? 'primary' : 'secondary'} size="sm" onClick={() => setLang('en')}>
             English
           </Button>
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold">
+          <Waves size={18} className="text-primary" /> {lang === 'he' ? 'תנועה' : 'Motion'}
+        </h2>
+        <p className="mb-4 text-sm text-fg-muted">
+          {lang === 'he'
+            ? 'אנימציות קטנות מראות מה השתנה. "מופחתת" מחליפה אותן במעבר עמעום קצר.'
+            : 'Small animations show what changed. Reduced swaps them for a short fade.'}
+        </p>
+        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={lang === 'he' ? 'תנועה' : 'Motion'}>
+          {(
+            [
+              ['system', 'כמו במכשיר', 'Match my device'],
+              ['reduced', 'מופחתת', 'Reduced'],
+              ['full', 'מלאה', 'Full'],
+            ] as const
+          ).map(([value, he, en]) => (
+            <Button
+              key={value}
+              role="radio"
+              aria-checked={motion === value}
+              variant={motion === value ? 'primary' : 'secondary'}
+              size="sm"
+              onClick={() => setMotion(value)}
+            >
+              {lang === 'he' ? he : en}
+            </Button>
+          ))}
         </div>
       </Card>
 

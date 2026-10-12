@@ -86,7 +86,7 @@ export function DashboardMeaning() {
           <div className="grid items-center gap-4 md:grid-cols-[1fr_240px]">
             <LifeWheel ratings={ratings ?? []} focus={focus} />
             <div className="flex flex-col gap-2">
-              <span className="text-xs font-mono uppercase tracking-wider text-fg-faint">{he ? 'הפערים הבולטים' : 'Biggest gaps'}</span>
+              <span className="text-xs font-medium text-fg-muted">{he ? 'הפערים הבולטים' : 'Biggest gaps'}</span>
               {gaps.map((r) => (
                 <Link key={r.categoryId} to={`/book/category/${r.categoryId}`} className="rounded-md p-2 hover:bg-surface-hover">
                   <div className="flex items-center justify-between gap-2 text-sm">

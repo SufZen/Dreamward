@@ -7,7 +7,7 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const ROUND = { sm: 'rounded-sm', md: 'rounded-md', lg: 'rounded-lg', full: 'rounded-full' } as const;
 
-/** A pulsing placeholder block. Size it with className (e.g. "h-4 w-32"). */
+/** A placeholder block with a slow band of light. Size it with className (e.g. "h-4 w-32"). */
 export function Skeleton({ className, rounded = 'md', ...props }: SkeletonProps) {
-  return <div className={cn('animate-pulse bg-surface', ROUND[rounded], className)} aria-hidden="true" {...props} />;
+  return <div className={cn('fx-shimmer', ROUND[rounded], className)} aria-hidden="true" {...props} />;
 }

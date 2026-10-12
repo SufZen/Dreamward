@@ -45,7 +45,7 @@ export function ChapterPage() {
 
       {past.length > 0 && (
         <section className="flex flex-col gap-2">
-          <h2 className="flex items-center gap-2 text-sm font-mono uppercase tracking-wider text-fg-faint">
+          <h2 className="flex items-center gap-2 text-sm font-medium text-fg-muted">
             <Archive size={14} /> {he ? 'פרקים קודמים' : 'Past chapters'}
           </h2>
           {past.map((c) => (

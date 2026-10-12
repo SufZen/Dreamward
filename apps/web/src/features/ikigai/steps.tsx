@@ -424,7 +424,7 @@ export function SynthesisStep({
 
       {strongest.length > 0 && (
         <div className="flex flex-col gap-2">
-          <span className="text-xs font-mono uppercase tracking-wider text-fg-faint">{he ? 'החפיפות שלך' : 'Your overlaps'}</span>
+          <span className="text-xs font-medium text-fg-muted">{he ? 'החפיפות שלך' : 'Your overlaps'}</span>
           <ul className="flex flex-col gap-1.5">
             {strongest.slice(0, 6).map((g) => (
               <li key={g.region.key} className="text-sm">

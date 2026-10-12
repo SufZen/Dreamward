@@ -1,0 +1,217 @@
+# Dreamward design system — "Night sky"
+
+The design system lives in `packages/design-system` (tokens, CSS, React
+components, motion) and is used by `apps/web` and the desktop app. Brand
+rules (name, logo, Clarity) are in [brand.md](brand.md); this document covers
+how the interface looks and moves.
+
+In dev builds, open **`/design`** in the app for the living reference: every
+swatch, curve and component there is the real token or component, in both
+themes and both directions.
+
+## The idea
+
+Dreamward is a private book about the life you want. It should feel like a
+calm night with one star in it, not like a dashboard. Three rules follow:
+
+1. **One star per screen.** Gold marks the one thing that matters on a screen:
+   the primary action, the current step, the focus area. The chrome stays
+   quiet ink.
+2. **Depth is light, not lines.** Surfaces rise by getting lighter, with a 1 px
+   highlight on the top edge, the way things catch moonlight. Borders are thin
+   and faint; shadows only start at the popover level.
+3. **Motion answers you.** Nothing moves on its own except the sky itself
+   (a few twinkling stars, the ritual's breathing orb). Everything else moves
+   because you did something, and shows what changed. Celebration is scaled to
+   the achievement: an action gets a spark, a goal a burst, a chapter a sky.
+
+## How it compares
+
+We studied products whose craft is relevant to a reflective planning app.
+
+| Product | What it does best | What we took | What we left |
+|---|---|---|---|
+| **Linear** | Perceptual (LCH) colour generated from a few inputs; quiet, warm-leaning neutrals; motion only for state | OKLCH ramps and semantic tokens; tinted neutrals instead of grey | Developer-tool density; faint text below AA |
+| **Things 3** | Physical, delightful completion and drag interactions | A completion check that draws itself and lands before the row leaves | — |
+| **Headspace** | Warm, functional illustration; a breathing animation that teaches | The breathing orb that opens a ritual | Mascot cuteness, which undercuts the weight of life-vision work |
+| **How We Feel** | Colour intensity encodes emotional intensity | The 1–10 score scale runs from deep amber to bright star gold | Four competing hues |
+| **Day One** | Content first; per-journal colour and memory resurfacing | Prose comes first; reader column of 72ch | Features hidden behind a "More" tab |
+| **Finch** | Immediate, visible reward for small steps | Celebration scaled to the size of the achievement | Overloaded onboarding |
+| **Apple HIG** | Springs set by duration and bounce; Reduce Motion means cross-fade, not nothing | Reduced motion becomes a short fade, never a frozen UI | — |
+| **Material 3 Expressive** | Separate spring schemes for spatial motion and for colour/opacity | Springs move transforms only; opacity and colour never overshoot | Bouncing everything |
+| **IBM Carbon / Atlassian** | A small, named duration scale; exits faster than entrances | Six durations; exits ≈ 0.7× entrances; hover/press under 150 ms | — |
+| **Radix Colors** | A fixed role per step of a 12-step scale | Ramps with fixed roles (page, sunken, card, input, hover, border) | — |
+
+What Dreamward does that these don't: bilingual EN/HE with full RTL as a
+first-class case (logical properties, mirrored motion, Hebrew line-height),
+and a brand motif — steps rising to a north star — that the motion system
+reuses for every celebration and progress element.
+
+## Tokens
+
+Three tiers, in `src/tokens.css`:
+
+| Tier | Prefix | Example | Who uses it |
+|---|---|---|---|
+| 1 · primitives | `--dw-ink-*`, `--dw-gold-*`, `--dw-day-*`, `--dw-mist-*` | `--dw-ink-3: oklch(0.205 0.038 278)` | Only tier 2 and the brand layer |
+| 2 · semantic | `--rz-*` | `--rz-bg-raised`, `--rz-fg-muted`, `--rz-accent` | Feature code, via Tailwind classes (`bg-card`, `text-fg-muted`, `bg-primary`) |
+| 3 · component | `.rz-*`, `.dw-*` classes | `.rz-btn--primary`, `.dw-check` | Components |
+
+Feature code never uses tier 1 or raw colours. The `--rz-*` names are kept
+from v1, so screens upgrade without changes.
+
+### Colour
+
+| Role | Dark | Light |
+|---|---|---|
+| Page | ink-1 `#090b19` | day-1 `#f5f7fb` |
+| Sidebar · sunken | ink-2 `#0e1020` | day-2 `#eef0f6` |
+| Card | ink-3 `#131528` | white |
+| Input · popover | ink-4 `#1d1f36` | day-2 |
+| Text | mist-1 `#ececf5` | dusk-1 `#121426` |
+| Primary (fill) | gold-9 `#ffcc00` | gold-8 `#eeb300` |
+| Gold as text | gold-9 | gold-11 `#976b03` |
+| Horizon (ambient only) | violet `oklch(.50 .16 290)` → dawn `oklch(.80 .13 70)` | lighter tints |
+
+The ink has a blue-violet hue (278) so the night reads as sky, not as an
+unlit room. Dawn and violet appear only in ambient light (`.dw-sky`,
+featured cards), never on a control.
+
+### Contrast (WCAG 2.2, measured)
+
+| Pair | Ratio |
+|---|---|
+| Body text on page (dark) | 16.7 : 1 |
+| Muted text on card (dark) | 9.6 : 1 |
+| Subtle text on card (dark) | 6.7 : 1 |
+| Faint text on card / input (dark) | 4.9 / 4.6 : 1 |
+| Gold text on card (dark) | 11.9 : 1 |
+| Ink on gold button (dark) | 13.0 : 1 |
+| Body text on page (light) | 16.9 : 1 |
+| Gold text on white (light) | 4.7 : 1 |
+| Ink on gold button (light) | 9.6 : 1 |
+
+v1's faint text was 2.3 : 1 and was used for real text 70 times; v2 lifts
+every text step above AA. Gold text in light mode uses the deep step
+automatically (`text-primary` maps to `--rz-accent-text`).
+
+### Type
+
+- **One stack for both scripts:** `Poppins, Rubik`. Poppins has no Hebrew
+  glyphs, so Hebrew falls through to Rubik glyph by glyph and mixed EN/HE lines
+  keep one rhythm. In RTL, Rubik leads.
+- **Scale (ratio ≈ 1.2):** 11 · 12 · 14 · **15 (product body)** · 16 (reading) ·
+  19 · 23 · 24→28 · 28→33 · 32→40 · 38→48 · 44→60 (display sizes are fluid).
+- **Line height:** 1.55 body, 1.65 Hebrew body, 1.2–1.25 headings.
+- **Hebrew is never letter-spaced and never faux-italic.** Latin headings are
+  tracked −0.018em. Direction rules use `:dir()`, so an English block inside the
+  Hebrew app (and the reverse) gets the right font and tracking.
+- Sentence case everywhere. No all-caps labels (they mean nothing in Hebrew).
+- Changing numbers use tabular figures (`.tabular`).
+
+### Space, radius, elevation
+
+- 4 px grid (`--rz-space-1` … `--rz-space-24`).
+- Radius grows with the surface: 4 tags · 8 inputs · 10 buttons · 14 cards ·
+  20 panels · 28 sheets. Nested: inner radius = outer − padding.
+- Elevation: level 0 page, 1 card (lighter + top highlight), 2 hover/raised
+  (+ soft shadow), 3 popover/dialog (+ deep shadow, optional glass).
+  `--rz-shadow-glow` is a signal (focus, achieved), not decoration.
+
+## Motion
+
+Defined in `src/keyframes.css`; React helpers in `src/motion`.
+
+| Token | Value | Use |
+|---|---|---|
+| `--rz-dur-instant` | 80 ms | press |
+| `--rz-dur-fast` | 120 ms | hover, focus |
+| `--rz-dur` | 200 ms | small UI, exits |
+| `--rz-dur-moderate` | 280 ms | menus, dialogs entering |
+| `--rz-dur-slow` | 450 ms | page entrance (opacity) |
+| `--rz-dur-ritual` | 900 ms | ritual moments; never blocks input |
+
+| Curve | Kind | Use |
+|---|---|---|
+| `--rz-ease-standard` | cubic-bezier(0.2, 0, 0, 1) | colour, opacity, routine UI |
+| `--rz-ease-enter` / `--rz-ease-exit` | (0,0,.3,1) / (.4,.14,1,1) | arriving / leaving |
+| `--rz-spring-snappy` (320 ms) | linear() spring, no overshoot | press, toggles |
+| `--rz-spring` (430 ms) | linear() spring, 1.5% overshoot | cards, panels, layout |
+| `--rz-spring-dream` (610 ms) | linear() spring, 2.8% overshoot | celebrations, the wheel, progress |
+| `--rz-spring-gentle` (650 ms) | critically damped | large surfaces |
+
+Rules:
+
+- **Springs move transforms only.** Opacity and colour use the béziers and
+  never overshoot.
+- **Exits ≈ 0.7× entrances.** Lists stagger 35 ms per item, capped at 8.
+- **Navigation:** pages change inside a view transition. Only the page moves
+  (old fades out in 120 ms, new rises in on the spring); the sidebar and header
+  stay still. `withViewTransition()` applies the update directly if the
+  browser can't animate within 200 ms, so navigation never waits on motion.
+- **Directional motion is logical.** Slides use `--rz-inline-dir`, which flips
+  in RTL; progress rings fill counter-clockwise in Hebrew.
+
+### Reduced motion
+
+Respecting `prefers-reduced-motion` does not mean freezing the UI. Under
+reduced motion every animation becomes a 120 ms cross-fade, so changes stay
+visible; ambient loops (`.rz-ambient`: twinkles, the breathing orb) stop;
+hover lifts and press scales are removed; celebrations are silent.
+
+Settings → **Motion** offers *Match my device / Reduced / Full*, stored per
+device and applied as `data-motion` on `<html>` before first paint. *Full*
+keeps motion even when the OS asks to reduce it.
+
+## Components
+
+From `@dreamward/design-system`:
+
+| Component | Notes |
+|---|---|
+| `Button` | primary · secondary · outline · ghost · danger; sm · md · lg · icon; `loading`. Presses sink 3% and spring back. Disabled primary goes neutral (gold at half opacity turns muddy on ink). |
+| `Card` | `interactive` lifts 2 px on a spring and catches the pointer's light (pair with `useSpotlight`); `featured` is the screen's one focal surface: horizon light and a gold hairline. |
+| `Input`, `Textarea` | Gold focus ring (3 px, 45% gold). `aria-invalid` turns it red. |
+| `.rz-select` | Class for native `<select>`: our chevron at the inline end (flips in RTL), same focus ring. |
+| `Badge` | Rounded pill, sentence case. |
+| `Skeleton`, `PageLoader` | A slow band of light, not a pulse. `PageLoader` is page-shaped and waits 250 ms before appearing, so fast loads never flash. |
+| `EmptyState` | The steps appear one by one, then the star. An empty page is an invitation. |
+| `Check` | Completion: the ring fills gold, the stroke draws in 220 ms, a step-sized spark flies. Accessible `role="checkbox"`. |
+| `StarBurst` | `scale="step" | "goal" | "chapter"`: 6 / 12 / 20 particles, plus a flash for goals and chapters. |
+| `ProgressRing` | Fills on the dream spring; mirrors in RTL; label scales with size. |
+| `CountUp` | Numbers ease to their new value (tabular figures). |
+| `BreathingOrb` | 4 s in, 4 s out. Opens the daily plan and weekly review. |
+| `Twinkles` | A few stars on their own clocks. Decorative, ambient. |
+| `Stagger` | One orchestrated entrance per screen, not on every section. |
+| `ClarityAvatar` | idle · thinking · speaking (see brand.md). |
+| Hooks | `useReducedMotion`, `setMotionPreference`, `withViewTransition`, `useSpotlight`. |
+
+Brand-layer classes (`themes/dreamward.css`): `.dw-sky` (horizon + starfield),
+`.dw-steps` (progress dots; the last one is the star), `.dw-prose` (reading
+rhythm, per-paragraph direction), `.dw-nav-item` (the gold "current step"
+marker), `.dw-wheel-shape` (the life wheel springs between ratings).
+
+## Patterns in the app
+
+- **The current step:** the active nav item gets a 3 px gold marker that
+  springs in. It's the only gold in the chrome.
+- **A step counts:** checking an action shows the check and spark at once and
+  sends the update ~550 ms later, so the row doesn't vanish before you see it
+  land. If the row unmounts first, the update is sent immediately.
+- **Rate an area:** the score scale runs deep amber → star gold; a change sweeps
+  as a wave from the old value; the wheel's shape springs to the new score,
+  lit from its centre.
+
+## Rules for contributors
+
+- Use semantic classes (`bg-card`, `text-fg-muted`, `border-border`,
+  `bg-primary`), never hex values or `--dw-*` primitives in feature code.
+- Gold text is `text-primary` (it picks the accessible step per theme). Text
+  on gold is `text-[color:var(--rz-accent-fg)]`, never white.
+- Labels are sentence case. No `uppercase`, no mono for labels.
+- Use logical properties (`ms-`, `pe-`, `start-`, `border-s`), never
+  left/right.
+- New motion: pick a duration and curve from the tables above, make it
+  answer an action, and check it under `data-motion="reduced"`.
+- Check every new screen at `/design`-level quality in dark, light, RTL and
+  375 px wide.
