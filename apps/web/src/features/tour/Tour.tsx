@@ -227,6 +227,9 @@ function TourRun() {
         <p id="dw-tour-body" className="text-sm leading-relaxed text-fg-muted">
           {t(step.body)}
         </p>
+        {centered && step.target && step.target !== 'today-steps' && (
+          <p className="text-xs text-fg-subtle">{he ? 'במסך קטן זה נמצא בתפריט ☰ למעלה.' : 'On a small screen it’s in the ☰ menu at the top.'}</p>
+        )}
         {step.waitFor && step.tryIt && (
           <p className={cn('flex items-center gap-2 text-sm font-medium', tried ? 'text-success' : 'text-primary')}>
             <MousePointerClick size={15} className={tried ? '' : 'dw-tour__nudge'} />
