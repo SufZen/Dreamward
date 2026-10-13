@@ -5,6 +5,7 @@ import { ArrowRight, Compass, Gauge, NotebookPen, Plus, Target, CalendarCheck } 
 import type { ProposalRow } from '@dreamward/shared';
 import { Badge, Button, Card, ProgressRing, Skeleton, buttonVariants, cn, toast } from '@dreamward/design-system';
 import { api } from '@/lib/api';
+import { htmlToText } from '@/lib/sanitize';
 import { useLang } from '@/lib/lang';
 import { OnboardingMotion } from '@/components/OnboardingMotion';
 import { useAreaLabel } from '@/features/book/hooks';
@@ -285,12 +286,7 @@ function JournalLine() {
       }),
   });
 
-  const snippet = todays
-    ? todays.bodyRichtext
-        .replace(/<[^>]*>/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim()
-    : '';
+  const snippet = todays ? htmlToText(todays.bodyRichtext) : '';
 
   return (
     <Card className="flex flex-col gap-3 p-5" data-tour="journal-line">

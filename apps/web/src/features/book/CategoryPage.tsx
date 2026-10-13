@@ -14,6 +14,7 @@ import { useCategoryRole } from '@/features/chapter/hooks';
 import { useCreateGoal, useGoals, useGoalsProgress } from '@/features/goals/hooks';
 import { useActions } from '@/features/actions/hooks';
 import { StepItem } from '@/features/actions/StepItem';
+import { htmlToText } from '@/lib/sanitize';
 
 /** Section title — the server's framework-pack wording, else the default pack. */
 const sectionLabel = (lang: 'he' | 'en', section: { sectionType: string; labelEn?: string; labelHe?: string }) => {
@@ -61,7 +62,7 @@ const PROMPTS: Record<string, { he: string; en: string }> = {
 
 /** True when a section has anything written in it (any shape). */
 function isWritten(s: Section): boolean {
-  if ((s.bodyRichtext ?? '').replace(/<[^>]*>/g, '').trim()) return true;
+  if (htmlToText(s.bodyRichtext)) return true;
   const hasText = (v: unknown): boolean =>
     typeof v === 'string'
       ? v.trim().length > 0

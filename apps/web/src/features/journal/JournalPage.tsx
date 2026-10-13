@@ -10,6 +10,7 @@ import { useUndoableDelete } from '@/lib/useUndoableDelete';
 import { SaveIndicator } from '@/components/SaveIndicator';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import { useJournal, useJournalEntry, useCreateJournal, useUpdateJournal, type JournalEntry } from './hooks';
+import { htmlToText } from '@/lib/sanitize';
 
 function fmtDate(ms: number, lang: string) {
   return new Date(ms).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-GB', {
@@ -44,7 +45,7 @@ function EntryEditor({ entry }: { entry: JournalEntry }) {
     if (pendingDelete.current) clearTimeout(pendingDelete.current);
     return () => {
       const { title: t, html: h } = latest.current;
-      if (t.trim() || h.replace(/<[^>]*>/g, '').trim()) return;
+      if (t.trim() || htmlToText(h)) return;
       pendingDelete.current = setTimeout(() => {
         void api.del(`/journal/${entry.id}`).then(() => qc.invalidateQueries({ queryKey: ['journal'] }));
       }, 300);

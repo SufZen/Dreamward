@@ -8,10 +8,11 @@ import { useCategories, useContentBlocks } from './hooks';
 import { useCurrentChapter, useLatestRatings } from '@/features/chapter/hooks';
 import { useGoalsSummary } from '@/features/goals/hooks';
 import { useIkigai } from '@/features/ikigai/hooks';
+import { htmlToText } from '@/lib/sanitize';
 
 /** True when a content block has something written in it. */
 function isWritten(b: { content: unknown; bodyRichtext: string | null }) {
-  const text = (b.bodyRichtext ?? '').replace(/<[^>]*>/g, '').trim();
+  const text = htmlToText(b.bodyRichtext);
   if (text) return true;
   if (Array.isArray(b.content)) return b.content.length > 0;
   return false;

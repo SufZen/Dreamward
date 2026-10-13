@@ -29,6 +29,7 @@ import { useCreateAction } from '@/features/actions/hooks';
 import { useCreateGoal, useGoals } from '@/features/goals/hooks';
 import { startTour } from '@/features/tour/Tour';
 import { useJournal } from '@/features/journal/hooks';
+import { htmlToText } from '@/lib/sanitize';
 
 interface Command {
   id: string;
@@ -312,7 +313,7 @@ export function CommandPalette() {
       });
     }
     for (const j of journal ?? []) {
-      const text = (j.title || j.bodyRichtext.replace(/<[^>]*>/g, ' ')).replace(/s+/g, ' ').trim().slice(0, 80);
+      const text = (j.title || htmlToText(j.bodyRichtext)).replace(/\s+/g, ' ').trim().slice(0, 80);
       if (!text) continue;
       list.push({
         id: `journal-${j.id}`,
