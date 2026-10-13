@@ -60,7 +60,7 @@ export function GalleryPage() {
     <div className="flex flex-col gap-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="fx-gradient-text text-3xl font-bold">{he ? 'גלריה' : 'Gallery'}</h1>
+          <h1 className="text-3xl font-semibold">{he ? 'ספריית התמונות' : 'Image library'}</h1>
           <p className="mt-1 text-sm text-fg-muted">
             {assets?.length
               ? he

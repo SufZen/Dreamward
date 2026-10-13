@@ -45,7 +45,7 @@ export function RatingCard({ categoryId }: { categoryId: string }) {
   return (
     <Card className="p-6">
       <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 className="flex items-center gap-2 text-xl font-semibold text-primary">
+        <h2 className="flex items-center gap-2 text-lg font-semibold">
           <Gauge size={18} /> {he ? 'איפה אני עכשיו' : 'Where I am now'}
         </h2>
         {!editing && (

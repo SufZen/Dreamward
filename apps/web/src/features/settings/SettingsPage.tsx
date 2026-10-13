@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Compass, KeyRound, Languages, Waves } from 'lucide-react';
-import { Button, Card, Input } from '@dreamward/design-system';
+import { Button, Card, Input, PageHeader } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
 import { api, ApiError } from '@/lib/api';
 import { AiSettings } from './AiSettings';
@@ -50,7 +50,14 @@ export function SettingsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-4xl font-bold">{t('settings')}</h1>
+      <PageHeader
+        title={t('settings')}
+        description={
+          lang === 'he'
+            ? 'Clarity, הרגלים אוטומטיים, גישה לסוכנים, הנתונים שלך והמראה.'
+            : 'Clarity, routines, agent access, your data, and how Dreamward looks.'
+        }
+      />
 
       <AiSettings />
 

@@ -1,7 +1,8 @@
+import { BookCrumb } from '@/features/book/BookCrumb';
 import { useState } from 'react';
 import { History, RefreshCw, Sparkles, Sun } from 'lucide-react';
 import { IKIGAI_CIRCLES, type IkigaiProfile } from '@dreamward/shared';
-import { Badge, Button, Card } from '@dreamward/design-system';
+import { Badge, Button, Card, PageHeader, PageLoader } from '@dreamward/design-system';
 import { useLang, pickLabel } from '@/lib/lang';
 import { OnboardingMotion } from '@/components/OnboardingMotion';
 import { IkigaiWizard } from './IkigaiWizard';
@@ -16,22 +17,21 @@ export function IkigaiPage() {
   const he = lang === 'he';
   const { data, isLoading, isError } = useIkigai();
 
-  if (isLoading) return <p className="text-fg-muted">{t('loading')}</p>;
+  if (isLoading) return <PageLoader label={t('loading')} />;
   if (isError || !data) return <p className="text-danger">{he ? 'שגיאה בטעינה' : 'Failed to load'}</p>;
 
   return (
     <div className="flex flex-col gap-6">
-      <header className="flex items-center gap-4">
-        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[color:var(--rz-accent-soft)] text-2xl text-primary">
-          生
-        </div>
-        <div>
-          <h1 className="text-4xl font-bold">{he ? 'איקיגאי' : 'IKIGAI'}</h1>
-          <p className="mt-1 text-fg-muted">
-            {he ? 'איפה מה שאתה אוהב, טוב בו, העולם צריך ומשלמים עליו — נפגשים.' : 'Where what you love, are good at, the world needs and can be paid for meet.'}
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow={<BookCrumb />}
+        icon={<span className="text-xl">生</span>}
+        title={he ? 'איקיגאי' : 'IKIGAI'}
+        description={
+          he
+            ? 'איפה מה שאתה אוהב, טוב בו, העולם צריך ומשלמים עליו — נפגשים.'
+            : 'Where what you love, are good at, the world needs and can be paid for meet.'
+        }
+      />
 
       {data.draft ? (
         <IkigaiWizard key={data.draft.id} draft={data.draft} isRevisit={Boolean(data.current)} />
@@ -106,7 +106,7 @@ function CurrentIkigai({ profile, history }: { profile: IkigaiProfile; history: 
 
       {profile.everyday.length > 0 && (
         <Card className="flex flex-col gap-3 p-6">
-          <h2 className="flex items-center gap-2 text-xl font-semibold text-primary">
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
             <Sun size={18} /> {he ? 'האיקיגאי היומיומי' : 'Everyday ikigai'}
           </h2>
           <ul className="flex flex-wrap gap-2">

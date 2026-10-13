@@ -11,6 +11,8 @@ interface Props {
   lowHint?: string;
   highHint?: string;
   className?: string;
+  /** compact: lighter, shorter segments for many scales on one screen */
+  compact?: boolean;
 }
 
 /**
@@ -18,7 +20,7 @@ interface Props {
  * Intensity encodes the score: low segments are a deep amber, high ones the
  * bright star gold. A change sweeps as a wave outward from the previous value.
  */
-export function ScoreSlider({ value, onChange, min = 1, max = 10, label, lowHint, highHint, className }: Props) {
+export function ScoreSlider({ value, onChange, min = 1, max = 10, label, lowHint, highHint, className, compact }: Props) {
   const steps = Array.from({ length: max - min + 1 }, (_, i) => min + i);
   const prev = useRef(value);
   const from = prev.current; // the value before this change: the wave starts there
@@ -46,9 +48,12 @@ export function ScoreSlider({ value, onChange, min = 1, max = 10, label, lowHint
               onClick={() => onChange(n)}
               style={style}
               className={cn(
-                'rz-press flex h-9 flex-1 items-center justify-center rounded-md border text-xs font-medium tabular transition-[background-color,color,border-color,box-shadow,transform] duration-moderate',
+                compact ? 'h-7' : 'h-9',
+                'rz-press flex flex-1 items-center justify-center rounded-md border text-xs font-medium tabular transition-[background-color,color,border-color,box-shadow,transform] duration-moderate',
                 active
-                  ? 'border-transparent bg-[color:var(--seg)] text-[color:var(--rz-accent-fg)]'
+                  ? compact && n !== value
+                    ? 'border-transparent bg-[color:var(--rz-accent-soft)] text-primary'
+                    : 'border-transparent bg-[color:var(--seg)] text-[color:var(--rz-accent-fg)]'
                   : 'border-border bg-surface text-fg-faint hover:bg-surface-hover hover:text-foreground',
                 n === value && 'ring-[3px] ring-[color:var(--rz-accent-ring)]',
               )}

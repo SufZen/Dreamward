@@ -13,30 +13,30 @@
 
 /* ── Tier 1 · primitives ────────────────────────────────────────────────── */
 :root {
-  /* Ink: the night sky. A blue-violet ink (hue 278), never a dead grey.
-   * Lightness climbs ~0.03 per elevation step. */
-  --dw-ink-0:  oklch(0.135 0.028 278);  /* #07091a  deepest — behind dialogs */
-  --dw-ink-1:  oklch(0.155 0.030 278);  /* #090b19  page */
-  --dw-ink-2:  oklch(0.180 0.034 278);  /* #0e1020  sidebar · sunken */
-  --dw-ink-3:  oklch(0.205 0.038 278);  /* #131528  card */
-  --dw-ink-4:  oklch(0.250 0.042 278);  /* #1d1f36  input · popover */
-  --dw-ink-5:  oklch(0.285 0.045 278);  /* #252840  hover */
-  --dw-ink-6:  oklch(0.340 0.045 278);  /* strong border */
-  --dw-mist-1: oklch(0.945 0.012 285);  /* #ececf5  text */
-  --dw-mist-2: oklch(0.800 0.024 282);  /* #bbbccd  secondary */
-  --dw-mist-3: oklch(0.700 0.030 280);  /* #9a9db1  tertiary */
-  --dw-mist-4: oklch(0.645 0.032 280);  /* #8a8ca2  faint — still ≥ 4.5:1 on ink-4 */
+  /* Ink: the night. Neutral near-black (the v1 brand ink) — depth comes from
+   * lighter steps, not from tint. */
+  --dw-ink-0:  #07070b;   /* deepest — behind dialogs */
+  --dw-ink-1:  #0a0a0f;   /* page */
+  --dw-ink-2:  #12121a;   /* sidebar · sunken */
+  --dw-ink-3:  #1a1a24;   /* card */
+  --dw-ink-4:  #22222e;   /* input · popover */
+  --dw-ink-5:  #2a2a36;   /* hover */
+  --dw-ink-6:  #3a3a48;   /* strong border */
+  --dw-mist-1: #e8e8ed;   /* text            16.6:1 on page */
+  --dw-mist-2: #a3a3b8;   /* secondary        7.0:1 on card */
+  --dw-mist-3: #8e8ea4;   /* tertiary         5.4:1 on card */
+  --dw-mist-4: #85859e;   /* faint            4.6:1 on input — still AA */
 
-  /* Daybreak: the light theme's cool paper. */
-  --dw-day-1:  oklch(0.975 0.006 270);  /* #f5f7fb  page */
-  --dw-day-2:  oklch(0.955 0.009 272);  /* #eef0f6  sunken · input */
-  --dw-day-3:  oklch(1 0 0);            /* #ffffff  card */
-  --dw-day-4:  oklch(0.930 0.012 274);  /* hover */
-  --dw-day-5:  oklch(0.880 0.016 276);  /* strong border */
-  --dw-dusk-1: oklch(0.200 0.035 278);  /* #121426  text */
-  --dw-dusk-2: oklch(0.450 0.030 278);  /* #515466  secondary */
-  --dw-dusk-3: oklch(0.520 0.028 278);  /* #656879  tertiary */
-  --dw-dusk-4: oklch(0.530 0.026 278);  /* faint — ≥ 4.5:1 on day-2 */
+  /* Day: the light theme. */
+  --dw-day-1:  #ffffff;   /* page */
+  --dw-day-2:  #f5f5f7;   /* sunken · sidebar */
+  --dw-day-3:  #ffffff;   /* card */
+  --dw-day-4:  #ebebef;   /* hover */
+  --dw-day-5:  #d4d4da;   /* strong border */
+  --dw-dusk-1: #0a0a0f;   /* text */
+  --dw-dusk-2: #5c5c70;   /* secondary  6.5:1 */
+  --dw-dusk-3: #69697d;   /* tertiary   4.9:1 on sunken */
+  --dw-dusk-4: #6c6c80;   /* faint      4.5:1 on input */
 
   /* Gold: the north star. #ffcc00 is the brand gold; keep it scarce. */
   --dw-gold-9:  oklch(0.865 0.177 91);  /* #ffcc00  star · primary fill (dark) */
@@ -47,7 +47,6 @@
 
   /* Dawn: the horizon's warm light. Ambient backgrounds only, never a control. */
   --dw-dawn:    oklch(0.780 0.120 55);
-  --dw-dusk-violet: oklch(0.550 0.140 295);
 
   /* Status */
   --dw-green:  oklch(0.800 0.150 152);
@@ -72,13 +71,13 @@
   --rz-bg-raised:     var(--dw-ink-3);
   --rz-surface:       var(--dw-ink-4);
   --rz-surface-hover: var(--dw-ink-5);
-  --rz-overlay:       oklch(0.10 0.03 278 / 0.72);
+  --rz-overlay:       rgba(10, 10, 15, 0.72);
   /* The 1px top highlight that makes a raised surface catch the light. */
   --rz-highlight:     inset 0 1px 0 0 oklch(1 0 0 / 0.05);
 
   /* Borders */
-  --rz-border:        oklch(0.85 0.03 280 / 0.09);
-  --rz-border-strong: oklch(0.85 0.03 280 / 0.17);
+  --rz-border:        rgba(255, 255, 255, 0.08);
+  --rz-border-strong: rgba(255, 255, 255, 0.15);
   --rz-border-accent: oklch(0.865 0.177 91 / 0.30);
 
   /* Text */
@@ -107,14 +106,13 @@
 
   /* Elevation: shadows only from level 2; dark mode leans on lightness. */
   --rz-shadow-1:      var(--rz-highlight), 0 1px 2px oklch(0 0 0 / 0.30);
-  --rz-shadow-2:      var(--rz-highlight), 0 1px 2px oklch(0 0 0 / 0.30), 0 8px 24px oklch(0.05 0.03 278 / 0.45);
-  --rz-shadow-3:      var(--rz-highlight), 0 2px 4px oklch(0 0 0 / 0.30), 0 24px 56px oklch(0.05 0.03 278 / 0.60);
+  --rz-shadow-2:      var(--rz-highlight), 0 1px 2px oklch(0 0 0 / 0.30), 0 8px 24px oklch(0 0 0 / 0.45);
+  --rz-shadow-3:      var(--rz-highlight), 0 2px 4px oklch(0 0 0 / 0.30), 0 24px 56px oklch(0 0 0 / 0.60);
   /* Gold glow is a signal (focus, "achieved"), not decoration. */
   --rz-shadow-glow:   0 0 0 1px oklch(0.865 0.177 91 / 0.40), 0 0 28px oklch(0.865 0.177 91 / 0.18);
 
   /* The night sky */
-  --dw-horizon:       radial-gradient(55% 140% at 92% -30%, oklch(0.80 0.13 70 / 0.16), transparent 65%),
-                      radial-gradient(75% 160% at 25% -45%, oklch(0.50 0.16 290 / 0.28), transparent 70%);
+  --dw-horizon:       radial-gradient(60% 55% at 80% 12%, rgba(255, 204, 0, 0.14), transparent 70%);
   --dw-starfield:     radial-gradient(1px 1px at 23px 41px, oklch(1 0 0 / 0.55), transparent),
                       radial-gradient(1px 1px at 71px 13px, oklch(1 0 0 / 0.35), transparent),
                       radial-gradient(1.5px 1.5px at 113px 87px, oklch(0.95 0.06 95 / 0.6), transparent),
@@ -130,11 +128,11 @@
   --rz-bg-raised:     var(--dw-day-3);
   --rz-surface:       var(--dw-day-2);
   --rz-surface-hover: var(--dw-day-4);
-  --rz-overlay:       oklch(0.20 0.035 278 / 0.38);
+  --rz-overlay:       rgba(10, 10, 15, 0.40);
   --rz-highlight:     inset 0 1px 0 0 oklch(1 0 0 / 0.9);
 
-  --rz-border:        oklch(0.30 0.04 278 / 0.10);
-  --rz-border-strong: oklch(0.30 0.04 278 / 0.18);
+  --rz-border:        #e5e5e8;
+  --rz-border-strong: #d4d4d8;
   --rz-border-accent: oklch(0.80 0.165 85 / 0.50);
 
   --rz-fg:            var(--dw-dusk-1);
@@ -158,17 +156,16 @@
   --rz-info:          var(--dw-blue-deep);
   --rz-info-soft:     oklch(0.80 0.09 250 / 0.20);
 
-  --rz-shadow-1:      0 1px 2px oklch(0.30 0.04 278 / 0.06);
-  --rz-shadow-2:      0 1px 2px oklch(0.30 0.04 278 / 0.06), 0 8px 24px oklch(0.30 0.04 278 / 0.08);
-  --rz-shadow-3:      0 2px 4px oklch(0.30 0.04 278 / 0.06), 0 24px 56px oklch(0.30 0.04 278 / 0.14);
+  --rz-shadow-1:      0 1px 2px oklch(0.1 0 0 / 0.06);
+  --rz-shadow-2:      0 1px 2px oklch(0.1 0 0 / 0.06), 0 8px 24px oklch(0.1 0 0 / 0.08);
+  --rz-shadow-3:      0 2px 4px oklch(0.1 0 0 / 0.06), 0 24px 56px oklch(0.1 0 0 / 0.14);
   --rz-shadow-glow:   0 0 0 1px oklch(0.74 0.15 82 / 0.45), 0 6px 24px oklch(0.80 0.165 85 / 0.22);
 
-  --dw-horizon:       radial-gradient(55% 140% at 92% -30%, oklch(0.88 0.10 75 / 0.30), transparent 65%),
-                      radial-gradient(75% 160% at 25% -45%, oklch(0.85 0.07 290 / 0.40), transparent 70%);
-  --dw-starfield:     radial-gradient(1px 1px at 23px 41px, oklch(0.40 0.05 278 / 0.25), transparent),
-                      radial-gradient(1px 1px at 71px 13px, oklch(0.40 0.05 278 / 0.18), transparent),
+  --dw-horizon:       radial-gradient(60% 55% at 80% 12%, rgba(204, 153, 0, 0.12), transparent 70%);
+  --dw-starfield:     radial-gradient(1px 1px at 23px 41px, oklch(0.3 0 0 / 0.25), transparent),
+                      radial-gradient(1px 1px at 71px 13px, oklch(0.3 0 0 / 0.18), transparent),
                       radial-gradient(1.5px 1.5px at 113px 87px, oklch(0.70 0.12 85 / 0.45), transparent),
-                      radial-gradient(1px 1px at 40px 150px, oklch(0.40 0.05 278 / 0.18), transparent);
+                      radial-gradient(1px 1px at 40px 150px, oklch(0.3 0 0 / 0.18), transparent);
 }
 
 /* ── Mode-independent ───────────────────────────────────────────────────── */

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Compass, Flag, Archive, Sparkles } from 'lucide-react';
 import { CATEGORIES, MAX_FOCUS_AREAS, type Chapter, type ListItem } from '@dreamward/shared';
-import { Badge, Button, Card, Input, Textarea, cn } from '@dreamward/design-system';
+import { Badge, Button, Card, Input, Textarea, cn, PageHeader, PageLoader } from '@dreamward/design-system';
 import { useLang, pickLabel } from '@/lib/lang';
 import { useAreaLabel } from '@/features/book/hooks';
 import { useAutosave } from '@/lib/useAutosave';
@@ -9,6 +9,7 @@ import { SaveIndicator } from '@/components/SaveIndicator';
 import { EditableList } from '@/components/editor/EditableList';
 import { Icon } from '@/components/Icon';
 import { OnboardingMotion } from '@/components/OnboardingMotion';
+import { WheelPanel } from './WheelPanel';
 import { useChapters, useCloseChapter, useCreateChapter, useCurrentChapter, useUpdateChapter } from './hooks';
 
 const toDateInput = (ms: number | null) => (ms ? new Date(ms).toISOString().slice(0, 10) : '');
@@ -23,25 +24,23 @@ export function ChapterPage() {
   const { data: all } = useChapters();
   const past = (all ?? []).filter((c) => c.status === 'closed');
 
-  if (isLoading) return <p className="text-fg-muted">{t('loading')}</p>;
+  if (isLoading) return <PageLoader label={t('loading')} />;
 
   return (
     <div className="flex flex-col gap-6">
-      <header className="flex items-center gap-4">
-        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[color:var(--rz-accent-soft)] text-primary">
-          <Compass size={28} />
-        </div>
-        <div>
-          <h1 className="text-4xl font-bold">{he ? 'הפרק הנוכחי' : 'Current Chapter'}</h1>
-          <p className="mt-1 text-fg-muted">
-            {he
-              ? 'לא כל התחומים חשובים באותה מידה בכל תקופה. מה התקופה הזו נועדה ליצור?'
-              : 'Not every area matters equally in every season. What is this season meant to create?'}
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        icon={<Compass size={24} />}
+        title={he ? 'הפרק הנוכחי' : 'Current chapter'}
+        description={
+          he
+            ? 'לא כל התחומים חשובים באותה מידה בכל תקופה. מה התקופה הזו נועדה ליצור?'
+            : 'Not every area matters equally in every season. What is this season meant to create?'
+        }
+      />
 
       {chapter ? <ChapterEditor key={chapter.id} chapter={chapter} /> : <StartChapter />}
+
+      <WheelPanel />
 
       {past.length > 0 && (
         <section className="flex flex-col gap-2">
@@ -188,7 +187,7 @@ function ChapterEditor({ chapter }: { chapter: Chapter }) {
 
       <Card className="flex flex-col gap-4 p-6">
         <div>
-          <h2 className="text-xl font-semibold text-primary">{he ? 'לאן הולכת האנרגיה' : 'Where the energy goes'}</h2>
+          <h2 className="text-lg font-semibold">{he ? 'לאן הולכת האנרגיה' : 'Where the energy goes'}</h2>
           <p className="mt-1 text-sm text-fg-muted">
             {he
               ? `לחיצה מחליפה: מיקוד (עד ${MAX_FOCUS_AREAS}) → תחזוקה בלבד → רגיל.`
@@ -227,7 +226,7 @@ function ChapterEditor({ chapter }: { chapter: Chapter }) {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="flex flex-col gap-3 p-6">
           <div>
-            <h2 className="text-xl font-semibold text-primary">{he ? 'לא עכשיו' : 'Not now'}</h2>
+            <h2 className="text-lg font-semibold">{he ? 'לא עכשיו' : 'Not now'}</h2>
             <p className="mt-1 text-sm text-fg-muted">
               {he ? 'דברים טובים שבכוונה לא נכנסים לפרק הזה.' : 'Good things that deliberately don’t get priority this chapter.'}
             </p>
@@ -236,7 +235,7 @@ function ChapterEditor({ chapter }: { chapter: Chapter }) {
         </Card>
         <Card className="flex flex-col gap-3 p-6">
           <div>
-            <h2 className="text-xl font-semibold text-primary">{he ? 'כבר לא מקובל עליי' : 'No longer acceptable'}</h2>
+            <h2 className="text-lg font-semibold">{he ? 'כבר לא מקובל עליי' : 'No longer acceptable'}</h2>
             <p className="mt-1 text-sm text-fg-muted">
               {he
                 ? 'מצבים, פשרות והתנהגויות שאני מפסיק לנרמל — מסנן להחלטות.'

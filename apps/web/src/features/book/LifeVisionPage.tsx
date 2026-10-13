@@ -1,6 +1,7 @@
+import { BookCrumb } from './BookCrumb';
 import { useState } from 'react';
 import { Pencil, Check } from 'lucide-react';
-import { Button, Card } from '@dreamward/design-system';
+import { Button, Card, PageHeader, PageLoader } from '@dreamward/design-system';
 import { useLang, pickLabel } from '@/lib/lang';
 import { sanitizeHtml } from '@/lib/sanitize';
 import { useAutosave } from '@/lib/useAutosave';
@@ -29,12 +30,20 @@ export function LifeVisionPage() {
   const { data, isLoading, isError } = useLifeVision();
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  if (isLoading) return <p className="text-fg-muted">{t('loading')}</p>;
+  if (isLoading) return <PageLoader label={t('loading')} />;
   if (isError || !data) return <p className="text-danger">{t('empty')}</p>;
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-4xl font-bold">{t('lifeVision')}</h1>
+      <PageHeader
+        eyebrow={<BookCrumb />}
+        title={t('lifeVision')}
+        description={
+          lang === 'he'
+            ? 'תאר את החיים שאתה רוצה, תחום אחר תחום, כאילו הם כבר קורים.'
+            : 'Describe the life you want, area by area, as if it’s already happening.'
+        }
+      />
       {data
         .slice()
         .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -43,7 +52,7 @@ export function LifeVisionPage() {
           return (
             <Card key={p.id} className="p-6">
               <div className="mb-3 flex items-center justify-between gap-3">
-                <h2 dir="auto" className="text-lg font-semibold text-primary">
+                <h2 dir="auto" className="text-lg font-semibold">
                   {pickLabel(lang, p.labelEn ?? p.question, p.labelHe ?? p.question)}
                 </h2>
                 <Button

@@ -15,7 +15,7 @@ import {
   X,
 } from 'lucide-react';
 import { TEMPLATES, EXPORT_FORMATS, type ExportFormatId } from '@dreamward/shared';
-import { Button, Card, cn } from '@dreamward/design-system';
+import { Button, Card, cn, PageLoader } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
 import { useAutosave } from '@/lib/useAutosave';
 import { SaveIndicator } from '@/components/SaveIndicator';
@@ -164,7 +164,7 @@ export function CollageEditor() {
     [],
   );
 
-  if (isLoading || !board || items === null) return <p className="text-fg-muted">{t('loading')}</p>;
+  if (isLoading || !board || items === null) return <PageLoader label={t('loading')} />;
 
   const scale = viewW / board.canvasWidth;
   const viewH = board.canvasHeight * scale;

@@ -1,12 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowDown, ArrowUp, Bot, Check, Pencil, Plus, Target, Trash2, X } from 'lucide-react';
 import { ACTION_PRIORITIES, type ActionPriority } from '@dreamward/shared';
-import { Badge, Button, Card, Check as DoneCheck, Input, cn } from '@dreamward/design-system';
+import { Badge, Button, Card, Check as DoneCheck, Input, PageHeader, PageLoader, cn } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
+import { api } from '@/lib/api';
+import { useUndoableDelete } from '@/lib/useUndoableDelete';
 import { OnboardingMotion } from '@/components/OnboardingMotion';
 import { useGoals } from '@/features/goals/hooks';
-import { useActions, useCreateAction, useUpdateAction, useDeleteAction, useReorderActions, type Action } from './hooks';
+import { useCompleteAction } from './useCompleteAction';
+import { useActions, useCreateAction, useUpdateAction, useReorderActions, type Action } from './hooks';
 
 const PRIORITY_META: Record<ActionPriority, { he: string; en: string; variant: 'danger' | 'warning' | 'neutral' }> = {
   high: { he: 'גבוהה', en: 'High', variant: 'danger' },
@@ -14,7 +17,11 @@ const PRIORITY_META: Record<ActionPriority, { he: string; en: string; variant: '
   low: { he: 'נמוכה', en: 'Low', variant: 'neutral' },
 };
 
-const fmtDate = (ms: number) => new Date(ms).toLocaleDateString();
+const fmtDate = (ms: number, lang: 'he' | 'en') =>
+  new Date(ms).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-GB', {
+    day: 'numeric',
+    month: 'short',
+  });
 
 function ActionRow({
   action,
@@ -27,41 +34,15 @@ function ActionRow({
 }) {
   const { lang } = useLang();
   const update = useUpdateAction();
-  const del = useDeleteAction();
+  const del = useUndoableDelete<Action>({
+    queryKey: ['actions'],
+    remove: (id) => api.del(`/actions/${id}`),
+    alsoInvalidate: [['goals-progress']],
+  });
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(action.title);
 
-  // Completing lands before the row leaves: show the check (and its spark) at
-  // once, send the update a beat later. If the row unmounts first, send it now.
-  const [landing, setLanding] = useState<'done' | null>(null);
-  const pending = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const flush = useRef<(() => void) | null>(null);
-  useEffect(
-    () => () => {
-      if (pending.current) clearTimeout(pending.current);
-      flush.current?.();
-    },
-    [],
-  );
-  const setDone = (v: boolean) => {
-    if (!v) {
-      if (pending.current) clearTimeout(pending.current);
-      const wasPending = flush.current !== null;
-      flush.current = null;
-      setLanding(null);
-      // never sent? then there is nothing to undo on the server
-      if (!wasPending) update.mutate({ id: action.id, status: 'todo' });
-      return;
-    }
-    setLanding('done');
-    flush.current = () => {
-      flush.current = null;
-      update.mutate({ id: action.id, status: 'done' });
-    };
-    pending.current = setTimeout(() => flush.current?.(), 550);
-  };
-
-  const done = landing === 'done' || action.status === 'done';
+  const { done, setDone } = useCompleteAction(action);
   const overdue = !done && action.dueDate !== null && action.dueDate < Date.now();
 
   const saveTitle = () => {
@@ -75,7 +56,9 @@ function ActionRow({
       <DoneCheck
         checked={done}
         onChange={setDone}
-        label={done ? (lang === 'he' ? 'סימון כפתוחה' : 'Mark as open') : lang === 'he' ? 'סימון כבוצעה' : 'Mark as done'}
+        label={
+          done ? (lang === 'he' ? 'סימון כפתוחה' : 'Mark as open') : lang === 'he' ? 'סימון כבוצעה' : 'Mark as done'
+        }
       />
 
       <div className="min-w-0 flex-1">
@@ -92,10 +75,20 @@ function ActionRow({
               }}
               className="h-8 flex-1"
             />
-            <Button variant="ghost" size="icon" onClick={saveTitle} aria-label="save title">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={saveTitle}
+              aria-label={lang === 'he' ? 'שמירת הכותרת' : 'Save title'}
+            >
               <Check size={15} />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => setEditing(false)} aria-label="cancel edit">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setEditing(false)}
+              aria-label={lang === 'he' ? 'ביטול העריכה' : 'Cancel editing'}
+            >
               <X size={15} />
             </Button>
           </div>
@@ -107,11 +100,14 @@ function ActionRow({
             <div className="flex flex-wrap items-center gap-2 text-xs text-fg-subtle">
               {action.dueDate !== null && (
                 <span className={cn(overdue && 'font-medium text-danger')}>
-                  {lang === 'he' ? 'עד' : 'Due'} {fmtDate(action.dueDate)}
+                  {lang === 'he' ? 'עד' : 'Due'} {fmtDate(action.dueDate, lang)}
                 </span>
               )}
               {goalTitle && (
-                <Link to="/goals" className="inline-flex items-center gap-1 hover:text-foreground">
+                <Link
+                  to={`/goals#goal-${action.goalId}`}
+                  className="inline-flex items-center gap-1 hover:text-foreground"
+                >
                   <Target size={11} /> <span className="max-w-40 truncate">{goalTitle}</span>
                 </Link>
               )}
@@ -127,9 +123,14 @@ function ActionRow({
 
       <select
         value={action.priority}
-        onChange={(e) => update.mutate({ id: action.id, priority: e.target.value as ActionPriority })}
+        onChange={(e) =>
+          update.mutate({
+            id: action.id,
+            priority: e.target.value as ActionPriority,
+          })
+        }
         className="rz-select h-8 rounded-md border border-border bg-surface px-2 text-xs text-foreground"
-        aria-label="priority"
+        aria-label={lang === 'he' ? 'עדיפות' : 'Priority'}
       >
         {ACTION_PRIORITIES.map((p) => (
           <option key={p} value={p}>
@@ -143,18 +144,36 @@ function ActionRow({
 
       {onMove && (
         <div className="flex flex-col">
-          <button onClick={() => onMove(-1)} className="text-fg-faint hover:text-foreground" aria-label="move up">
+          <button
+            onClick={() => onMove(-1)}
+            className="text-fg-faint hover:text-foreground"
+            aria-label={lang === 'he' ? 'הזזה למעלה' : 'Move up'}
+          >
             <ArrowUp size={13} />
           </button>
-          <button onClick={() => onMove(1)} className="text-fg-faint hover:text-foreground" aria-label="move down">
+          <button
+            onClick={() => onMove(1)}
+            className="text-fg-faint hover:text-foreground"
+            aria-label={lang === 'he' ? 'הזזה למטה' : 'Move down'}
+          >
             <ArrowDown size={13} />
           </button>
         </div>
       )}
-      <Button variant="ghost" size="icon" onClick={() => setEditing(true)} aria-label="edit action">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setEditing(true)}
+        aria-label={lang === 'he' ? 'עריכת הצעד' : 'Edit step'}
+      >
         <Pencil size={15} />
       </Button>
-      <Button variant="ghost" size="icon" onClick={() => del.mutate(action.id)} aria-label="delete action">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => del(action, action.title)}
+        aria-label={lang === 'he' ? 'מחיקת הצעד' : 'Delete step'}
+      >
         <Trash2 size={15} />
       </Button>
     </div>
@@ -209,14 +228,14 @@ export function ActionsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-baseline justify-between">
-        <h1 className="text-4xl font-bold">{t('actions')}</h1>
-        {statusFilter !== 'done' && (
-          <span className="text-sm text-fg-muted">
-            {lang === 'he' ? `${openCount} פעולות פתוחות` : `${openCount} open`}
-          </span>
-        )}
-      </div>
+      <PageHeader
+        title={t('actions')}
+        description={
+          lang === 'he'
+            ? `כל הצעדים הקטנים, במקום אחד. ${openCount} פתוחים.`
+            : `Every small step, in one place. ${openCount} open.`
+        }
+      />
 
       <Card className="p-5">
         <form onSubmit={add} className="flex flex-col gap-3 lg:flex-row">
@@ -231,7 +250,7 @@ export function ActionsPage() {
             value={priority}
             onChange={(e) => setPriority(e.target.value as ActionPriority)}
             className="rz-select h-9 rounded-md border border-border bg-surface px-2 text-sm text-foreground"
-            aria-label="new action priority"
+            aria-label={lang === 'he' ? 'עדיפות לצעד החדש' : 'Priority for the new step'}
           >
             {ACTION_PRIORITIES.map((p) => (
               <option key={p} value={p}>
@@ -243,7 +262,7 @@ export function ActionsPage() {
             value={goalId}
             onChange={(e) => setGoalId(e.target.value)}
             className="rz-select h-9 max-w-52 rounded-md border border-border bg-surface px-2 text-sm text-foreground"
-            aria-label="link to goal"
+            aria-label={lang === 'he' ? 'שיוך למטרה' : 'Link to a goal'}
           >
             <option value="">{lang === 'he' ? 'ללא מטרה' : 'No goal'}</option>
             {goals?.map((g) => (
@@ -257,7 +276,7 @@ export function ActionsPage() {
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
             className="h-9 rounded-md border border-border bg-surface px-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-[color:var(--rz-accent-ring)] transition-[border-color,box-shadow]"
-            aria-label="due date"
+            aria-label={lang === 'he' ? 'תאריך יעד' : 'Due date'}
           />
           <Button type="submit" disabled={!title.trim() || create.isPending}>
             <Plus size={15} /> {lang === 'he' ? 'הוסף' : 'Add'}
@@ -294,7 +313,7 @@ export function ActionsPage() {
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value as '' | ActionPriority)}
           className="rz-select h-7 rounded-full border border-border bg-surface px-2 text-xs text-fg-muted"
-          aria-label="filter by priority"
+          aria-label={lang === 'he' ? 'סינון לפי עדיפות' : 'Filter by priority'}
         >
           <option value="">{lang === 'he' ? 'כל העדיפויות' : 'All priorities'}</option>
           {ACTION_PRIORITIES.map((p) => (
@@ -307,7 +326,7 @@ export function ActionsPage() {
           value={goalFilter}
           onChange={(e) => setGoalFilter(e.target.value)}
           className="rz-select h-7 max-w-48 rounded-full border border-border bg-surface px-2 text-xs text-fg-muted"
-          aria-label="filter by goal"
+          aria-label={lang === 'he' ? 'סינון לפי מטרה' : 'Filter by goal'}
         >
           <option value="">{lang === 'he' ? 'כל המטרות' : 'All goals'}</option>
           {goals?.map((g) => (
@@ -320,7 +339,7 @@ export function ActionsPage() {
 
       <Card className="px-5 py-2">
         {isLoading ? (
-          <p className="py-4 text-fg-muted">{t('loading')}</p>
+          <PageLoader label={t('loading')} />
         ) : actions?.length ? (
           actions.map((a, i) => (
             <ActionRow

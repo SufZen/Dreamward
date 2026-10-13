@@ -357,3 +357,76 @@ textarea.rz-input {
 .rz-select:hover { border-color: var(--rz-border-strong); }
 .rz-select:focus { outline: none; border-color: var(--rz-accent); box-shadow: 0 0 0 3px var(--rz-accent-ring); }
 .rz-select option { background: var(--rz-bg-raised); color: var(--rz-fg); }
+
+/* ── Toasts ─────────────────────────────────────────────────────────────── */
+.dw-toaster {
+  position: fixed;
+  inset-block-end: 24px;
+  inset-inline: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.dw-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 44px;
+  max-width: min(92vw, 480px);
+  padding: 10px 10px 10px 16px;
+  padding-inline: 16px 10px;
+  border-radius: var(--rz-radius-lg);
+  background: var(--rz-surface);
+  border: 1px solid var(--rz-border-strong);
+  box-shadow: var(--rz-shadow-3);
+  color: var(--rz-fg);
+  font-size: var(--rz-text-sm);
+  animation:
+    rz-fade-in var(--rz-dur) var(--rz-ease-enter) both,
+    rz-rise var(--rz-spring-dur) var(--rz-spring) both;
+}
+.dw-toast[data-tone="success"] { border-inline-start: 3px solid var(--rz-success); }
+.dw-toast[data-tone="danger"]  { border-inline-start: 3px solid var(--rz-danger); }
+.dw-toast--leaving { animation: rz-fade-out var(--rz-dur) var(--rz-ease-exit) both; }
+.dw-toast__msg { flex: 1; }
+.dw-toast__action {
+  flex: none;
+  height: 30px;
+  padding-inline: 12px;
+  border-radius: var(--rz-radius-sm);
+  color: var(--rz-accent-text);
+  font-weight: 600;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: background-color var(--rz-dur-fast) var(--rz-ease-standard);
+}
+.dw-toast__action:hover { background: var(--rz-accent-soft); }
+
+/* ── Dialog ─────────────────────────────────────────────────────────────── */
+.dw-dialog {
+  width: min(92vw, 560px);
+  max-height: min(80vh, 640px);
+  padding: 0;
+  border: 1px solid var(--rz-border-strong);
+  border-radius: var(--rz-radius-xl);
+  background: var(--rz-bg-raised);
+  color: var(--rz-fg);
+  box-shadow: var(--rz-shadow-3);
+  overflow: hidden;
+}
+.dw-dialog[open] {
+  animation:
+    rz-fade-in var(--rz-dur) var(--rz-ease-enter) both,
+    rz-popup-in var(--rz-spring-dur) var(--rz-spring) both;
+}
+.dw-dialog--top { margin-block-start: 12vh; }
+.dw-dialog::backdrop {
+  background: var(--rz-overlay);
+  backdrop-filter: blur(3px);
+  animation: rz-fade-in var(--rz-dur) var(--rz-ease-standard) both;
+}

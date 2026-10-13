@@ -7,7 +7,8 @@ import { useLang } from '@/lib/lang';
 import { useLogout, useMe } from '@/features/auth/useAuth';
 import { AssistantLauncher } from '@/features/assistant/AssistantLauncher';
 import { isDesktop } from '@/lib/desktop';
-import { PageLoader } from '@dreamward/design-system';
+import { PageLoader, Toaster } from '@dreamward/design-system';
+import { CommandPalette } from '@/components/CommandPalette';
 
 export function AppShell() {
   const { t, lang } = useLang();
@@ -55,6 +56,8 @@ export function AppShell() {
         </main>
       </div>
       <AssistantLauncher />
+      <CommandPalette />
+      <Toaster />
     </div>
   );
 }

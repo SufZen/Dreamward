@@ -33,7 +33,7 @@ const STRINGS = {
   strategy: { he: 'אסטרטגיה', en: 'Strategy' },
   habits: { he: 'הרגלים', en: 'Habits' },
   leverages: { he: 'מנופים', en: 'Leverages' },
-  empty: { he: 'הדף הזה עדיין מחכה לך ✨', en: 'This page is waiting for you ✨' },
+  empty: { he: 'עוד לא נכתב כאן', en: 'Nothing written here yet' },
   loading: { he: 'טוען…', en: 'Loading…' },
 } as const;
 

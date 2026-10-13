@@ -9,7 +9,7 @@ import {
   type Chapter,
   type OnboardingStep,
 } from '@dreamward/shared';
-import { Button, Card, Input, Textarea, buttonVariants, cn } from '@dreamward/design-system';
+import { Button, Card, Input, Textarea, buttonVariants, cn, PageLoader } from '@dreamward/design-system';
 import { api } from '@/lib/api';
 import { useLang } from '@/lib/lang';
 import { Stepper, type StepperStep } from '@/components/Stepper';
@@ -58,7 +58,7 @@ export function StartPage() {
   const { data: categories } = useCategories();
   const ready = onboarding !== undefined && chapter !== undefined && latest !== undefined && categories !== undefined;
 
-  if (!ready) return <p className="text-fg-muted">{t('loading')}</p>;
+  if (!ready) return <PageLoader label={t('loading')} />;
   return <Flow chapter={chapter} />;
 }
 

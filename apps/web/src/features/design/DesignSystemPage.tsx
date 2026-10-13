@@ -34,7 +34,7 @@ const RAMPS: { name: string; steps: string[] }[] = [
   { name: 'Mist · text on night', steps: ['mist-4', 'mist-3', 'mist-2', 'mist-1'] },
   { name: 'Day · light theme', steps: ['day-1', 'day-2', 'day-3', 'day-4', 'day-5'] },
   { name: 'Gold · the star', steps: ['gold-7', 'gold-8', 'gold-9', 'gold-10', 'gold-11'] },
-  { name: 'Horizon · ambient only', steps: ['dawn', 'dusk-violet'] },
+  { name: 'Dawn · ambient only', steps: ['dawn'] },
 ];
 
 const SEMANTIC = [

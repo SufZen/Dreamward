@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Images } from 'lucide-react';
-import { Button, Card, Input } from '@dreamward/design-system';
+import { Button, Card, Input, PageHeader } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
 import { useBoards, useCreateBoard } from './hooks';
 
@@ -20,7 +20,15 @@ export function BoardGallery() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-4xl font-bold">{t('moodboard')}</h1>
+      <PageHeader
+        title={t('moodboard')}
+        description={lang === 'he' ? 'תמונות ומילים שמזכירות לך לאן אתה הולך.' : 'Images and words that remind you where you’re going.'}
+        actions={
+          <Link to="/gallery" className="text-sm text-fg-muted hover:text-foreground">
+            {lang === 'he' ? 'ספריית התמונות' : 'Image library'}
+          </Link>
+        }
+      />
 
       <Card className="p-5">
         <form onSubmit={add} className="flex gap-3">

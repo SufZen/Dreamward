@@ -11,8 +11,9 @@ import { useMe } from '@/features/auth/useAuth';
 const lazyNamed = <K extends string>(loader: () => Promise<Record<K, React.ComponentType>>, key: K) =>
   lazy(() => loader().then((m) => ({ default: m[key] })));
 
-const Dashboard = lazyNamed(() => import('@/features/dashboard/Dashboard'), 'Dashboard');
+const TodayPage = lazyNamed(() => import('@/features/today/TodayPage'), 'TodayPage');
 const CategoryPage = lazyNamed(() => import('@/features/book/CategoryPage'), 'CategoryPage');
+const BookHubPage = lazyNamed(() => import('@/features/book/BookHubPage'), 'BookHubPage');
 const ContentBlockPage = lazyNamed(() => import('@/features/book/ContentBlockPage'), 'ContentBlockPage');
 const LifeVisionPage = lazyNamed(() => import('@/features/book/LifeVisionPage'), 'LifeVisionPage');
 const GoalsPage = lazyNamed(() => import('@/features/goals/GoalsPage'), 'GoalsPage');
@@ -47,10 +48,12 @@ function ShellRoutes() {
     <Routes>
       {/* AppShell wraps a <Suspense> around the Outlet, so lazy pages stream in. */}
       <Route element={<AppShell />}>
-        <Route index element={<Dashboard />} />
+        <Route index element={<TodayPage />} />
         <Route path="chapter" element={<ChapterPage />} />
         <Route path="ikigai" element={<IkigaiPage />} />
         <Route path="start" element={<StartPage />} />
+        <Route path="book" element={<BookHubPage />} />
+        <Route path="areas" element={<Navigate to="/book" replace />} />
         <Route path="book/cover" element={<ContentBlockPage />} />
         <Route path="book/front/:blockId" element={<ContentBlockPage />} />
         <Route path="book/implementation/:blockId" element={<ContentBlockPage />} />
