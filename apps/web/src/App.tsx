@@ -11,6 +11,7 @@ import { useMe } from '@/features/auth/useAuth';
 const lazyNamed = <K extends string>(loader: () => Promise<Record<K, React.ComponentType>>, key: K) =>
   lazy(() => loader().then((m) => ({ default: m[key] })));
 
+const ReviewPage = lazyNamed(() => import('@/features/review/ReviewPage'), 'ReviewPage');
 const TodayPage = lazyNamed(() => import('@/features/today/TodayPage'), 'TodayPage');
 const CategoryPage = lazyNamed(() => import('@/features/book/CategoryPage'), 'CategoryPage');
 const BookHubPage = lazyNamed(() => import('@/features/book/BookHubPage'), 'BookHubPage');
@@ -50,6 +51,7 @@ function ShellRoutes() {
       <Route element={<AppShell />}>
         <Route index element={<TodayPage />} />
         <Route path="chapter" element={<ChapterPage />} />
+        <Route path="review" element={<ReviewPage />} />
         <Route path="ikigai" element={<IkigaiPage />} />
         <Route path="start" element={<StartPage />} />
         <Route path="book" element={<BookHubPage />} />

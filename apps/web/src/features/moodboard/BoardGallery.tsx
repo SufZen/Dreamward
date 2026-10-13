@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Images } from 'lucide-react';
-import { Button, Card, Input, PageHeader, EmptyState, PageLoader } from '@dreamward/design-system';
+import { Check, Images, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { Button, Card, Input, PageHeader, EmptyState, PageLoader, toast } from '@dreamward/design-system';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { api } from '@/lib/api';
+import { useUndoableDelete } from '@/lib/useUndoableDelete';
 import { useLang } from '@/lib/lang';
-import { useBoards, useCreateBoard } from './hooks';
+import { useBoards, useCreateBoard, type Board } from './hooks';
 
 export function BoardGallery() {
   const { t, lang } = useLang();
@@ -61,30 +64,90 @@ export function BoardGallery() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {boards?.map((b) => (
-            <Link key={b.id} to={`/moodboard/${b.id}`}>
-              <Card interactive className="overflow-hidden p-0">
-                <div className="flex aspect-video items-center justify-center bg-bg-elevated">
-                  {b.cover ? (
-                    <img src={`/media/${b.cover}`} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
-                  ) : (
-                    <Images size={32} className="text-fg-faint" />
-                  )}
-                </div>
-                <div className="p-4">
-                  <p dir="auto" className="truncate font-medium">
-                    {b.title}
-                  </p>
-                  {b.visionStatement && (
-                    <p dir="auto" className="mt-1 line-clamp-2 text-xs text-fg-muted">
-                      {b.visionStatement}
-                    </p>
-                  )}
-                </div>
-              </Card>
-            </Link>
+            <BoardCard key={b.id} board={b} />
           ))}
         </div>
       )}
     </div>
+  );
+}
+
+/** A board in the gallery: open it, rename it in place, or delete it (with Undo). */
+function BoardCard({ board: b }: { board: Board }) {
+  const { lang } = useLang();
+  const he = lang === 'he';
+  const qc = useQueryClient();
+  const [renaming, setRenaming] = useState(false);
+  const [title, setTitle] = useState(b.title);
+  const rename = useMutation({
+    mutationFn: (t: string) => api.put(`/moodboards/${b.id}`, { title: t }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['boards'] });
+      toast(he ? 'שם הלוח עודכן' : 'Board renamed', { tone: 'success' });
+    },
+  });
+  const del = useUndoableDelete<Board>({ queryKey: ['boards'], remove: (id) => api.del(`/moodboards/${id}`) });
+
+  const save = (e: React.FormEvent) => {
+    e.preventDefault();
+    const t = title.trim();
+    if (t && t !== b.title) rename.mutate(t);
+    setRenaming(false);
+  };
+
+  return (
+    <Card interactive className="group relative overflow-hidden p-0">
+      <Link to={`/moodboard/${b.id}`} className="block" aria-label={b.title}>
+        <div className="flex aspect-video items-center justify-center bg-bg-elevated">
+          {b.cover ? (
+            <img src={`/media/${b.cover}`} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+          ) : (
+            <Images size={32} className="text-fg-faint" />
+          )}
+        </div>
+      </Link>
+      <div className="flex items-start gap-2 p-4">
+        {renaming ? (
+          <form onSubmit={save} className="flex flex-1 items-center gap-1">
+            <Input
+              autoFocus
+              dir="auto"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onKeyDown={(e) => e.key === 'Escape' && setRenaming(false)}
+              aria-label={he ? 'שם הלוח' : 'Board name'}
+              className="h-8 flex-1"
+            />
+            <Button type="submit" variant="ghost" size="icon" aria-label={he ? 'שמירה' : 'Save'}>
+              <Check size={15} />
+            </Button>
+            <Button type="button" variant="ghost" size="icon" onClick={() => setRenaming(false)} aria-label={he ? 'ביטול' : 'Cancel'}>
+              <X size={15} />
+            </Button>
+          </form>
+        ) : (
+          <>
+            <Link to={`/moodboard/${b.id}`} className="min-w-0 flex-1">
+              <p className="truncate font-medium">
+                <bdi>{b.title}</bdi>
+              </p>
+              {b.visionStatement && (
+                <p dir="auto" className="mt-1 line-clamp-2 text-xs text-fg-muted">
+                  {b.visionStatement}
+                </p>
+              )}
+            </Link>
+            <div className="flex flex-none gap-0.5 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
+              <Button variant="ghost" size="icon" onClick={() => { setTitle(b.title); setRenaming(true); }} aria-label={he ? 'שינוי שם' : 'Rename'}>
+                <Pencil size={14} />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => del(b, b.title)} aria-label={he ? 'מחיקת הלוח' : 'Delete board'}>
+                <Trash2 size={14} />
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
+    </Card>
   );
 }

@@ -205,9 +205,9 @@ The interface is organised around one question per screen.
 | **Current chapter** | What is this season for? | The chapter, its focus and maintenance areas, and the life wheel with **Rate all areas**: twelve scales in one place, the wheel pinned beside them. |
 | **My book** | What have I written? | Foundations (cover, dream life, IKIGAI, opening and closing pages) and the twelve areas with score, focus and goal count. Every book page is reachable from here. |
 | **Goals** | Where am I going? | Each goal holds its steps: add, check, progress ring, target date, edit in place. *Achieved* celebrates; the review outcome is secondary. |
-| **Actions** | Everything I committed to | The full list with filters, priorities and ordering. |
+| **Actions** | Everything I committed to | The full list with filters, priorities and ordering; due dates edit in place. |
 | **Journal** | What's on my mind? | Opens on today's page; prompts when it's blank; empty drafts clean themselves up. |
-| **Vision boards** | What does it look like? | Boards, with the image library one link away. |
+| **Vision boards** | What does it look like? | Boards (rename in place, delete with Undo), with the image library one link away. |
 
 The sidebar shows these seven, then the chapter's **focus areas** with their
 scores; the other areas are one click away. Everything else (gallery,
@@ -219,6 +219,27 @@ to any page or area, find a goal or journal entry by its words (matches are
 listed first, so Enter opens what you already have), switch theme or
 language, or type a title and press Enter to add it as a step or a goal.
 New items confirm with a toast.
+
+**Weekly review (`/review`).** A ten-minute ritual that needs no AI: arrive
+(a breathing orb) → look back at the week's checked-off steps → re-rate the
+focus areas (each tap saves) → a pass over every open goal (mark it achieved,
+or give it a next step) → next week (what's already due, plus up to three
+more) → one honest paragraph saved to the journal → done. Today invites you
+to it from Friday to Sunday when the last review is six or more days old; it's
+also in ⌘K and on `G R`.
+
+**Product tour.** A spotlight walks the real interface (navigation, today's
+steps, quick add, the journal line, ⌘K, the chapter, the book, Clarity). Two
+steps are interactive: they wait for you to check off a step or press ⌘K, and
+the spotlight's hole lets that click through while the rest of the page is
+shielded. It starts once on Today after the guided start, and can be replayed
+from Settings or ⌘K. Arrow keys follow the reading direction; Esc leaves.
+Targets are `data-tour` attributes; steps live in `features/tour/steps.ts`.
+
+**Keyboard.** ⌘K / Ctrl K or `/` for the palette; `G` then `T` Today,
+`C` Chapter, `B` Book, `G` Goals, `A` Actions, `J` Journal, `M` Vision
+boards, `R` Review; `?` lists them. Single-key shortcuts are off while
+typing.
 
 **Trust rules.**
 - Writing never waits on a button: editors autosave, flush when you leave,

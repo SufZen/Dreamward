@@ -52,7 +52,7 @@ function ActionRow({
   };
 
   return (
-    <div className="flex items-center gap-3 border-b border-border py-3 last:border-b-0">
+    <div className="group flex items-center gap-3 border-b border-border py-3 last:border-b-0">
       <DoneCheck
         checked={done}
         onChange={setDone}
@@ -98,11 +98,11 @@ function ActionRow({
               {action.title}
             </p>
             <div className="flex flex-wrap items-center gap-2 text-xs text-fg-subtle">
-              {action.dueDate !== null && (
-                <span className={cn(overdue && 'font-medium text-danger')}>
-                  {lang === 'he' ? 'עד' : 'Due'} {fmtDate(action.dueDate, lang)}
-                </span>
-              )}
+              <DueDateChip
+                value={action.dueDate}
+                overdue={overdue}
+                onChange={(dueDate) => update.mutate({ id: action.id, dueDate })}
+              />
               {goalTitle && (
                 <Link
                   to={`/goals#goal-${action.goalId}`}
@@ -209,7 +209,7 @@ export function ActionsPage() {
       title: title.trim(),
       priority,
       goalId: goalId || null,
-      dueDate: dueDate ? Date.parse(dueDate) : null,
+      dueDate: fromDateInput(dueDate),
     });
     setTitle('');
     setDueDate('');
@@ -363,5 +363,72 @@ export function ActionsPage() {
         )}
       </Card>
     </div>
+  );
+}
+
+const toDateInput = (ms: number) => {
+  const d = new Date(ms);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+/** End of the chosen local day, so "due today" stays due all day. */
+const fromDateInput = (v: string) => (v ? new Date(`${v}T23:59:59`).getTime() : null);
+
+/** The due date, editable in place: click to pick a date, × to clear it. */
+function DueDateChip({ value, overdue, onChange }: { value: number | null; overdue: boolean; onChange: (v: number | null) => void }) {
+  const { lang } = useLang();
+  const he = lang === 'he';
+  const [editing, setEditing] = useState(false);
+  if (editing) {
+    return (
+      <span className="inline-flex items-center gap-1">
+        <input
+          type="date"
+          autoFocus
+          defaultValue={value ? toDateInput(value) : ''}
+          aria-label={he ? 'תאריך יעד' : 'Due date'}
+          onChange={(e) => {
+            if (e.target.value) {
+              onChange(fromDateInput(e.target.value));
+              setEditing(false);
+            }
+          }}
+          onBlur={() => setEditing(false)}
+          onKeyDown={(e) => e.key === 'Escape' && setEditing(false)}
+          className="h-7 rounded-sm border border-border bg-surface px-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+        />
+        {value !== null && (
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              onChange(null);
+              setEditing(false);
+            }}
+            className="rounded-xs px-1 text-fg-subtle hover:text-foreground"
+            aria-label={he ? 'הסרת התאריך' : 'Remove the date'}
+          >
+            ×
+          </button>
+        )}
+      </span>
+    );
+  }
+  return value !== null ? (
+    <button
+      type="button"
+      onClick={() => setEditing(true)}
+      className={cn('rounded-xs hover:text-foreground hover:underline', overdue && 'font-medium text-danger')}
+      title={he ? 'שינוי התאריך' : 'Change the date'}
+    >
+      {he ? 'עד' : 'Due'} {fmtDate(value, lang)}
+    </button>
+  ) : (
+    <button
+      type="button"
+      onClick={() => setEditing(true)}
+      className="rounded-xs text-fg-faint opacity-0 transition-opacity hover:text-foreground focus-visible:opacity-100 group-hover:opacity-100"
+    >
+      {he ? '+ תאריך' : '+ Add a date'}
+    </button>
   );
 }

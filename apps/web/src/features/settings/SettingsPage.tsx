@@ -10,6 +10,7 @@ import { RoutinesSettings } from './RoutinesSettings';
 import { DataSettings } from './DataSettings';
 import { isDesktop } from '@/lib/desktop';
 import { useMotionPreference } from '@/lib/motion';
+import { startTour } from '@/features/tour/Tour';
 import { useSetOnboardingStatus } from '@/features/onboarding/hooks';
 
 export function SettingsPage() {
@@ -99,6 +100,17 @@ export function SettingsPage() {
           onClick={() => setOnboarding.mutate('pending', { onSuccess: () => navigate('/start') })}
         >
           {lang === 'he' ? 'פתח את ההתחלה המודרכת' : 'Open guided start'}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="ms-2"
+          onClick={() => {
+            navigate('/');
+            setTimeout(startTour, 300);
+          }}
+        >
+          {lang === 'he' ? 'סיור במערכת' : 'Take the tour'}
         </Button>
       </Card>
 

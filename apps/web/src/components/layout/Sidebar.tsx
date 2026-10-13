@@ -82,6 +82,7 @@ export function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: (
       )}
       <nav
         aria-label={he ? 'ניווט ראשי' : 'Main'}
+        data-tour="nav"
         className={cn(
           'fixed inset-y-0 start-0 z-50 flex h-full w-64 shrink-0 flex-col gap-0.5 overflow-y-auto border-e border-border bg-bg-elevated p-3',
           'transition-transform duration-spring ease-spring sm:static sm:translate-x-0',
@@ -95,6 +96,7 @@ export function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: (
         <button
           type="button"
           onClick={showCommandPalette}
+          data-tour="search"
           className="mb-3 flex items-center gap-3 rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg-subtle shadow-[var(--rz-highlight)] transition-colors duration-fast hover:border-border-strong hover:text-fg-muted"
         >
           <Search size={16} />
@@ -107,10 +109,10 @@ export function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: (
         <TransitionNavLink to="/" end className={itemClasses}>
           <Sunrise size={18} /> {he ? 'היום' : 'Today'}
         </TransitionNavLink>
-        <TransitionNavLink to="/chapter" className={itemClasses}>
+        <TransitionNavLink to="/chapter" className={itemClasses} data-tour="nav-chapter">
           <Compass size={18} /> {t('chapter')}
         </TransitionNavLink>
-        <TransitionNavLink to="/book" end className={itemClasses}>
+        <TransitionNavLink to="/book" end className={itemClasses} data-tour="nav-book">
           <BookOpen size={18} /> {t('myBook')}
         </TransitionNavLink>
 
@@ -142,7 +144,7 @@ export function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: (
             className={cn('transition-transform duration-spring ease-spring', areasOpen && 'rotate-180')}
           />
         </button>
-        <div className={cn('flex flex-col gap-0.5', areasOpen && 'rz-stagger')}>
+        <div className={cn('flex flex-col gap-0.5', areasOpen && 'rz-stagger')} data-tour="areas">
           {visibleAreas.map((c, i) => {
             const s = score.get(c.id);
             return (

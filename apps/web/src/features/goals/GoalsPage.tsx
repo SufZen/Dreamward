@@ -33,7 +33,12 @@ const OUTCOME: Record<GoalStatus, { he: string; en: string }> = {
   not_relevant: { he: 'פתוחה', en: 'Open' },
 };
 
-const toDateInput = (ms: number | null) => (ms ? new Date(ms).toISOString().slice(0, 10) : '');
+/** Local calendar date (toISOString would shift it a day east of UTC). */
+const toDateInput = (ms: number | null) => {
+  if (!ms) return '';
+  const d = new Date(ms);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 const fromDateInput = (v: string) => (v ? new Date(`${v}T12:00:00`).getTime() : null);
 
 type Filter = 'open' | 'achieved' | 'all';

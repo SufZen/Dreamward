@@ -1,7 +1,7 @@
 import { useMemo, useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, Compass, Gauge, NotebookPen, Plus, Target } from 'lucide-react';
+import { ArrowRight, Compass, Gauge, NotebookPen, Plus, Target, CalendarCheck } from 'lucide-react';
 import type { ProposalRow } from '@dreamward/shared';
 import { Badge, Button, Card, ProgressRing, Skeleton, buttonVariants, cn, toast } from '@dreamward/design-system';
 import { api } from '@/lib/api';
@@ -16,6 +16,7 @@ import { BriefingCard } from '@/features/assistant/BriefingCard';
 import { ProposalCard } from '@/features/assistant/ProposalCard';
 import { useCurrentChapter, useLatestRatings } from '@/features/chapter/hooks';
 import { useOnboarding } from '@/features/onboarding/hooks';
+import { reviewDue } from '@/features/review/lastReview';
 
 const DAY = 86_400_000;
 const startOfToday = () => new Date().setHours(0, 0, 0, 0);
@@ -123,6 +124,7 @@ export function TodayPage() {
           <BriefingCard />
         </div>
         <div className="flex flex-col gap-6">
+          {reviewDue() && <ReviewNudge />}
           <JournalLine />
           <GoalsInMotion />
           <WhereYouStand />
@@ -188,7 +190,7 @@ function TodaySteps() {
   };
 
   return (
-    <Card className="flex flex-col gap-1 p-5">
+    <Card className="flex flex-col gap-1 p-5" data-tour="today-steps">
       <div className="mb-1 flex items-baseline justify-between gap-2">
         <h2 className="text-lg font-semibold">{he ? 'הצעדים של היום' : 'Today’s steps'}</h2>
         {list.length > 0 && (
@@ -223,6 +225,7 @@ function TodaySteps() {
         </ul>
       )}
       <form
+        data-tour="quick-add"
         className="mt-2 flex items-center gap-2 rounded-md border border-dashed border-border px-3 transition-colors focus-within:border-solid focus-within:border-primary"
         onSubmit={(e) => {
           e.preventDefault();
@@ -290,7 +293,7 @@ function JournalLine() {
     : '';
 
   return (
-    <Card className="flex flex-col gap-3 p-5">
+    <Card className="flex flex-col gap-3 p-5" data-tour="journal-line">
       <div className="flex items-center gap-2">
         <NotebookPen size={17} className="text-primary" />
         <h2 className="flex-1 font-semibold">{he ? 'שורה ביומן' : 'A line in the journal'}</h2>
@@ -531,6 +534,29 @@ function WelcomeCard() {
           {he ? 'בוא נתחיל · כ-10 דקות' : 'Start · about 10 min'} <ArrowRight size={16} className="rtl:rotate-180" />
         </Link>
       </div>
+    </Card>
+  );
+}
+
+/* ── Weekly review nudge (Fri–Sun, when the last review is ≥ 6 days old) ── */
+
+function ReviewNudge() {
+  const { lang } = useLang();
+  const he = lang === 'he';
+  return (
+    <Card featured className="flex flex-col gap-3 p-5">
+      <div className="flex items-center gap-2">
+        <CalendarCheck size={17} className="text-primary" />
+        <h2 className="flex-1 font-semibold">{he ? 'זמן לסקירה השבועית' : 'Time for your weekly review'}</h2>
+      </div>
+      <p className="text-sm text-fg-muted">
+        {he
+          ? 'עשר דקות: מה הלך טוב, איפה אתה עומד, ומה חשוב בשבוע הבא.'
+          : 'Ten minutes: what went well, where you stand, and what matters next week.'}
+      </p>
+      <Link to="/review" className={cn(buttonVariants({ size: 'sm' }), 'self-start')}>
+        {he ? 'להתחיל' : 'Begin'} <ArrowRight size={14} className="rtl:rotate-180" />
+      </Link>
     </Card>
   );
 }

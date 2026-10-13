@@ -33,3 +33,64 @@ body {
   background: var(--rz-surface);
   border-radius: 999px;
 }
+
+/* ── Product tour (features/tour) ─────────────────────────────────────── */
+.dw-tour { position: fixed; inset: 0; z-index: 70; pointer-events: none; }
+.dw-tour__spot {
+  position: fixed;
+  border-radius: var(--rz-radius-lg);
+  box-shadow:
+    0 0 0 2px var(--rz-accent),
+    0 0 0 6px var(--rz-accent-soft),
+    0 0 0 9999px var(--rz-overlay);
+  transition:
+    left var(--rz-spring-dur) var(--rz-spring),
+    top var(--rz-spring-dur) var(--rz-spring),
+    width var(--rz-spring-dur) var(--rz-spring),
+    height var(--rz-spring-dur) var(--rz-spring),
+    box-shadow var(--rz-dur) var(--rz-ease-standard);
+  animation: rz-fade-in var(--rz-dur-moderate) var(--rz-ease-enter) both;
+}
+/* No target: the whole page dims (the spot collapses to the centre). */
+.dw-tour__spot--none { left: 50%; top: 50%; width: 0; height: 0; box-shadow: 0 0 0 9999px var(--rz-overlay); }
+/* Interactive steps breathe, to say "this one — try it". */
+.dw-tour__spot--live { animation: rz-fade-in var(--rz-dur-moderate) var(--rz-ease-enter) both, dw-tour-pulse 2.4s var(--rz-ease-in-out) 0.5s infinite; }
+@keyframes dw-tour-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px var(--rz-accent), 0 0 0 6px var(--rz-accent-soft), 0 0 0 9999px var(--rz-overlay); }
+  50%      { box-shadow: 0 0 0 2px var(--rz-accent), 0 0 0 12px oklch(0.865 0.177 91 / 0.10), 0 0 0 9999px var(--rz-overlay); }
+}
+.dw-tour__sky { position: fixed; inset: 0; opacity: 0.8; }
+.dw-tour__card {
+  position: fixed;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(360px, calc(100vw - 32px));
+  padding: 20px;
+  border-radius: var(--rz-radius-xl);
+  border: 1px solid var(--rz-border-strong);
+  background: var(--rz-bg-raised);
+  box-shadow: var(--rz-shadow-3);
+  outline: none;
+  transition: left var(--rz-spring-dur) var(--rz-spring), top var(--rz-spring-dur) var(--rz-spring);
+  animation: rz-popup-in var(--rz-spring-dur) var(--rz-spring) both;
+}
+.dw-tour__card--center { width: min(420px, calc(100vw - 32px)); text-align: center; align-items: stretch; }
+.dw-tour__nudge { animation: dw-tour-tap 1.4s var(--rz-ease-in-out) infinite; }
+@keyframes dw-tour-tap { 0%, 100% { transform: none; } 50% { transform: translateY(-2px) scale(1.08); } }
+
+/* Opening and closing art: the path draws, the steps appear, the star arrives. */
+.dw-tour__art { width: 100%; height: auto; margin-block-end: 4px; overflow: visible; }
+.dw-tour__path {
+  fill: none;
+  stroke: var(--rz-border-strong);
+  stroke-width: 1.5;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: rz-draw 900ms var(--rz-ease-emphasis) 150ms forwards;
+}
+.dw-tour__dot { fill: var(--rz-fg-faint); animation: rz-zoom-in-95 var(--rz-spring-dur) var(--rz-spring) both; animation-delay: calc(300ms + var(--i) * 140ms); transform-box: fill-box; transform-origin: center; }
+.dw-tour__star { fill: var(--rz-accent); transform-box: fill-box; transform-origin: center; animation: rz-zoom-in-95 var(--rz-spring-dream-dur) var(--rz-spring-dream) 900ms both; }
+.dw-tour__star--bright { filter: drop-shadow(0 0 8px oklch(0.865 0.177 91 / 0.8)); }
+.dw-tour__halo { animation: rz-breathe 6s var(--rz-ease-in-out) 1.2s infinite; transform-box: fill-box; transform-origin: center; }

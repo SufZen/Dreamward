@@ -269,7 +269,8 @@ export function ProgressRing({ value, size = 56, stroke = 5, label, className, a
           strokeWidth={stroke}
           pathLength={1}
           className="dw-ring__fill"
-          style={{ strokeDashoffset: 1 - v } as CSSProperties}
+          // at 0 the round cap would still draw a dot
+          style={{ strokeDashoffset: 1 - v, opacity: v === 0 ? 0 : 1 } as CSSProperties}
         />
       </svg>
       {label != null && <span className="dw-ring__label">{label}</span>}

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BookOpen,
+  CalendarCheck,
   Compass,
   CornerDownLeft,
   Eye,
@@ -26,6 +27,7 @@ import { Icon } from '@/components/Icon';
 import { useCategories } from '@/features/book/hooks';
 import { useCreateAction } from '@/features/actions/hooks';
 import { useCreateGoal, useGoals } from '@/features/goals/hooks';
+import { startTour } from '@/features/tour/Tour';
 import { useJournal } from '@/features/journal/hooks';
 
 interface Command {
@@ -85,6 +87,8 @@ export function CommandPalette() {
     if (!open) {
       setQ('');
       setActive(0);
+    } else {
+      window.dispatchEvent(new Event('dw:palette-open')); // the product tour listens
     }
   }, [open]);
 
@@ -148,6 +152,25 @@ export function CommandPalette() {
         keywords: 'journal entry write יומן רשומה',
         icon: <NotebookPen size={16} />,
         run: () => go('/journal?new=1'),
+      },
+      {
+        id: 'tour',
+        group: 'prefs',
+        label: L('סיור במערכת', 'Take the tour'),
+        keywords: 'tour tutorial help guide סיור הדרכה עזרה',
+        icon: <Compass size={16} />,
+        run: () => {
+          navigate('/');
+          setTimeout(startTour, 300);
+        },
+      },
+      {
+        id: 'review',
+        group: 'create',
+        label: L('סקירה שבועית', 'Weekly review'),
+        keywords: 'review week reflect סקירה שבוע',
+        icon: <CalendarCheck size={16} />,
+        run: () => go('/review'),
       },
       {
         id: 'go-home',

@@ -31,6 +31,7 @@ export function useCompleteAction(action: Action) {
       return;
     }
     setLanding(true);
+    window.dispatchEvent(new Event('dw:step-checked')); // the product tour listens
     flush.current = () => {
       flush.current = null;
       update.mutate({ id: action.id, status: 'done' });

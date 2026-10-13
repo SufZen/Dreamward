@@ -9,6 +9,9 @@ import { AssistantLauncher } from '@/features/assistant/AssistantLauncher';
 import { isDesktop } from '@/lib/desktop';
 import { PageLoader, Toaster } from '@dreamward/design-system';
 import { CommandPalette } from '@/components/CommandPalette';
+import { KeyboardShortcuts } from '@/components/KeyboardShortcuts';
+import { TourOverlay, startTour, tourSeen } from '@/features/tour/Tour';
+import { useOnboarding } from '@/features/onboarding/hooks';
 
 export function AppShell() {
   const { t, lang } = useLang();
@@ -16,6 +19,15 @@ export function AppShell() {
   const { data: user } = useMe();
   const [navOpen, setNavOpen] = useState(false);
   const location = useLocation();
+
+  // First visit to Today after the guided start (finished or set aside): show the tour once.
+  const { data: onboarding } = useOnboarding();
+  useEffect(() => {
+    if (location.pathname !== '/' || !onboarding || tourSeen()) return;
+    if (onboarding.fresh && onboarding.status === 'pending') return; // the guided start comes first
+    const t = setTimeout(startTour, 1200);
+    return () => clearTimeout(t);
+  }, [location.pathname, onboarding]);
 
   // Close the mobile drawer whenever the route changes.
   useEffect(() => setNavOpen(false), [location.pathname]);
@@ -57,6 +69,8 @@ export function AppShell() {
       </div>
       <AssistantLauncher />
       <CommandPalette />
+      <KeyboardShortcuts />
+      <TourOverlay />
       <Toaster />
     </div>
   );
