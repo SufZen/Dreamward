@@ -7,6 +7,11 @@ import { useLang } from '@/lib/lang';
 import { useLogout, useMe } from '@/features/auth/useAuth';
 import { AssistantLauncher } from '@/features/assistant/AssistantLauncher';
 import { isDesktop } from '@/lib/desktop';
+import { PageLoader, Toaster } from '@dreamward/design-system';
+import { CommandPalette } from '@/components/CommandPalette';
+import { KeyboardShortcuts } from '@/components/KeyboardShortcuts';
+import { TourOverlay, startTour, tourSeen } from '@/features/tour/Tour';
+import { useOnboarding } from '@/features/onboarding/hooks';
 
 export function AppShell() {
   const { t, lang } = useLang();
@@ -15,6 +20,15 @@ export function AppShell() {
   const [navOpen, setNavOpen] = useState(false);
   const location = useLocation();
 
+  // First visit to Today after the guided start (finished or set aside): show the tour once.
+  const { data: onboarding } = useOnboarding();
+  useEffect(() => {
+    if (location.pathname !== '/' || !onboarding || tourSeen()) return;
+    if (onboarding.fresh && onboarding.status === 'pending') return; // the guided start comes first
+    const t = setTimeout(startTour, 1200);
+    return () => clearTimeout(t);
+  }, [location.pathname, onboarding]);
+
   // Close the mobile drawer whenever the route changes.
   useEffect(() => setNavOpen(false), [location.pathname]);
 
@@ -22,7 +36,10 @@ export function AppShell() {
     <div className="flex h-screen overflow-hidden">
       <Sidebar open={navOpen} onClose={() => setNavOpen(false)} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="fx-glass sticky top-0 z-10 flex h-14 items-center gap-2 border-b border-border px-4">
+        <header
+          className="fx-glass sticky top-0 z-10 flex h-14 items-center gap-2 border-b border-border px-4"
+          style={{ viewTransitionName: 'header' }}
+        >
           <button
             onClick={() => setNavOpen(true)}
             className="-ms-1 inline-flex h-9 w-9 items-center justify-center rounded-md text-fg-muted hover:bg-surface hover:text-foreground sm:hidden"
@@ -42,14 +59,19 @@ export function AppShell() {
           )}
         </header>
         <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
-            <Suspense fallback={<p className="p-6 text-fg-muted">…</p>}>
+          {/* view-transition-name: only the page moves on navigation; the shell stays still */}
+          <div className="mx-auto max-w-4xl px-4 pb-28 pt-6 sm:px-6 sm:pt-8" style={{ viewTransitionName: 'page' }}>
+            <Suspense fallback={<PageLoader label={t('loading')} />}>
               <Outlet />
             </Suspense>
           </div>
         </main>
       </div>
       <AssistantLauncher />
+      <CommandPalette />
+      <KeyboardShortcuts />
+      <TourOverlay />
+      <Toaster />
     </div>
   );
 }

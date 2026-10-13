@@ -11,8 +11,10 @@ import { useMe } from '@/features/auth/useAuth';
 const lazyNamed = <K extends string>(loader: () => Promise<Record<K, React.ComponentType>>, key: K) =>
   lazy(() => loader().then((m) => ({ default: m[key] })));
 
-const Dashboard = lazyNamed(() => import('@/features/dashboard/Dashboard'), 'Dashboard');
+const ReviewPage = lazyNamed(() => import('@/features/review/ReviewPage'), 'ReviewPage');
+const TodayPage = lazyNamed(() => import('@/features/today/TodayPage'), 'TodayPage');
 const CategoryPage = lazyNamed(() => import('@/features/book/CategoryPage'), 'CategoryPage');
+const BookHubPage = lazyNamed(() => import('@/features/book/BookHubPage'), 'BookHubPage');
 const ContentBlockPage = lazyNamed(() => import('@/features/book/ContentBlockPage'), 'ContentBlockPage');
 const LifeVisionPage = lazyNamed(() => import('@/features/book/LifeVisionPage'), 'LifeVisionPage');
 const GoalsPage = lazyNamed(() => import('@/features/goals/GoalsPage'), 'GoalsPage');
@@ -27,6 +29,10 @@ const CollageEditor = lazyNamed(() => import('@/features/moodboard/CollageEditor
 const ChapterPage = lazyNamed(() => import('@/features/chapter/ChapterPage'), 'ChapterPage');
 const IkigaiPage = lazyNamed(() => import('@/features/ikigai/IkigaiPage'), 'IkigaiPage');
 const StartPage = lazyNamed(() => import('@/features/onboarding/StartPage'), 'StartPage');
+// Dev-only living reference for the design system (not shipped in production builds).
+const DesignSystemPage = import.meta.env.DEV
+  ? lazyNamed(() => import('@/features/design/DesignSystemPage'), 'DesignSystemPage')
+  : null;
 
 const Loading = () => <p className="p-6 text-fg-muted">…</p>;
 
@@ -43,10 +49,13 @@ function ShellRoutes() {
     <Routes>
       {/* AppShell wraps a <Suspense> around the Outlet, so lazy pages stream in. */}
       <Route element={<AppShell />}>
-        <Route index element={<Dashboard />} />
+        <Route index element={<TodayPage />} />
         <Route path="chapter" element={<ChapterPage />} />
+        <Route path="review" element={<ReviewPage />} />
         <Route path="ikigai" element={<IkigaiPage />} />
         <Route path="start" element={<StartPage />} />
+        <Route path="book" element={<BookHubPage />} />
+        <Route path="areas" element={<Navigate to="/book" replace />} />
         <Route path="book/cover" element={<ContentBlockPage />} />
         <Route path="book/front/:blockId" element={<ContentBlockPage />} />
         <Route path="book/implementation/:blockId" element={<ContentBlockPage />} />
@@ -61,6 +70,7 @@ function ShellRoutes() {
         <Route path="gallery" element={<GalleryPage />} />
         <Route path="snapshots" element={<SnapshotsPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        {DesignSystemPage && <Route path="design" element={<DesignSystemPage />} />}
         <Route
           path="admin"
           element={

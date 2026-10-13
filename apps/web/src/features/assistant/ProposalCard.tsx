@@ -56,7 +56,7 @@ export function ProposalCard({
     >
       <div className="flex items-center gap-2">
         <Sparkles size={14} className="shrink-0 text-primary" />
-        <span className="font-mono text-2xs uppercase tracking-wider text-fg-subtle">{label}</span>
+        <span className="text-xs font-medium text-fg-subtle">{label}</span>
         {proposal.status === 'approved' && <CheckCircle2 size={14} className="ms-auto text-success" />}
         {proposal.status === 'rejected' && <XCircle size={14} className="ms-auto text-fg-subtle" />}
         {proposal.status === 'failed' && <AlertTriangle size={14} className="ms-auto text-danger" />}

@@ -1,8 +1,9 @@
+import { BookCrumb } from './BookCrumb';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Pencil, Check } from 'lucide-react';
 import type { ListItem } from '@dreamward/shared';
-import { Button, Card } from '@dreamward/design-system';
+import { Button, Card, PageHeader, PageLoader } from '@dreamward/design-system';
 import { useLang, pickLabel } from '@/lib/lang';
 import { sanitizeHtml } from '@/lib/sanitize';
 import { useAutosave } from '@/lib/useAutosave';
@@ -66,20 +67,26 @@ export function ContentBlockPage() {
   const { data, isLoading, isError } = useContentBlock(blockId);
   const [editing, setEditing] = useState(false);
 
-  if (isLoading) return <p className="text-fg-muted">{t('loading')}</p>;
-  if (isError || !data) return <p className="text-danger">{t('empty')}</p>;
+  if (isLoading) return <PageLoader label={t('loading')} />;
+  if (isError || !data)
+    return (
+      <p className="text-fg-muted">
+        {lang === 'he' ? 'לא הצלחנו לטעון את העמוד הזה. נסה לרענן.' : 'Couldn’t load this page. Try refreshing.'}
+      </p>
+    );
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between gap-3">
-        <h1 dir="auto" className="text-4xl font-bold">
-          {pickLabel(lang, data.labelEn, data.labelHe)}
-        </h1>
-        <Button variant={editing ? 'primary' : 'ghost'} size="sm" onClick={() => setEditing(!editing)}>
-          {editing ? <Check size={14} /> : <Pencil size={14} />}
-          {editing ? (lang === 'he' ? 'סיום' : 'Done') : lang === 'he' ? 'עריכה' : 'Edit'}
-        </Button>
-      </div>
+      <PageHeader
+        eyebrow={<BookCrumb />}
+        title={<span dir="auto">{pickLabel(lang, data.labelEn, data.labelHe)}</span>}
+        actions={
+          <Button variant={editing ? 'primary' : 'ghost'} size="sm" onClick={() => setEditing(!editing)}>
+            {editing ? <Check size={14} /> : <Pencil size={14} />}
+            {editing ? (lang === 'he' ? 'סיום' : 'Done') : lang === 'he' ? 'עריכה' : 'Edit'}
+          </Button>
+          }
+      />
       <Card className="p-6">{editing ? <BlockEditor block={data} /> : <BlockReader block={data} />}</Card>
     </div>
   );

@@ -3,15 +3,19 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/cn';
 
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 rounded-md font-medium whitespace-nowrap select-none ' +
-    'transition-colors duration-150 ease-out focus-visible:outline-none ' +
+  'inline-flex items-center justify-center gap-2 rounded-md font-medium whitespace-nowrap select-none rz-press ' +
+    'transition-[color,background-color,border-color,box-shadow,transform] duration-fast focus-visible:outline-none ' +
     'focus-visible:ring-[3px] focus-visible:ring-[color:var(--rz-accent-ring)] ' +
     'disabled:opacity-50 disabled:pointer-events-none',
   {
     variants: {
       variant: {
-        primary: 'bg-primary text-[color:var(--rz-accent-fg)] hover:bg-brand-yellow-hover hover:shadow-glow',
-        secondary: 'bg-surface text-foreground border border-border hover:bg-surface-hover hover:border-border-strong',
+        primary:
+          'bg-primary font-semibold text-[color:var(--rz-accent-fg)] shadow-[inset_0_1px_0_oklch(1_0_0/0.35),0_1px_2px_oklch(0_0_0/0.25)] hover:bg-brand-yellow-hover ' +
+          // disabled gold over ink turns muddy at half opacity — go neutral instead
+          'disabled:bg-surface disabled:text-fg-faint disabled:shadow-none disabled:opacity-100',
+        secondary:
+          'bg-surface text-foreground border border-border shadow-[var(--rz-highlight)] hover:bg-surface-hover hover:border-border-strong',
         ghost: 'bg-transparent text-fg-muted hover:bg-surface hover:text-foreground',
         danger: 'bg-danger text-white hover:brightness-110',
         outline: 'bg-transparent text-foreground border border-border hover:bg-surface',
@@ -35,7 +39,7 @@ export interface ButtonProps
 }
 
 const Spinner = () => (
-  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <svg className="h-4 w-4 animate-spin-slow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
     <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4z" />
   </svg>

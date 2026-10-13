@@ -48,3 +48,14 @@ export function sanitizeHtml(html: string): string {
     ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'start', 'data-youtube-video', 'target', 'rel', 'loading', 'decoding'],
   });
 }
+
+/**
+ * Plain text of an HTML string, for emptiness checks and short snippets.
+ * Parsed with an inert DOMParser document (no scripts run, nothing is
+ * rendered) rather than a regex, which can't reliably strip tags.
+ */
+export function htmlToText(html: string | null | undefined): string {
+  if (!html) return '';
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return (doc.body.textContent ?? '').replace(/\s+/g, ' ').trim();
+}

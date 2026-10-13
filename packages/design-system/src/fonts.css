@@ -1,26 +1,32 @@
 /* ============================================================================
  * @dreamward/design-system — fonts.css
- * Loads all brand fonts in a single Google Fonts call.
- * Applies Rubik automatically when the document/element direction is RTL.
+ * Poppins (Latin) + Rubik (Hebrew, variable 300–800) + JetBrains Mono, in one
+ * Google Fonts call. In LTR the stack is Poppins → Rubik, so Hebrew words in
+ * English text still render in Rubik. In RTL Rubik leads, so Latin words in a
+ * Hebrew sentence share its rhythm.
  * ========================================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Rubik:wght@300..800&family=JetBrains+Mono:wght@400;500&display=swap');
 
-/* Body inherits sans by default; RTL contexts swap to Rubik */
-html        { font-family: var(--rz-font-sans); }
+html        { font-family: var(--rz-font-sans); font-optical-sizing: auto; }
 [dir="rtl"] { font-family: var(--rz-font-rtl); }
+[dir="ltr"] { font-family: var(--rz-font-sans); }   /* an English island inside the Hebrew app */
 
-/* Heading defaults — overridable per-component
- * line-height 1.25 prevents descender clipping (g, y, p, q) on Poppins Bold,
- * especially with background-clip:text gradient treatments.               */
+/* Headings: tighter tracking in Latin only — Hebrew is never letter-spaced. */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--rz-font-display);
   font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.015em;
+  line-height: var(--rz-lh-heading);
+  letter-spacing: -0.018em;
+  text-wrap: balance;
 }
+:is(h1, h2, h3, h4, h5, h6):dir(rtl) {
+  font-family: var(--rz-font-rtl);
+  letter-spacing: 0;
+}
+p { text-wrap: pretty; }
 
-/* Code defaults */
-code, kbd, samp, pre {
-  font-family: var(--rz-font-mono);
-}
+/* Numbers that change (scores, counts) shouldn't jiggle. */
+.tabular, time, [data-numeric] { font-variant-numeric: tabular-nums; }
+
+code, kbd, samp, pre { font-family: var(--rz-font-mono); }

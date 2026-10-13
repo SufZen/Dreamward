@@ -16,9 +16,10 @@ export function AssistantLauncher() {
           onClick={() => openPanel()}
           title={lang === 'he' ? 'שיחה עם Clarity' : 'Talk with Clarity'}
           aria-label={lang === 'he' ? 'שיחה עם Clarity' : 'Talk with Clarity'}
+          data-tour="clarity"
           className={cn(
-            'fixed bottom-6 z-40 flex h-14 w-14 items-center justify-center rounded-full',
-            'shadow-glow ring-1 ring-[color:var(--rz-border-accent)] transition-transform hover:scale-105',
+            'fixed bottom-6 z-30 flex h-14 w-14 items-center justify-center rounded-full',
+            'shadow-glow ring-1 ring-[color:var(--rz-border-accent)] rz-press transition-transform duration-spring ease-spring hover:scale-105',
             'end-6',
           )}
         >

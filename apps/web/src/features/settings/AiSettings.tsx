@@ -111,7 +111,7 @@ function ProviderForm({ initial, onClose }: { initial: FormState; onClose: () =>
           <div className="flex flex-col gap-2">
             {(['cloud', 'router', 'local', 'custom'] as const).map((group) => (
               <div key={group} className="flex flex-wrap items-center gap-2">
-                <span className="w-20 text-2xs font-mono uppercase tracking-wider text-fg-faint">
+                <span className="w-20 text-xs font-medium text-fg-subtle">
                   {lang === 'he'
                     ? { cloud: 'ענן', router: 'נתב', local: 'מקומי', custom: 'אחר' }[group]
                     : { cloud: 'cloud', router: 'router', local: 'local', custom: 'other' }[group]}
@@ -196,7 +196,7 @@ function ProviderForm({ initial, onClose }: { initial: FormState; onClose: () =>
           <select
             value={form.toolsMode}
             onChange={(e) => setForm({ ...form, toolsMode: e.target.value as ToolsMode })}
-            className="h-9 rounded-md border border-border bg-surface px-2 text-sm text-foreground focus:border-primary focus:outline-none"
+            className="rz-select h-9 rounded-md border border-border bg-surface px-2 text-sm text-foreground"
           >
             {TOOLS_MODES.map((m) => (
               <option key={m} value={m}>

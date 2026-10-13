@@ -137,7 +137,7 @@ export function Toolbar({ editor }: { editor: Editor }) {
             onChange={(e) => setYtUrl(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addYoutube()}
             placeholder="https://youtube.com/watch?v=…"
-            className="w-56 rounded border border-border bg-surface px-2 py-1 text-sm focus:border-primary focus:outline-none"
+            className="w-56 rounded border border-border bg-surface px-2 py-1 text-sm focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-[color:var(--rz-accent-ring)] transition-[border-color,box-shadow]"
           />
           <button type="button" onClick={addYoutube} className="rounded bg-primary px-2 text-sm text-[color:var(--rz-accent-fg)]">
             {he ? 'הוסף' : 'Add'}

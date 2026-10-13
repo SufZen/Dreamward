@@ -52,7 +52,13 @@ export function useCreateGoal() {
 export function useUpdateGoal() {
   const invalidate = useInvalidateGoals();
   return useMutation({
-    mutationFn: (vars: { id: string; title?: string; description?: string | null; categoryId?: string | null }) =>
+    mutationFn: (vars: {
+      id: string;
+      title?: string;
+      description?: string | null;
+      categoryId?: string | null;
+      targetDate?: number | null;
+    }) =>
       api.put<Goal>(`/goals/${vars.id}`, { ...vars, id: undefined }),
     onSuccess: invalidate,
   });

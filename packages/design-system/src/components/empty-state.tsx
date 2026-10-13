@@ -4,31 +4,61 @@ import { cn } from '../lib/cn';
 export interface EmptyStateProps {
   title: string;
   hint?: string;
-  /** optional custom icon/illustration; defaults to a book + sparkle motif */
+  /** optional custom icon/illustration; defaults to the steps rising to the star */
   icon?: ReactNode;
   action?: ReactNode;
   className?: string;
 }
 
-/** Friendly empty state with a soft inline-SVG illustration (token-colored). */
+/** An empty page is an invitation: the steps toward the star, drawn as it appears. */
 export function EmptyState({ title, hint, icon, action, className }: EmptyStateProps) {
   return (
-    <div className={cn('flex flex-col items-center justify-center gap-3 px-6 py-12 text-center', className)}>
-      <div className="text-primary opacity-90">{icon ?? <BookSparkle />}</div>
-      <p className="text-sm font-medium text-foreground">{title}</p>
-      {hint && <p className="max-w-xs text-xs text-fg-muted">{hint}</p>}
-      {action && <div className="mt-1">{action}</div>}
+    <div className={cn('rz-stagger flex flex-col items-center justify-center gap-3 px-6 py-12 text-center', className)}>
+      <div style={{ '--i': 0 } as React.CSSProperties}>{icon ?? <StepsToStar />}</div>
+      <p className="text-md font-medium text-foreground" style={{ '--i': 1 } as React.CSSProperties}>
+        {title}
+      </p>
+      {hint && (
+        <p className="max-w-xs text-sm text-fg-muted" style={{ '--i': 2 } as React.CSSProperties}>
+          {hint}
+        </p>
+      )}
+      {action && (
+        <div className="mt-2" style={{ '--i': 3 } as React.CSSProperties}>
+          {action}
+        </div>
+      )}
     </div>
   );
 }
 
-function BookSparkle() {
+const STEPS = [
+  { cx: 14, cy: 54, r: 2.5 },
+  { cx: 24, cy: 46, r: 3 },
+  { cx: 34, cy: 38, r: 3.5 },
+  { cx: 44, cy: 30, r: 4 },
+];
+
+/** The brand motif: four steps growing as they rise toward the north star. */
+function StepsToStar() {
   return (
-    <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      <rect x="14" y="12" width="36" height="40" rx="3" stroke="currentColor" strokeWidth="2.5" opacity="0.55" />
-      <path d="M32 14v38" stroke="currentColor" strokeWidth="2.5" opacity="0.35" />
-      <path d="M20 24h7M20 31h7M37 24h7M37 31h7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.45" />
-      <path d="M46 8l1.6 4.4L52 14l-4.4 1.6L46 20l-1.6-4.4L40 14l4.4-1.6L46 8z" fill="currentColor" />
+    <svg width="72" height="72" viewBox="0 0 72 72" fill="none" aria-hidden="true" className="dw-empty-mark">
+      <circle cx="56" cy="16" r="14" fill="var(--rz-accent-soft)" className="dw-empty-mark__halo" />
+      {STEPS.map((s, i) => (
+        <circle
+          key={i}
+          {...s}
+          fill="var(--rz-fg-faint)"
+          className="dw-empty-mark__step"
+          style={{ '--i': i } as React.CSSProperties}
+        />
+      ))}
+      {/* compass star: the vertical ray is longer than the horizontal one */}
+      <path
+        d="M56 4 L58.2 13.8 L66 16 L58.2 18.2 L56 28 L53.8 18.2 L46 16 L53.8 13.8 Z"
+        fill="var(--rz-accent)"
+        className="dw-empty-mark__star"
+      />
     </svg>
   );
 }

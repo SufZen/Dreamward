@@ -9,7 +9,7 @@ import {
   type Chapter,
   type OnboardingStep,
 } from '@dreamward/shared';
-import { Button, Card, Input, Textarea, buttonVariants, cn } from '@dreamward/design-system';
+import { Button, Card, Input, Textarea, buttonVariants, cn, PageLoader, toast } from '@dreamward/design-system';
 import { api } from '@/lib/api';
 import { useLang } from '@/lib/lang';
 import { Stepper, type StepperStep } from '@/components/Stepper';
@@ -58,7 +58,7 @@ export function StartPage() {
   const { data: categories } = useCategories();
   const ready = onboarding !== undefined && chapter !== undefined && latest !== undefined && categories !== undefined;
 
-  if (!ready) return <p className="text-fg-muted">{t('loading')}</p>;
+  if (!ready) return <PageLoader label={t('loading')} />;
   return <Flow chapter={chapter} />;
 }
 
@@ -208,7 +208,15 @@ function Flow({ chapter }: { chapter: Chapter | null }) {
       writeSession(IKIGAI_SEEN_KEY, null);
     }, () => setDone(true));
 
-  const notNow = () => setStatus.mutate('dismissed', { onSuccess: () => navigate('/') });
+  const notNow = () =>
+    setStatus.mutate('dismissed', {
+      onSuccess: () => {
+        navigate('/');
+        toast(he ? 'אפשר לחזור להתחלה המודרכת מההגדרות' : 'You can reopen the guided start from Settings', {
+          action: { label: he ? 'להגדרות' : 'Settings', onClick: () => navigate('/settings') },
+        });
+      },
+    });
 
   /* ── render ───────────────────────────────────────────────────────────── */
   if (done) {
@@ -246,7 +254,7 @@ function Flow({ chapter }: { chapter: Chapter | null }) {
     <div className="mx-auto flex max-w-3xl flex-col gap-6 pb-24 md:pb-0">
       <header className="flex items-center justify-between gap-4">
         <div className="flex flex-col">
-          <span className="text-xs uppercase tracking-wide text-fg-faint">{he ? 'התחלה מודרכת' : 'Guided start'}</span>
+          <span className="text-xs font-medium text-fg-subtle">{he ? 'התחלה מודרכת' : 'Guided start'}</span>
           <span className="text-sm text-fg-muted">{he ? 'כ-10 דקות. אפשר לעצור ולחזור.' : 'About 10 minutes. Stop and come back anytime.'}</span>
         </div>
         <Button variant="ghost" onClick={notNow} loading={setStatus.isPending && !saving}>
@@ -289,11 +297,17 @@ function Flow({ chapter }: { chapter: Chapter | null }) {
                   ? 'דירוג מהיר ומהבטן, 1–10 לכל תחום. אפשר לדלג על תחומים.'
                   : 'A quick gut rating, 1–10 for each area. Skip any area you like.'}
               </p>
-              <div className="flex flex-col gap-4">
+              <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
                 {(categories ?? []).map((c) => (
                   <div key={c.id} className="flex flex-col gap-1">
-                    <span className="text-sm font-medium">{areaLabel(c.id)}</span>
+                    <span className="flex items-center justify-between gap-2 text-sm font-medium">
+                      {areaLabel(c.id)}
+                      <span className="tabular text-xs font-normal text-fg-subtle">
+                        {scoreOf(c.id) ? `${scoreOf(c.id)}/10` : he ? 'לא דורג' : 'Not rated'}
+                      </span>
+                    </span>
                     <ScoreSlider
+                      compact
                       label={areaLabel(c.id)}
                       value={scoreOf(c.id) ?? 0}
                       onChange={(v) => setScores((s) => ({ ...s, [c.id]: v }))}

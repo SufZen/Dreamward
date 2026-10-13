@@ -1,19 +1,16 @@
-import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Plus, Search, Trash2 } from 'lucide-react';
-import { Button, Card, Input, cn } from '@dreamward/design-system';
+import { Button, Card, Input, PageHeader, cn } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
 import { useAutosave } from '@/lib/useAutosave';
+import { api } from '@/lib/api';
+import { useUndoableDelete } from '@/lib/useUndoableDelete';
 import { SaveIndicator } from '@/components/SaveIndicator';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
-import {
-  useJournal,
-  useJournalEntry,
-  useCreateJournal,
-  useUpdateJournal,
-  useDeleteJournal,
-  type JournalEntry,
-} from './hooks';
+import { useJournal, useJournalEntry, useCreateJournal, useUpdateJournal, type JournalEntry } from './hooks';
+import { htmlToText } from '@/lib/sanitize';
 
 function fmtDate(ms: number, lang: string) {
   return new Date(ms).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-GB', {
@@ -30,8 +27,31 @@ function EntryEditor({ entry }: { entry: JournalEntry }) {
   const [html, setHtml] = useState(entry.bodyRichtext);
 
   const status = useAutosave(JSON.stringify({ title, html }), async () =>
-    update.mutateAsync({ id: entry.id, title: title || null, bodyRichtext: html }),
+    update.mutateAsync({
+      id: entry.id,
+      title: title || null,
+      bodyRichtext: html,
+    }),
   );
+
+  // An entry left completely empty is removed when you move on, so abandoned
+  // drafts don't pile up as "(untitled)".
+  const qc = useQueryClient();
+  const latest = useRef({ title, html });
+  latest.current = { title, html };
+  // Deferred, so a remount (React StrictMode in dev) cancels it.
+  const pendingDelete = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (pendingDelete.current) clearTimeout(pendingDelete.current);
+    return () => {
+      const { title: t, html: h } = latest.current;
+      if (t.trim() || htmlToText(h)) return;
+      pendingDelete.current = setTimeout(() => {
+        void api.del(`/journal/${entry.id}`).then(() => qc.invalidateQueries({ queryKey: ['journal'] }));
+      }, 300);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="flex flex-col gap-3">
@@ -59,26 +79,55 @@ export function JournalPage() {
   const { data: entries, isLoading } = useJournal(q);
   const { data: entry } = useJournalEntry(entryId);
   const create = useCreateJournal();
-  const del = useDeleteJournal();
+  const del = useUndoableDelete<JournalEntry>({
+    queryKey: ['journal'],
+    remove: (id) => api.del(`/journal/${id}`),
+  });
 
   const newEntry = async () => {
     const created = await create.mutateAsync();
-    navigate(`/journal/${created.id}`);
+    navigate(`/journal/${created.id}`, { replace: true });
   };
 
-  const remove = async (id: string) => {
-    await del.mutateAsync(id);
-    if (entryId === id) navigate('/journal');
+  // ?new=1 (from ⌘K or Today) starts a fresh entry; plain /journal opens today's page if you wrote one.
+  const [params] = useSearchParams();
+  const started = useRef(false);
+  useEffect(() => {
+    if (entryId || started.current) return;
+    if (params.get('new') === '1') {
+      started.current = true;
+      void newEntry();
+      return;
+    }
+    const today = new Date().setHours(0, 0, 0, 0);
+    const todays = !q && entries?.find((e) => e.entryDate >= today);
+    if (todays) {
+      started.current = true;
+      navigate(`/journal/${todays.id}`, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entryId, params, entries]);
+
+  const remove = (e: JournalEntry) => {
+    del(e, e.title || (lang === 'he' ? '(ללא כותרת)' : '(untitled)'));
+    if (entryId === e.id) navigate('/journal');
   };
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-4xl font-bold">{t('journal')}</h1>
-        <Button onClick={newEntry} disabled={create.isPending}>
-          <Plus size={15} /> {lang === 'he' ? 'רשומה חדשה' : 'New entry'}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('journal')}
+        description={
+          lang === 'he'
+            ? 'מקום לחשוב בקול. שורה אחת ביום מספיקה.'
+            : 'A place to think out loud. One line a day is enough.'
+        }
+        actions={
+          <Button onClick={newEntry} loading={create.isPending}>
+            <Plus size={15} /> {lang === 'he' ? 'רשומה חדשה' : 'New entry'}
+          </Button>
+        }
+      />
 
       <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
         <div className="flex flex-col gap-3">
@@ -114,10 +163,10 @@ export function JournalPage() {
                   <button
                     onClick={(ev) => {
                       ev.stopPropagation();
-                      void remove(e.id);
+                      remove(e);
                     }}
-                    className="hidden text-fg-faint hover:text-danger group-hover:block"
-                    aria-label="delete entry"
+                    className="rounded-xs p-1 text-fg-faint opacity-0 transition-opacity hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
+                    aria-label={lang === 'he' ? 'מחיקת הרשומה' : 'Delete entry'}
                   >
                     <Trash2 size={14} />
                   </button>
@@ -133,12 +182,54 @@ export function JournalPage() {
           {entry ? (
             <EntryEditor key={entry.id} entry={entry} />
           ) : (
-            <p className="text-sm text-fg-faint">
-              {lang === 'he' ? 'בחר רשומה או צור חדשה' : 'Select an entry or create a new one'}
-            </p>
+            <TodayPrompt onStart={newEntry} starting={create.isPending} />
           )}
         </Card>
       </div>
+    </div>
+  );
+}
+
+const PROMPTS = {
+  he: [
+    'מה היה הרגע הטוב של היום?',
+    'מה למדתי על עצמי השבוע?',
+    'על מה אני מכיר תודה עכשיו?',
+    'איזה צעד קטן קירב אותי לחזון?',
+  ],
+  en: [
+    'What was the best moment of today?',
+    'What did I learn about myself this week?',
+    'What am I grateful for right now?',
+    'Which small step moved me toward the vision?',
+  ],
+};
+
+/** No entry open: today's blank page, with a few questions to start from. */
+function TodayPrompt({ onStart, starting }: { onStart: () => void; starting: boolean }) {
+  const { lang } = useLang();
+  const he = lang === 'he';
+  const date = new Date().toLocaleDateString(he ? 'he-IL' : 'en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  });
+  return (
+    <div className="flex flex-col gap-4 py-4">
+      <p className="text-sm text-fg-subtle">{date}</p>
+      <h2 className="text-2xl font-semibold">{he ? 'העמוד של היום עוד ריק' : 'Today’s page is still blank'}</h2>
+      <p className="text-fg-muted">{he ? 'אפשר להתחיל משאלה:' : 'You could start from a question:'}</p>
+      <ul className="flex flex-col gap-2">
+        {PROMPTS[lang].map((p) => (
+          <li key={p} className="flex items-center gap-2 text-fg-muted">
+            <span className="h-1.5 w-1.5 flex-none rounded-full bg-primary" aria-hidden="true" />
+            {p}
+          </li>
+        ))}
+      </ul>
+      <Button className="mt-2 self-start" onClick={onStart} loading={starting}>
+        <Plus size={15} /> {he ? 'להתחיל לכתוב' : 'Start writing'}
+      </Button>
     </div>
   );
 }

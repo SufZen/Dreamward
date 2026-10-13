@@ -71,8 +71,8 @@ Reduced motion shows the static avatar.
 | `--rz-bg` (Ink) | `#0a0a0f` | `#ffffff` | Page |
 | `--rz-bg-sunken` / `--rz-bg-raised` | `#12121a` / `#1a1a24` | `#f5f5f7` / `#ffffff` | Sidebar / cards |
 | `--rz-fg` (Mist) | `#e8e8ed` | `#0a0a0f` | Text |
-| `--rz-fg-muted` | `#9a9ab0` | `#6b6b80` | Secondary text |
-| `--rz-accent` (Gold) | `#ffcc00` | `#cc9900` | The star: actions, focus, highlights |
+| `--rz-fg-muted` | `#a3a3b8` | `#5c5c70` | Secondary text |
+| `--rz-accent` (Gold) | `#ffcc00` | `#eeb300` fill · `#976b03` text | The star: actions, focus, highlights |
 | `--rz-success` / `warning` / `danger` / `info` | green / amber / red / blue | darker versions | Status only |
 
 - **Gold is scarce.** Use it for the one thing that matters on a screen: the
@@ -84,10 +84,12 @@ Reduced motion shows the static avatar.
 
 ## Type
 
-- **Poppins** for Latin text (headings 600, body 400/500), and **Rubik**
-  whenever the direction is RTL. `JetBrains Mono` for data and code.
-- Headings use `line-height: 1.25` and `letter-spacing: -0.015em`. The type
-  scale is in `tokens.css` (`--rz-text-*`).
+- **Poppins** for Latin text (headings 600, body 400/500) and **Rubik** for
+  Hebrew, in one font stack so mixed lines just work; in RTL, Rubik leads.
+  `JetBrains Mono` for code only, never for labels.
+- Latin headings use `letter-spacing: -0.018em`; Hebrew is never
+  letter-spaced. Labels are sentence case, never all caps. The type scale is
+  in `tokens.css` (`--rz-text-*`).
 - Long-form writing (`.dw-prose`) is capped at 72 characters wide with
   line-height 1.75. Every paragraph finds its own direction, so Hebrew and
   English can share a page.
@@ -104,9 +106,10 @@ Reduced motion shows the static avatar.
    Never behind long text.
 4. **Icons:** lucide line icons with rounded caps, 1.5–2 px strokes, 16–20 px
    in UI. No emoji as section markers.
-5. **Motion:** calm. Use `--rz-ease-out` at 180–320 ms. The only celebration
-   is the star brightening when something is completed. Everything respects
-   `prefers-reduced-motion`.
+5. **Motion:** it answers the person. Celebrations are the star's light,
+   scaled to the moment: a spark for an action, a burst for a goal, a sky for
+   a chapter. Durations, springs and reduced-motion rules are in
+   [design-system.md](design-system.md#motion).
 
 ## Voice
 

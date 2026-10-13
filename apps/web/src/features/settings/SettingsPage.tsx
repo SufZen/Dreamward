@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Compass, KeyRound, Languages } from 'lucide-react';
-import { Button, Card, Input } from '@dreamward/design-system';
+import { Link, useNavigate } from 'react-router-dom';
+import { Compass, History, KeyRound, Languages, Waves } from 'lucide-react';
+import { Button, Card, Input, PageHeader, buttonVariants } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
 import { api, ApiError } from '@/lib/api';
 import { AiSettings } from './AiSettings';
@@ -9,6 +9,8 @@ import { ApiKeysSettings } from './ApiKeysSettings';
 import { RoutinesSettings } from './RoutinesSettings';
 import { DataSettings } from './DataSettings';
 import { isDesktop } from '@/lib/desktop';
+import { useMotionPreference } from '@/lib/motion';
+import { startTour } from '@/features/tour/Tour';
 import { useSetOnboardingStatus } from '@/features/onboarding/hooks';
 
 export function SettingsPage() {
@@ -19,6 +21,7 @@ export function SettingsPage() {
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
   const setOnboarding = useSetOnboardingStatus();
+  const [motion, setMotion] = useMotionPreference();
 
   const changePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +51,14 @@ export function SettingsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-4xl font-bold">{t('settings')}</h1>
+      <PageHeader
+        title={t('settings')}
+        description={
+          lang === 'he'
+            ? 'Clarity, הרגלים אוטומטיים, גישה לסוכנים, הנתונים שלך והמראה.'
+            : 'Clarity, routines, agent access, your data, and how Dreamward looks.'
+        }
+      />
 
       <AiSettings />
 
@@ -57,6 +67,22 @@ export function SettingsPage() {
       <ApiKeysSettings />
 
       <DataSettings />
+
+      <Card className="flex flex-wrap items-center gap-4 p-6">
+        <div className="min-w-0 flex-1">
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
+            <History size={18} className="text-primary" /> {t('snapshots')}
+          </h2>
+          <p className="mt-1 text-sm text-fg-muted">
+            {lang === 'he'
+              ? 'עותק של כל הספר ברגע נתון — להשוואה, או כדי לחזור אחורה.'
+              : 'A copy of your whole book at a moment in time — to compare, or to go back.'}
+          </p>
+        </div>
+        <Link to="/snapshots" className={buttonVariants({ variant: 'secondary', size: 'sm' })}>
+          {lang === 'he' ? 'לתמונות המצב' : 'Open snapshots'}
+        </Link>
+      </Card>
 
       <Card className="p-6">
         <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold">
@@ -75,6 +101,17 @@ export function SettingsPage() {
         >
           {lang === 'he' ? 'פתח את ההתחלה המודרכת' : 'Open guided start'}
         </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="ms-2"
+          onClick={() => {
+            navigate('/');
+            setTimeout(startTour, 300);
+          }}
+        >
+          {lang === 'he' ? 'סיור במערכת' : 'Take the tour'}
+        </Button>
       </Card>
 
       <Card className="p-6">
@@ -88,6 +125,37 @@ export function SettingsPage() {
           <Button variant={lang === 'en' ? 'primary' : 'secondary'} size="sm" onClick={() => setLang('en')}>
             English
           </Button>
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold">
+          <Waves size={18} className="text-primary" /> {lang === 'he' ? 'תנועה' : 'Motion'}
+        </h2>
+        <p className="mb-4 text-sm text-fg-muted">
+          {lang === 'he'
+            ? 'אנימציות קטנות מראות מה השתנה. "מופחתת" מחליפה אותן במעבר עמעום קצר.'
+            : 'Small animations show what changed. Reduced swaps them for a short fade.'}
+        </p>
+        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={lang === 'he' ? 'תנועה' : 'Motion'}>
+          {(
+            [
+              ['system', 'כמו במכשיר', 'Match my device'],
+              ['reduced', 'מופחתת', 'Reduced'],
+              ['full', 'מלאה', 'Full'],
+            ] as const
+          ).map(([value, he, en]) => (
+            <Button
+              key={value}
+              role="radio"
+              aria-checked={motion === value}
+              variant={motion === value ? 'primary' : 'secondary'}
+              size="sm"
+              onClick={() => setMotion(value)}
+            >
+              {lang === 'he' ? he : en}
+            </Button>
+          ))}
         </div>
       </Card>
 

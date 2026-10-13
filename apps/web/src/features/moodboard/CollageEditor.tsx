@@ -15,7 +15,7 @@ import {
   X,
 } from 'lucide-react';
 import { TEMPLATES, EXPORT_FORMATS, type ExportFormatId } from '@dreamward/shared';
-import { Button, Card, cn } from '@dreamward/design-system';
+import { Button, Card, cn, PageLoader } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
 import { useAutosave } from '@/lib/useAutosave';
 import { SaveIndicator } from '@/components/SaveIndicator';
@@ -164,7 +164,7 @@ export function CollageEditor() {
     [],
   );
 
-  if (isLoading || !board || items === null) return <p className="text-fg-muted">{t('loading')}</p>;
+  if (isLoading || !board || items === null) return <PageLoader label={t('loading')} />;
 
   const scale = viewW / board.canvasWidth;
   const viewH = board.canvasHeight * scale;
@@ -264,7 +264,7 @@ export function CollageEditor() {
           <select
             defaultValue={board.templateId ?? ''}
             onChange={(e) => e.target.value && applyTemplate(e.target.value)}
-            className="h-8 rounded-md border border-border bg-surface px-2 text-xs text-foreground focus:border-primary focus:outline-none"
+            className="rz-select h-8 rounded-md border border-border bg-surface px-2 text-xs text-foreground"
           >
             <option value="">{lang === 'he' ? 'תבנית…' : 'Template…'}</option>
             {TEMPLATES.map((tp) => (
@@ -371,7 +371,7 @@ export function CollageEditor() {
 
         {/* asset library */}
         <Card className="max-h-[70vh] overflow-y-auto p-2">
-          <p className="px-1 pb-2 text-2xs font-mono uppercase tracking-wider text-fg-faint">
+          <p className="px-1 pb-2 text-xs font-medium text-fg-subtle">
             {lang === 'he' ? 'ספריית תמונות' : 'Asset library'}
           </p>
           <div className="grid grid-cols-2 gap-2">

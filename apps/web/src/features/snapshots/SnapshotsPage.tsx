@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Camera, GitCompareArrows } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Card, Input, Badge } from '@dreamward/design-system';
+import { Button, Card, Input, Badge, PageHeader } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
 import { api } from '@/lib/api';
 
@@ -74,7 +74,14 @@ export function SnapshotsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-4xl font-bold">{t('snapshots')}</h1>
+      <PageHeader
+        title={t('snapshots')}
+        description={
+          lang === 'he'
+            ? 'עותק של כל הספר ברגע נתון — כדי לראות איך השתנית, או לחזור אחורה.'
+            : 'A copy of your whole book at a moment in time — to see how you’ve changed, or to go back.'
+        }
+      />
 
       <Card className="p-5">
         <form onSubmit={doCapture} className="flex gap-3">

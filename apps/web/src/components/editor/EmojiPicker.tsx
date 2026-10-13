@@ -33,7 +33,7 @@ export function EmojiPicker({ onPick, onClose }: Props) {
     >
       {GROUPS.map((g) => (
         <div key={g.name} className="mb-1.5">
-          <div className="px-1 pb-1 text-2xs font-mono uppercase tracking-wider text-fg-faint">{g.name}</div>
+          <div className="px-1 pb-1 text-xs font-medium text-fg-subtle">{g.name}</div>
           <div className="grid grid-cols-8 gap-0.5">
             {g.chars.map((ch, i) => (
               <button
