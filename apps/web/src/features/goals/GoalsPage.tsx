@@ -246,8 +246,8 @@ function GoalCard({ goal, progress, highlight }: { goal: Goal; progress?: GoalPr
             />
           )}
           <div className="min-w-0 flex-1">
-            <p dir="auto" className={cn('truncate font-medium', achieved && 'text-fg-muted')}>
-              {goal.title}
+            <p className={cn('truncate font-medium', achieved && 'text-fg-muted')}>
+              <bdi>{goal.title}</bdi>
             </p>
             <p className="flex flex-wrap items-center gap-x-2 text-xs text-fg-subtle">
               {category && <span>{pickLabel(lang, category.labelEn, category.labelHe)}</span>}

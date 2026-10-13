@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Compass, KeyRound, Languages, Waves } from 'lucide-react';
-import { Button, Card, Input, PageHeader } from '@dreamward/design-system';
+import { Link, useNavigate } from 'react-router-dom';
+import { Compass, History, KeyRound, Languages, Waves } from 'lucide-react';
+import { Button, Card, Input, PageHeader, buttonVariants } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
 import { api, ApiError } from '@/lib/api';
 import { AiSettings } from './AiSettings';
@@ -66,6 +66,22 @@ export function SettingsPage() {
       <ApiKeysSettings />
 
       <DataSettings />
+
+      <Card className="flex flex-wrap items-center gap-4 p-6">
+        <div className="min-w-0 flex-1">
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
+            <History size={18} className="text-primary" /> {t('snapshots')}
+          </h2>
+          <p className="mt-1 text-sm text-fg-muted">
+            {lang === 'he'
+              ? 'עותק של כל הספר ברגע נתון — להשוואה, או כדי לחזור אחורה.'
+              : 'A copy of your whole book at a moment in time — to compare, or to go back.'}
+          </p>
+        </div>
+        <Link to="/snapshots" className={buttonVariants({ variant: 'secondary', size: 'sm' })}>
+          {lang === 'he' ? 'לתמונות המצב' : 'Open snapshots'}
+        </Link>
+      </Card>
 
       <Card className="p-6">
         <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold">

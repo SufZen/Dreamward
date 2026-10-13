@@ -53,7 +53,7 @@ Three tiers, in `src/tokens.css`:
 
 | Tier | Prefix | Example | Who uses it |
 |---|---|---|---|
-| 1 · primitives | `--dw-ink-*`, `--dw-gold-*`, `--dw-day-*`, `--dw-mist-*` | `--dw-ink-3: oklch(0.205 0.038 278)` | Only tier 2 and the brand layer |
+| 1 · primitives | `--dw-ink-*`, `--dw-gold-*`, `--dw-day-*`, `--dw-mist-*` | `--dw-ink-3: #1a1a24` | Only tier 2 and the brand layer |
 | 2 · semantic | `--rz-*` | `--rz-bg-raised`, `--rz-fg-muted`, `--rz-accent` | Feature code, via Tailwind classes (`bg-card`, `text-fg-muted`, `bg-primary`) |
 | 3 · component | `.rz-*`, `.dw-*` classes | `.rz-btn--primary`, `.dw-check` | Components |
 
@@ -64,26 +64,27 @@ from v1, so screens upgrade without changes.
 
 | Role | Dark | Light |
 |---|---|---|
-| Page | ink-1 `#090b19` | day-1 `#f5f7fb` |
-| Sidebar · sunken | ink-2 `#0e1020` | day-2 `#eef0f6` |
-| Card | ink-3 `#131528` | white |
-| Input · popover | ink-4 `#1d1f36` | day-2 |
-| Text | mist-1 `#ececf5` | dusk-1 `#121426` |
+| Page | ink-1 `#0a0a0f` | white |
+| Sidebar · sunken | ink-2 `#12121a` | day-2 `#f5f5f7` |
+| Card | ink-3 `#1a1a24` | white |
+| Input · popover | ink-4 `#22222e` | day-2 |
+| Text | mist-1 `#e8e8ed` | dusk-1 `#0a0a0f` |
 | Primary (fill) | gold-9 `#ffcc00` | gold-8 `#eeb300` |
 | Gold as text | gold-9 | gold-11 `#976b03` |
-| Horizon (ambient only) | violet `oklch(.50 .16 290)` → dawn `oklch(.80 .13 70)` | lighter tints |
+| Horizon (ambient only) | soft gold glow `rgba(255,204,0,.14)` | `rgba(204,153,0,.12)` |
 
-The ink has a blue-violet hue (278) so the night reads as sky, not as an
-unlit room. Dawn and violet appear only in ambient light (`.dw-sky`,
-featured cards), never on a control.
+The ink is the original neutral near-black: depth comes from lighter steps
+and a 1 px top highlight, not from tint. (A blue-violet ink was tried and
+rolled back; the neutral night reads calmer.) The horizon glow appears only
+in ambient light (`.dw-sky`, featured cards), never on a control.
 
 ### Contrast (WCAG 2.2, measured)
 
 | Pair | Ratio |
 |---|---|
-| Body text on page (dark) | 16.7 : 1 |
-| Muted text on card (dark) | 9.6 : 1 |
-| Subtle text on card (dark) | 6.7 : 1 |
+| Body text on page (dark) | 16.6 : 1 |
+| Muted text on card (dark) | 7.0 : 1 |
+| Subtle text on card (dark) | 5.4 : 1 |
 | Faint text on card / input (dark) | 4.9 / 4.6 : 1 |
 | Gold text on card (dark) | 11.9 : 1 |
 | Ink on gold button (dark) | 13.0 : 1 |
@@ -174,6 +175,9 @@ From `@dreamward/design-system`:
 | `Input`, `Textarea` | Gold focus ring (3 px, 45% gold). `aria-invalid` turns it red. |
 | `.rz-select` | Class for native `<select>`: our chevron at the inline end (flips in RTL), same focus ring. |
 | `Badge` | Rounded pill, sentence case. |
+| `PageHeader` | Title, one sentence of purpose, optional breadcrumb (`eyebrow`) and icon, and the primary action at the inline end. Every page uses it. |
+| `Dialog` | Native `<dialog>`: focus trap, Esc, inert page behind; centre or top placement. |
+| `toast()` / `Toaster` | Confirmation with an optional action (Undo, View). At most three; they leave on their own. |
 | `Skeleton`, `PageLoader` | A slow band of light, not a pulse. `PageLoader` is page-shaped and waits 250 ms before appearing, so fast loads never flash. |
 | `EmptyState` | The steps appear one by one, then the star. An empty page is an invitation. |
 | `Check` | Completion: the ring fills gold, the stroke draws in 220 ms, a step-sized spark flies. Accessible `role="checkbox"`. |
@@ -190,6 +194,45 @@ Brand-layer classes (`themes/dreamward.css`): `.dw-sky` (horizon + starfield),
 `.dw-steps` (progress dots; the last one is the star), `.dw-prose` (reading
 rhythm, per-paragraph direction), `.dw-nav-item` (the gold "current step"
 marker), `.dw-wheel-shape` (the life wheel springs between ratings).
+
+## Navigation and flows
+
+The interface is organised around one question per screen.
+
+| Place | Answers | What's there |
+|---|---|---|
+| **Today** (home) | What do I do now? | Today's steps, ranked overdue → today → next 3 days → toward a focus area, checkable in place, with quick-add; one line in the journal; goals in motion; where you stand (focus areas and biggest gaps, with a nudge when the wheel is over a month old); Clarity's briefing and suggestions when it's set up. |
+| **Current chapter** | What is this season for? | The chapter, its focus and maintenance areas, and the life wheel with **Rate all areas**: twelve scales in one place, the wheel pinned beside them. |
+| **My book** | What have I written? | Foundations (cover, dream life, IKIGAI, opening and closing pages) and the twelve areas with score, focus and goal count. Every book page is reachable from here. |
+| **Goals** | Where am I going? | Each goal holds its steps: add, check, progress ring, target date, edit in place. *Achieved* celebrates; the review outcome is secondary. |
+| **Actions** | Everything I committed to | The full list with filters, priorities and ordering. |
+| **Journal** | What's on my mind? | Opens on today's page; prompts when it's blank; empty drafts clean themselves up. |
+| **Vision boards** | What does it look like? | Boards, with the image library one link away. |
+
+The sidebar shows these seven, then the chapter's **focus areas** with their
+scores; the other areas are one click away. Everything else (gallery,
+snapshots, any page or area) is in the command palette, and Snapshots is
+also in Settings.
+
+**Command palette (⌘K / Ctrl K, or the search field in the sidebar).** Jump
+to any page or area, switch theme or language, or type a title and press
+Enter to add it as a step or a goal. New items confirm with a toast.
+
+**Trust rules.**
+- Writing never waits on a button: editors autosave, flush when you leave,
+  and warn before the tab closes mid-save.
+- Deletes don't ask "are you sure?": they happen at once and offer **Undo**
+  for six seconds; the server delete lands only when the toast runs out.
+- Every create, complete and delete confirms with a toast.
+
+**Area pages connect the vision to doing:** the score and its trend, the
+area's goals and next steps ("In motion"), and each section; empty ones show
+the question that gets you writing.
+
+**Bilingual lists.** Titles in lists are wrapped in `<bdi>`: a Hebrew title in
+the English UI (or the reverse) keeps its own word order but aligns with the
+row, so metadata and titles line up.
+
 
 ## Patterns in the app
 

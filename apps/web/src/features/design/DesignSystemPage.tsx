@@ -206,7 +206,7 @@ export function DesignSystemPage() {
         </div>
       </header>
 
-      <Section title="Colour" lede="OKLCH ramps (tier 1) feed semantic tokens (tier 2). The ink is a blue-violet night, raised by lightness; gold is the one star on a screen.">
+      <Section title="Colour" lede="OKLCH ramps (tier 1) feed semantic tokens (tier 2). The ink is a neutral night, raised by lightness; gold is the one star on a screen.">
         <div className="space-y-4">
           {RAMPS.map((r) => (
             <div key={r.name} className="grid items-center gap-3 sm:grid-cols-[12rem_1fr]">

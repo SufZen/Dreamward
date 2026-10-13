@@ -48,7 +48,7 @@ export function AppShell() {
         </header>
         <main className="flex-1 overflow-y-auto">
           {/* view-transition-name: only the page moves on navigation; the shell stays still */}
-          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8" style={{ viewTransitionName: 'page' }}>
+          <div className="mx-auto max-w-4xl px-4 pb-28 pt-6 sm:px-6 sm:pt-8" style={{ viewTransitionName: 'page' }}>
             <Suspense fallback={<PageLoader label={t('loading')} />}>
               <Outlet />
             </Suspense>

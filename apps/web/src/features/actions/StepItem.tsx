@@ -51,13 +51,12 @@ export function StepItem({
       />
       <div className="min-w-0 flex-1">
         <p
-          dir="auto"
           className={cn(
             'truncate transition-colors duration-moderate',
             done && 'text-fg-subtle line-through decoration-[color:var(--rz-fg-faint)]',
           )}
         >
-          {action.title}
+          <bdi>{action.title}</bdi>
         </p>
         {(goalTitle || due) && (
           <p className="flex flex-wrap items-center gap-x-2 text-xs text-fg-subtle">
@@ -67,8 +66,8 @@ export function StepItem({
               </span>
             )}
             {goalTitle && goalId && (
-              <Link to={`/goals#goal-${goalId}`} dir="auto" className="truncate hover:text-foreground">
-                {goalTitle}
+              <Link to={`/goals#goal-${goalId}`} className="truncate hover:text-foreground">
+                <bdi>{goalTitle}</bdi>
               </Link>
             )}
           </p>

@@ -84,9 +84,7 @@ export function TodayPage() {
             <>
               <Link to="/chapter" className="inline-flex items-center gap-1.5 hover:text-foreground">
                 <Compass size={16} className="text-primary" />
-                <span dir="auto" className="font-medium text-foreground">
-                  {chapter.title}
-                </span>
+                <bdi className="font-medium text-foreground">{chapter.title}</bdi>
               </Link>
               {focus.map((id) => (
                 <Badge key={id} dot className="[&>span:first-child]:bg-primary">
@@ -389,8 +387,8 @@ function GoalsInMotion() {
                     ariaLabel={pct == null ? (he ? 'אין צעדים' : 'No steps yet') : `${pct}%`}
                   />
                   <div className="min-w-0 flex-1">
-                    <p dir="auto" className="truncate text-sm font-medium group-hover:text-primary">
-                      {g.title}
+                    <p className="truncate text-sm font-medium group-hover:text-primary">
+                      <bdi>{g.title}</bdi>
                     </p>
                     <p className="text-xs text-fg-subtle">
                       {pct == null

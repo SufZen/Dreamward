@@ -221,8 +221,8 @@ function InMotion({ categoryId }: { categoryId: string }) {
                     stroke={3}
                     ariaLabel={p?.pct != null ? `${p.pct}%` : he ? 'אין צעדים' : 'No steps'}
                   />
-                  <span dir="auto" className="min-w-0 flex-1 truncate text-sm group-hover:text-primary">
-                    {g.title}
+                  <span className="min-w-0 flex-1 truncate text-sm group-hover:text-primary">
+                    <bdi>{g.title}</bdi>
                   </span>
                   {p && p.totalActions > 0 && (
                     <span className="tabular text-xs text-fg-subtle">

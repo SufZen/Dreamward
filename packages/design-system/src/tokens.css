@@ -2,7 +2,7 @@
  * @dreamward/design-system — tokens.css  (v2 · "Night sky")
  *
  * Three tiers:
- *   1. primitives  --dw-ink-*, --dw-gold-*, --dw-dawn-*   raw OKLCH ramps
+ *   1. primitives  --dw-ink-*, --dw-gold-*, --dw-dawn-*   raw colour ramps
  *   2. semantic    --rz-*                                  what the UI asks for
  *   3. component   --btn-*, --card-* …                     in components.css
  * Feature code uses tier 2 (or the Tailwind classes mapped onto it), never

@@ -68,16 +68,12 @@ Reduced motion shows the static avatar.
 
 | Token | Dark | Light | Role |
 |---|---|---|---|
-| `--rz-bg` (Night ink) | `#090b19` | `#f5f7fb` | Page |
-| `--rz-bg-sunken` / `--rz-bg-raised` | `#0e1020` / `#131528` | `#eef0f6` / `#ffffff` | Sidebar / cards |
-| `--rz-fg` (Mist) | `#ececf5` | `#121426` | Text |
-| `--rz-fg-muted` | `#bbbccd` | `#515466` | Secondary text |
+| `--rz-bg` (Ink) | `#0a0a0f` | `#ffffff` | Page |
+| `--rz-bg-sunken` / `--rz-bg-raised` | `#12121a` / `#1a1a24` | `#f5f5f7` / `#ffffff` | Sidebar / cards |
+| `--rz-fg` (Mist) | `#e8e8ed` | `#0a0a0f` | Text |
+| `--rz-fg-muted` | `#a3a3b8` | `#5c5c70` | Secondary text |
 | `--rz-accent` (Gold) | `#ffcc00` | `#eeb300` fill · `#976b03` text | The star: actions, focus, highlights |
 | `--rz-success` / `warning` / `danger` / `info` | green / amber / red / blue | darker versions | Status only |
-
-The interface ink is a blue-violet night (v2, see
-[design-system.md](design-system.md)). The logo files keep their original ink
-`#0a0a0f`, which sits naturally on it.
 
 - **Gold is scarce.** Use it for the one thing that matters on a screen: the
   primary action, the focus area, the current step. Two gold elements

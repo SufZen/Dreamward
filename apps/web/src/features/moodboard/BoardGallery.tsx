@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Images } from 'lucide-react';
-import { Button, Card, Input, PageHeader } from '@dreamward/design-system';
+import { Button, Card, Input, PageHeader, EmptyState, PageLoader } from '@dreamward/design-system';
 import { useLang } from '@/lib/lang';
 import { useBoards, useCreateBoard } from './hooks';
 
@@ -46,7 +46,18 @@ export function BoardGallery() {
       </Card>
 
       {isLoading ? (
-        <p className="text-fg-muted">{t('loading')}</p>
+        <PageLoader label={t('loading')} />
+      ) : !boards?.length ? (
+        <Card className="p-0">
+          <EmptyState
+            title={lang === 'he' ? 'עוד אין לוחות חזון' : 'No vision boards yet'}
+            hint={
+              lang === 'he'
+                ? 'תן ללוח שם למעלה — למשל "הבית שלנו" או "השנה הזו" — ומלא אותו בתמונות ובמילים.'
+                : 'Name a board above — say "Our home" or "This year" — then fill it with images and words.'
+            }
+          />
+        </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {boards?.map((b) => (
