@@ -215,8 +215,10 @@ snapshots, any page or area) is in the command palette, and Snapshots is
 also in Settings.
 
 **Command palette (⌘K / Ctrl K, or the search field in the sidebar).** Jump
-to any page or area, switch theme or language, or type a title and press
-Enter to add it as a step or a goal. New items confirm with a toast.
+to any page or area, find a goal or journal entry by its words (matches are
+listed first, so Enter opens what you already have), switch theme or
+language, or type a title and press Enter to add it as a step or a goal.
+New items confirm with a toast.
 
 **Trust rules.**
 - Writing never waits on a button: editors autosave, flush when you leave,

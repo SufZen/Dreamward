@@ -25,11 +25,12 @@ import { useTheme } from '@/lib/theme';
 import { Icon } from '@/components/Icon';
 import { useCategories } from '@/features/book/hooks';
 import { useCreateAction } from '@/features/actions/hooks';
-import { useCreateGoal } from '@/features/goals/hooks';
+import { useCreateGoal, useGoals } from '@/features/goals/hooks';
+import { useJournal } from '@/features/journal/hooks';
 
 interface Command {
   id: string;
-  group: 'create' | 'go' | 'areas' | 'prefs';
+  group: 'create' | 'found' | 'go' | 'areas' | 'prefs';
   label: string;
   /** extra words that should match (e.g. the other language) */
   keywords?: string;
@@ -56,6 +57,8 @@ export function CommandPalette() {
   const navigate = useNavigate();
   const { mode, toggle: toggleTheme } = useTheme();
   const { data: categories } = useCategories();
+  const { data: goals } = useGoals();
+  const { data: journal } = useJournal();
   const createAction = useCreateAction();
   const createGoal = useCreateGoal();
   const [open, setOpen] = useState(false);
@@ -275,18 +278,42 @@ export function CommandPalette() {
         run: () => toggleLang(),
       },
     ];
+    // Your own content: goals and journal entries, found by title (only when typing).
+    for (const g of goals ?? []) {
+      list.push({
+        id: `goal-${g.id}`,
+        group: 'found',
+        label: g.title,
+        icon: <Target size={16} />,
+        run: () => go(`/goals#goal-${g.id}`),
+      });
+    }
+    for (const j of journal ?? []) {
+      const text = (j.title || j.bodyRichtext.replace(/<[^>]*>/g, ' ')).replace(/s+/g, ' ').trim().slice(0, 80);
+      if (!text) continue;
+      list.push({
+        id: `journal-${j.id}`,
+        group: 'found',
+        label: text,
+        keywords: new Date(j.entryDate).toLocaleDateString(he ? 'he-IL' : 'en-GB'),
+        icon: <NotebookPen size={16} />,
+        run: () => go(`/journal/${j.id}`),
+      });
+    }
     return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [he, lang, categories, mode]);
+  }, [he, lang, categories, mode, goals, journal]);
 
   const text = q.trim();
   const matches = useMemo(() => {
-    if (!text) return commands;
+    if (!text) return commands.filter((c) => c.group !== 'found');
     const needle = text.toLowerCase();
     const hit = commands.filter((c) => `${c.label} ${c.keywords ?? ''}`.toLowerCase().includes(needle));
     // With free text, offer to create it even if no command name matched.
     const creators = commands.filter((c) => c.takesText && !hit.includes(c));
-    return [...hit, ...creators];
+    // keyboard order must match the order groups are drawn in
+    const order = ['found', 'create', 'go', 'areas', 'prefs'];
+    return [...hit, ...creators].sort((x, y) => order.indexOf(x.group) - order.indexOf(y.group));
   }, [commands, text]);
 
   useEffect(() => setActive(0), [text]);
@@ -302,6 +329,7 @@ export function CommandPalette() {
   const GROUPS: Record<Command['group'], string> = {
     create: he ? 'יצירה' : 'Create',
     go: he ? 'מעבר אל' : 'Go to',
+    found: he ? 'מהספר שלך' : 'From your book',
     areas: he ? 'תחומי חיים' : 'Life areas',
     prefs: he ? 'העדפות' : 'Preferences',
   };
@@ -346,7 +374,7 @@ export function CommandPalette() {
         {matches.length === 0 && (
           <p className="px-3 py-6 text-center text-sm text-fg-muted">{he ? 'לא נמצא' : 'Nothing found'}</p>
         )}
-        {(['create', 'go', 'areas', 'prefs'] as const).map((g) => {
+        {(['found', 'create', 'go', 'areas', 'prefs'] as const).map((g) => {
           const items = matches.filter((m) => m.group === g);
           if (!items.length) return null;
           return (
