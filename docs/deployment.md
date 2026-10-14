@@ -65,6 +65,14 @@ the external `coolify` network. The `web` service is dual-homed (`internal` +
 The `api` container sits only on the `internal` network, so nothing is
 published on the host.
 
+The web container's nginx reaches the api as **`dreamward-api`**, a network
+alias the compose file gives the `api` service. It doesn't use the bare service
+name `api`, because `web` is also on the shared `coolify` network: when another
+stack's `api` joined it, Docker's DNS answered `api` with that container and
+every `/api` request returned 502 (#64). If you write your own compose file,
+give the api service the alias `dreamward-api` on the network it shares with
+`web`.
+
 ### SSE (AI chat streaming)
 
 The agent chat streams server-sent events. The chain that keeps it unbuffered:
