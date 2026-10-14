@@ -86,12 +86,18 @@ jobs:
       - name: Boot & health check
         run: |
           docker network create lb
-          docker run -d --name api --network lb \
+          docker run -d --name api --network lb --network-alias dreamward-api \
             -e NODE_ENV=production -e COOKIE_SECURE=true \
             -e JWT_SECRET=$(openssl rand -hex 32) -e KEY_ENCRYPTION_SECRET=$(openssl rand -hex 32) \
             -e DREAMWARD_EMAIL=ci@example.com -e DREAMWARD_PASSWORD=ci-password-123 \
             dreamward-api:ci
           docker run -d --name web --network lb -p 8080:80 dreamward-web:ci
+          # Regression for #64: web also sits on a shared proxy network where
+          # another stack's container answers to `api`. nginx must still reach
+          # Dreamward's api (via its unique `dreamward-api` alias), not the decoy.
+          docker network create shared
+          docker run -d --name decoy --network shared --network-alias api busybox:1.37 sleep 600
+          docker network connect shared web
           for i in $(seq 1 30); do
             if curl -fsS http://localhost:8080/api/health | tee /dev/stderr | grep -q '"ok":true'; then exit 0; fi
             sleep 2

@@ -37,7 +37,10 @@ services:
     volumes:
       - dreamward_data:/data
       - dreamward_backups:/backups
-    networks: [internal]
+    networks:
+      internal:
+        # nginx in web reaches the api by this unique name (see apps/web/nginx.conf, #64)
+        aliases: [dreamward-api]
     restart: unless-stopped
     logging: &logging
       driver: json-file

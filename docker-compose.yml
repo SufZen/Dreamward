@@ -29,6 +29,10 @@ services:
       - dreamward_backups:/backups
     restart: unless-stopped
 
+    networks:
+      default:
+        # nginx in web reaches the api by this unique name (see apps/web/nginx.conf, #64)
+        aliases: [dreamward-api]
   web:
     build:
       context: .
