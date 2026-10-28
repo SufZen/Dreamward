@@ -24,7 +24,7 @@
     "@dreamward/api": "workspace:*",
     "@dreamward/web": "workspace:*",
     "@types/node": "^22.10.7",
-    "electron": "^44.7.0",
+    "electron": "^44.9.1",
     "tsup": "^8.3.5",
     "typescript": "^5.7.3"
   }
